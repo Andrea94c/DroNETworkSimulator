@@ -216,7 +216,8 @@ class Simulator:
                 drone.move(self.time_step_duration)
 
             # in case we need probability map
-            # self.increase_meetings_probs(self.drones, cur_step)
+            if config.ENABLE_PROBABILITIES:
+                self.increase_meetings_probs(self.drones, cur_step)
 
             if cur_step % 10000 == 0:
                 end = time.time()

@@ -19,7 +19,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
             self.buckets_probability = self.__init_guassian()
 
         self.current_n_transmission = 0
-        self.hello_messages = {}
+        self.hello_messages = {}  #{ drone_id : most recent hello packet}
         self.network_disp = simulator.network_dispatcher
         self.simulator = simulator
         self.no_transmission = False
@@ -93,15 +93,15 @@ class BASE_routing(metaclass=abc.ABCMeta):
        # TODO: Aspetta che lo faccia a ogni drone_retransmission_delta
         if cur_step % self.simulator.drone_retransmission_delta == 0:
 
-
             opt_neighbors = []
             for hpk_id in self.hello_messages:
                 hpk: HelloPacket = self.hello_messages[hpk_id]
 
-                opt_neighbors.append((hpk, hpk.src_drone))
+                # check if packet is too old
+                if hpk.time_step_creation < cur_step - config.OLD_HELLO_PACKET:
+                    continue
 
-                # estimate error
-                dist_src_dst = util.euclidean_distance(self.drone.coords, hpk.src_drone.coords)
+                opt_neighbors.append((hpk, hpk.src_drone))
 
             if len(opt_neighbors) > 0:
                 best_neighbor = self.relay_selection(opt_neighbors)  # compute score

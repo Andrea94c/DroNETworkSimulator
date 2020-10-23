@@ -89,7 +89,9 @@ class PathPlanningDrawer():
         """ update the draw """
         if self.borders:
             self.__borders_plot()
-        self.__grid_plot()
+
+        if config.ENABLE_PROBABILITIES:
+            self.__grid_plot()
         if show:
             stddraw.show(rate)
         if save:

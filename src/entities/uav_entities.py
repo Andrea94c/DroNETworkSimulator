@@ -422,7 +422,6 @@ class Drone(Entity):
         """ When invoked the drone moves to the depot. TODO: Add comments and clean.
             time -> time_step_duration (how much time between two simulation frame)
         """
-
         p0 = self.coords
         p1 = self.depot.coords
 

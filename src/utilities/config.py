@@ -23,8 +23,6 @@ Attributes that one needs tweak often are tagged with # ***
 #
 # ----------------------------------------------------------------------------------
 
-
-
 # ----------------------- PATH DRONES -----------------------------------------#
 
 DEMO_PATH = False    # bool: whether to use handcrafted tours or not
@@ -55,7 +53,7 @@ SAVE_PLOT_DIR = "data/plots/"
 # add constants here...
 
 # ----------------------------- SIMULATION PARAMS. ---------------------------- #
-SIM_DURATION = 70000   # int: steps of simulation. # ***
+SIM_DURATION = 15000   # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 20          # int: seed of this simulation.
 
@@ -113,6 +111,7 @@ RETRANSMISSION_DELAY = 10     # int: how many time steps to wait before transmit
 HELLO_DELAY = 5            # int : how many time steps wait before transmit again an hello message
 RECEPTION_GRANTED = 0.95   # float : the min amount of success to evalute a neigh as relay
 LIL_DELTA = 1              # INT:  > 0
+OLD_HELLO_PACKET = 50
 
 ROOT_EVALUATION_DATA = "data/evaluation_tests/"
 
@@ -120,4 +119,4 @@ NN_MODEL_PATH = "data/nnmodels/"
 
 # --------------- new cell probabilities -------------- #
 CELL_PROB_SIZE_R = 1.875  # the percentage of cell size with respect to drone com range
-
+ENABLE_PROBABILITIES = False

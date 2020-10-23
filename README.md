@@ -139,10 +139,10 @@ To run a simulation with your new routing algorithms, just set the attribute ``R
 with the enumeration variable of your choice.
 
 ## Contacts
-For further information contact Andrea Coletta at [coletta@di.uniroma1.it](mailto:coletta@di.uniroma1.it).
+For further information contact Andrea Coletta at **coletta[AT]di.uniroma1.it**.
 
 ## Thanks and License
 The current version of the simulator is free for non-commercial use.
-The simulator was done in collaboration with Matteo Prata, PhD Student at La Sapienza [prata@di.uniroma1.it](mailto:prata@di.uniroma1.it).
+The simulator was done in collaboration with Matteo Prata, PhD Student at La Sapienza **prata[AT]di.uniroma1.it**.
 
 

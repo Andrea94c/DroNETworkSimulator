@@ -202,14 +202,14 @@ class Simulator:
             self.network_dispatcher.run_medium(cur_step)
 
             # generates events
+            # sense the events
             self.event_generator.handle_events_generation(cur_step, self.drones)
 
             for drone in self.drones:
 
-                # 1. sense the closest events
-                # 2. update expired packets on drone buffers
-                # 3. try routing packets vs other drones or depot
-                # 4. actually move the drone towards next waypoint or depot
+                # 1. update expired packets on drone buffers
+                # 2. try routing packets vs other drones or depot
+                # 3. actually move the drone towards next waypoint or depot
 
                 drone.update_packets(cur_step)
                 drone.routing(self.drones, self.depot, cur_step)

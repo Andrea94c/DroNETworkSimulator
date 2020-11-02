@@ -24,8 +24,8 @@ Attributes that one needs tweak often are tagged with # ***
 # ----------------------------------------------------------------------------------
 
 # ----------------------- PATH DRONES -----------------------------------------#
-
-DEMO_PATH = False    # bool: whether to use handcrafted tours or not
+CIRCLE_PATH = True # bool: whether to use cirlce paths around the depot
+DEMO_PATH = False   # bool: whether to use handcrafted tours or not
 # to set up handcrafted torus see utilities.utilities
 PATH_FROM_JSON = False                   # bool: whether to use the path (for drones) store in the JSONS_PATH_PREFIX,
                                             # otherwise path are generated online
@@ -77,7 +77,7 @@ DRONE_MAX_ENERGY = 1000000           # int: max energy of a drone.
 
 # depot
 DEPOT_COMMUNICATION_RANGE = 200  # float: meters, communication range of the depot.
-DEPOT_COO = (750, 0)             # (float, float): coordinates of the depot.
+DEPOT_COO = (750, 750)             # (float, float): coordinates of the depot.
 
 
 # ------------------------------- ROUTING PARAMS. ------------------------------- #

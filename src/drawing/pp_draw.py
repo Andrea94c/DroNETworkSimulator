@@ -116,8 +116,10 @@ class PathPlanningDrawer():
     def draw_depot(self, depot):
         coords = depot.coords
         stddraw.setPenRadius(0.0100)
-        stddraw.setPenColor(c=stddraw.BLUE)
-        stddraw.point(coords[0], coords[1])
+        stddraw.setPenColor(c=stddraw.DARK_RED)
+        size_depot = 50
+        stddraw.filledPolygon([coords[0] - (size_depot / 2), coords[0], coords[0] + (size_depot / 2)],
+                        [coords[1], coords[1] + size_depot, coords[1]])
         self.__draw_communication_range(depot)
         self.__reset_pen()
 

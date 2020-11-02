@@ -200,9 +200,14 @@ class Depot(Entity):
 
         for pck in packets_to_offload:
             # add metrics: all the packets notified to the depot
-            self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))
-            self.simulator.metrics.drones_packets_to_depot_list.append((pck, cur_step))
-            pck.time_delivery = cur_step
+            self.add_packet(pck, cur_step)
+
+    def add_packet(self, pck, cur_step):
+        """ offload a new packet to the depot buffer """
+        self.__buffer.append(pck)
+        self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))
+        self.simulator.metrics.drones_packets_to_depot_list.append((pck, cur_step))
+        pck.time_delivery = cur_step
 
 
 # ------------------ Drone ----------------------
@@ -234,11 +239,16 @@ class Drone(Entity):
         # setup drone routing algorithm
         self.routing_algorithm = self.simulator.routing_algorithm.value(self, self.simulator)
 
-        # drone state simulator
+        # drop packets since last upload
+        self.drop_packet_since_last_upload = 0
 
         # last mission coord to restore the mission after movement
         self.last_mission_coords = None
 
+    def remove_packet(self, pck):
+        """ remove a packet from the buffer """
+        self.__buffer = [pck for pck in self.__buffer
+                                if pck.identifier != pck.identifier]
 
     def update_packets(self, cur_step):
         """ removes the expired packets from the buffer
@@ -253,6 +263,7 @@ class Drone(Entity):
                 self.tightest_event_deadline = np.nanmin([self.tightest_event_deadline, pck.event_ref.deadline])
             else:
                 to_remove_packets += 1
+                self.drop_packet_since_last_upload += 1
         self.__buffer = tmp_buffer
 
         if self.buffer_length() == 0:

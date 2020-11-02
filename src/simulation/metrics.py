@@ -2,21 +2,20 @@
 
 import numpy as np
 import pickle
-import pandas as pd
-import seaborn as sb
 import json
-import matplotlib.pyplot as plt
+import plotille
 
-from src.entities.uav_entities import DataPacket
 from collections import defaultdict
-from src.utilities import utilities as util
-from src.utilities import config
 
 """ Metrics class keeps track of all the metrics during all the simulation. """
 
 
 class Metrics:
     def __init__(self, simulator):
+
+        # MAC METRICS
+        self.generated_packet_for_drone = defaultdict(int)
+        self.delivered_packet_for_drone = defaultdict(int)
 
         self.simulator = simulator
 
@@ -128,6 +127,27 @@ class Metrics:
         print("number_of_packets_to_depot", self.number_of_packets_to_depot)
         print("packet_mean_delivery_time", self.packet_mean_delivery_time)
         print("event_mean_delivery_time", self.event_mean_delivery_time)
+        self.__plot_packet_distribution(self.generated_packet_for_drone, "Distribution Generated Packet:")
+        self.__plot_packet_distribution(self.delivered_packet_for_drone, "Distribution Delivered Packet:")
+
+    def __plot_packet_distribution(self, distr, title):
+        """ plot on the terminal the packe distribution """
+        print(title)
+        fig = plotille.Figure()
+        fig.width = 40
+        fig.height = 20
+        fig.color_mode = 'byte'
+        values = []
+        max_v = 0
+        for k, v in distr.items():
+            values += [k]*v
+            max_v = max(v, max_v)
+        fig.set_x_limits(min_=0, max_=self.simulator.n_drones - 1)
+        fig.set_y_limits(min_=0, max_=max_v)
+        #fig.register_float_converter(float, round)
+        fig.histogram(values, self.simulator.n_drones)
+        print(fig.show())
+        print("X : id_drone - Y : #packets generated")
 
     def info_mission(self):
         """ save all the mission / sim setup """

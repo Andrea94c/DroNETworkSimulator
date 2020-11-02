@@ -81,9 +81,14 @@ class EventGenerator:
         """
         if cur_step % self.simulator.event_generation_delay == 0:  # if it's time to generate a new packet
             # drone that will receive the packet:
-            drone_index = self.rnd_drones.randint(0, len(drones))
+            drone_index = int(self.rnd_drones.normal(int(self.simulator.n_drones / 2), 1.5))
+            if drone_index >= self.simulator.n_drones:
+                drone_index = self.simulator.n_drones - 1
+            elif drone_index < 0:
+                drone_index = 0
             drone = drones[drone_index]
             drone.feel_event(cur_step)
+            self.simulator.metrics.generated_packet_for_drone[drone_index] += 1
 
 # ------------------ Path manager ----------------------
 class PathManager:

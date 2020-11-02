@@ -7,7 +7,6 @@ def main():
 
     sim = Simulator()   # empty constructor means that all the parameters of the simulation are taken from src.utilities.config.py
     sim.run()            # run the simulation
-    sim.print_metrics()  # print the metrics at the end of the simulation
     sim.close()
 
 

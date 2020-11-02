@@ -5,6 +5,7 @@ from src.simulation.metrics import Metrics
 from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher
 from collections import defaultdict
+from src.mac_protocol.depot_mac import DepotMAC
 
 import numpy as np
 import math
@@ -115,7 +116,12 @@ class Simulator:
         self.path_manager = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.seed)
         self.environment = Environment(self.env_width, self.env_height, self)
 
+        # configure the depot
         self.depot = Depot(self.depot_coordinates, self.depot_com_range, self)
+        # add a MAC protocol for the depot
+
+        # MAC_ALGORITHM
+        self.depot_mac_protocol = config.MAC_ALGORITHM.value(self, self.depot)
 
         self.drones = []
 
@@ -212,8 +218,11 @@ class Simulator:
                 # 3. actually move the drone towards next waypoint or depot
 
                 drone.update_packets(cur_step)
-                drone.routing(self.drones, self.depot, cur_step)
+                # drone.routing(self.drones, self.depot, cur_step)  # NO ROUTING!
                 drone.move(self.time_step_duration)
+
+            # run the mac protocol to let drones communicate with the depot
+            self.depot_mac_protocol.run(cur_step)
 
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:

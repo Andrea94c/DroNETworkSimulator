@@ -1,4 +1,4 @@
-# UAV-Networks-Routing
+# UAV-Networks Simulator
 
 UAV-Networks-Routing is a Python simulator for experimenting routing algorithms on unmanned aerial vehicle 
 networks. The project requires Python 3, and the following dependencies ``numpy``.

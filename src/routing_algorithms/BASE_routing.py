@@ -104,6 +104,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
                 opt_neighbors.append((hpk, hpk.src_drone))
 
             if len(opt_neighbors) > 0:
+                self.simulator.metrics.mean_numbers_of_possible_relays.append(len(opt_neighbors))
                 best_neighbor = self.relay_selection(opt_neighbors)  # compute score
                 if best_neighbor is not None:
 

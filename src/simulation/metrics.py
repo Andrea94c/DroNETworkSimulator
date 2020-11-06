@@ -16,9 +16,13 @@ from src.utilities import config
 
 
 class Metrics:
+
     def __init__(self, simulator):
 
         self.simulator = simulator
+
+        # The mean number of possible relays when i want to communicate
+        self.mean_numbers_of_possible_relays = []
 
         # all packets in the simulation
         self.all_control_packets_in_simulation = 0
@@ -120,6 +124,7 @@ class Metrics:
     def print_overall_stats(self):
         """ print the overall stats of the alg execution """
         self.other_metrics()
+        print("Mean number of relays: ", np.nanmean(self.mean_numbers_of_possible_relays))
         print("number_of_generated_events", self.number_of_generated_events)
         print("number_of_detected_events", self.number_of_detected_events)
         print("all_control_packets_in_simulation", self.all_control_packets_in_simulation)
@@ -178,6 +183,7 @@ class Metrics:
         out_results["drones_packets"] = [pck.to_json() for pck in self.drones_packets]
         out_results["drones_to_depot_packets"] = [(pck.to_json(), delivery_ts) for pck, delivery_ts in self.drones_packets_to_depot]
         out_results["score"] = self.score()
+        out_results["mean_number_of_relays"] = np.nanmean(self.mean_numbers_of_possible_relays)
 
         return out_results
 

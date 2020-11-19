@@ -44,6 +44,8 @@ class Simulator:
                  routing_algorithm=config.ROUTING_ALGORITHM,
                  communication_error_type=config.CHANNEL_ERROR_TYPE,
                  prob_size_cell_r=config.CELL_PROB_SIZE_R,
+                 mac_algorithm=config.MAC_ALGORITHM,
+                 plot_histograms=config.PLOT_HISTOGRAMS,
                  simulation_name=""):
         self.drone_com_range = drone_com_range
         self.drone_sen_range = drone_sen_range
@@ -68,6 +70,8 @@ class Simulator:
         self.show_plot = show_plot
         self.routing_algorithm = routing_algorithm
         self.communication_error_type = communication_error_type
+        self.mac_algorithm = mac_algorithm
+        self.plot_histograms = plot_histograms
 
         # --------------- cell for drones -------------
         self.prob_size_cell_r = prob_size_cell_r
@@ -120,9 +124,6 @@ class Simulator:
         self.depot = Depot(self.depot_coordinates, self.depot_com_range, self)
         # add a MAC protocol for the depot
 
-        # MAC_ALGORITHM
-        self.depot_mac_protocol = config.MAC_ALGORITHM.value(self, self.depot)
-
         self.drones = []
 
         # drone 0 is the first
@@ -131,6 +132,9 @@ class Simulator:
 
         self.environment.add_drones(self.drones)
         self.environment.add_depot(self.depot)
+
+        # MAC_ALGORITHM
+        self.depot_mac_protocol = self.mac_algorithm.value(self, self.depot)
 
         # Set the maximum distance between the drones and the depot
         self.max_dist_drone_depot = utilities.euclidean_distance(self.depot.coords, (self.env_width, self.env_height))
@@ -263,6 +267,7 @@ class Simulator:
 
             Notice that, expired or not found events will be counted with a max_delay
         """
-        score = round(self.metrics.score(), 2)
+        score = round(sum(self.metrics.delivered_packet_for_drone.values())
+                      / sum(self.metrics.generated_packet_for_drone.values()), 2)
         print("Score sim " + self.simulation_name + ":", score)
         return score

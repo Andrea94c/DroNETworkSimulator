@@ -68,8 +68,7 @@ class EventGenerator:
         """
         self.simulator = simulator
         self.rnd_drones = np.random.RandomState(self.simulator.seed)
-        # for now no random on number of event generated
-        # self.rnd_event = np.random.RandomState(self.simulator.seed)
+        self.probabilities = None
 
     def handle_events_generation(self, cur_step : int, drones : list):
         """
@@ -79,16 +78,49 @@ class EventGenerator:
         :param drones: the drones where to sample the event
         :return: nothing
         """
+
         if cur_step % self.simulator.event_generation_delay == 0:  # if it's time to generate a new packet
-            # drone that will receive the packet:
-            drone_index = int(self.rnd_drones.normal(int(self.simulator.n_drones / 2), 1.5))
-            if drone_index >= self.simulator.n_drones:
-                drone_index = self.simulator.n_drones - 1
-            elif drone_index < 0:
-                drone_index = 0
+            # Gaussian Generation            
+            if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.GAUSSIAN:
+                # drone that will receive the packet:
+                drone_index = int(self.rnd_drones.normal(int(self.simulator.n_drones / 2), len(drones) * .15))
+
+                if drone_index >= self.simulator.n_drones:
+                    drone_index = self.simulator.n_drones - 1
+                elif drone_index < 0:
+                    drone_index = 0
+
+            # Random Generation
+            if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.UNIFORM:
+                drone_index = self.rnd_drones.choice(range(self.simulator.n_drones))
+           
+            # Fixed Weighted Random Generation
+            if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.FIXED_PROB:
+                prob = self.__sample_probabilities(cur_step)
+                drone_index = self.rnd_drones.choice(range(self.simulator.n_drones), p=prob)
+
             drone = drones[drone_index]
             drone.feel_event(cur_step)
             self.simulator.metrics.generated_packet_for_drone[drone_index] += 1
+
+
+    def __sample_probabilities(self, cur_step : int):
+        """ init of the probabilities to sample a packet on a drone 
+            this is done just at the beginning of the simulation
+        """
+        if self.probabilities is None:
+            offset = int(self.rnd_drones.randint(0, self.simulator.n_drones) / 2)
+            sum_ = 1
+            self.probabilities = [0]*offset
+            for i in range(offset, self.simulator.n_drones):
+                p = self.rnd_drones.random()
+                if p > sum_:
+                    p = sum_
+                sum_ -= p
+                self.probabilities.append(p)
+    
+        return self.probabilities
+
 
 # ------------------ Path manager ----------------------
 class PathManager:

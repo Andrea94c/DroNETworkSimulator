@@ -3,10 +3,10 @@
 import numpy as np
 import pickle
 import json
-import plotille
+import matplotlib.pyplot as plt
 
 from collections import defaultdict
-
+from src.utilities import config
 """ Metrics class keeps track of all the metrics during all the simulation. """
 
 
@@ -127,27 +127,39 @@ class Metrics:
         print("number_of_packets_to_depot", self.number_of_packets_to_depot)
         print("packet_mean_delivery_time", self.packet_mean_delivery_time)
         print("event_mean_delivery_time", self.event_mean_delivery_time)
-        self.__plot_packet_distribution(self.generated_packet_for_drone, "Distribution Generated Packet:")
-        self.__plot_packet_distribution(self.delivered_packet_for_drone, "Distribution Delivered Packet:")
+        print("Collected Ratio:", sum(self.delivered_packet_for_drone.values()) / sum(self.generated_packet_for_drone.values()))
+        if self.simulator.plot_histograms:
+            self.__plot_packet_distribution(self.generated_packet_for_drone, "Distribution Generated Packet:")
+            self.__plot_packet_distribution(self.delivered_packet_for_drone, "Distribution Delivered Packet:")
 
     def __plot_packet_distribution(self, distr, title):
         """ plot on the terminal the packe distribution """
-        print(title)
-        fig = plotille.Figure()
-        fig.width = 40
-        fig.height = 20
-        fig.color_mode = 'byte'
-        values = []
-        max_v = 0
-        for k, v in distr.items():
-            values += [k]*v
-            max_v = max(v, max_v)
-        fig.set_x_limits(min_=0, max_=self.simulator.n_drones - 1)
-        fig.set_y_limits(min_=0, max_=max_v)
-        #fig.register_float_converter(float, round)
-        fig.histogram(values, self.simulator.n_drones)
-        print(fig.show())
-        print("X : id_drone - Y : #packets generated")
+        if len(distr) == 0:
+            print(title, "No results")
+            return
+
+        if config.MATPLOTLIB_TERMINAL:
+            import matplotlib_terminal
+            items = np.asarray(sorted(distr.items(), key=lambda x: x[0]))
+            plt.bar(items[:, 0], items[:, 1])
+            plt.xticks(range(self.simulator.n_drones), range(self.simulator.n_drones))
+            plt.title(title)
+            plt.ylim(0, self.number_of_generated_events)
+
+            plt.show("braille")
+            plt.close()
+        else:
+            print("")
+            print("")
+            print(title)
+            print("")
+            sum_packets = self.number_of_generated_events
+            for drone in self.simulator.drones:
+                value = distr[drone.identifier] if drone.identifier in distr else 0
+                perc_ = int(value / sum_packets * 100)
+                print("Drone:", drone.identifier, "|"*perc_, " -", value)
+            print("")
+            print("")
 
     def info_mission(self):
         """ save all the mission / sim setup """

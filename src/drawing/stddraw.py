@@ -497,6 +497,9 @@ def text(x, y, s):
     ys = _scaleY(y)
     font = pygame.font.SysFont(_fontFamily, _fontSize)
     text = font.render(s, 1, _pygameColor(_penColor))
+
+    text.set_alpha(255 - 1)
+
     textpos = text.get_rect(center=(xs, ys))
     _surface.blit(text, textpos)
 

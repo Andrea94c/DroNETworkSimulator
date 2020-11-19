@@ -66,7 +66,6 @@ def coverage_distribution(filename_format : str, ndrones : int,
                 Y.append(pack["coord"][1])
     return X, Y 
 
-#TODO: this is done for each METRIC!!! can be done once at the beginning for all the metrics
 def mean_std_of_metric(filename_format : str, ndrones : int, 
                         alg_k : int, seeds : list, metric : str):
     data = []
@@ -77,9 +76,6 @@ def mean_std_of_metric(filename_format : str, ndrones : int,
             if metric == "ratio_delivery_generated":
                 data.append(ktri_0["number_of_events_to_depot"] 
                                         / ktri_0["number_of_generated_events"])
-            elif metric == "ratio_delivery_detected":
-                data.append(ktri_0["number_of_events_to_depot"] 
-                                / ktri_0["number_of_detected_events"])
             else:
                 data.append(ktri_0[metric])
 
@@ -137,17 +133,8 @@ def set_font():
 
 METRICS_OF_INTEREST = [
         'number_of_generated_events', 
-        'number_of_detected_events', 
-        'number_of_events_to_depot', 
-        'number_of_packets_to_depot', 
-        'packet_mean_delivery_time', 
-        'event_mean_delivery_time', 
-        'time_on_mission',
-        'time_on_active_routing', 
-        'Routing time / mission time',
-        'ratio_delivery_generated',
-        'ratio_delivery_detected']
-
+        'number_of_events_to_depot',
+        'ratio_delivery_generated']
 
 
 if __name__ == "__main__":
@@ -193,12 +180,7 @@ if __name__ == "__main__":
     
     
     pattern_file = config.EXPERIMENTS_DIR + "out__" + exp_metric + "{}_seed{}_alg_{}.json"
-    out_dir = config.SAVE_PLOT_DIR
+    out_dir = "data/res_plots/"
     print(alg_exp_suffix)
     for metric in METRICS_OF_INTEREST:
         plot_ndrones(pattern_file, n_drones, metric, alg_exp_suffix, n_seeds, out_dir + "_" + str(exp_metric) + "_", exp_metric)
-
-    #size_mission = 3000
-    plot_coverage_distribution(pattern_file, n_drones, config.SAVE_PLOT_DIR + 'coverage_distribution', 
-                            alg_exp_suffix, n_seeds, dim_area)    
-    

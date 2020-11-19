@@ -1,7 +1,10 @@
 
 from src.routing_algorithms.georouting import GeoRouting
 from src.routing_algorithms.random_routing import RandomRouting
+from src.routing_algorithms.no_routing import NoRouting
 from src.mac_protocol.depot_mac_rnd import RandomDepotMAC
+from src.mac_protocol.depot_mac_round_robin import RoundRobinDepotMAC
+from src.mac_protocol.ai_depot_mac import AIDepotMAC
 
 from enum import Enum
 
@@ -54,7 +57,7 @@ SAVE_PLOT_DIR = "data/plots/"
 # add constants here...
 
 # ----------------------------- SIMULATION PARAMS. ---------------------------- #
-SIM_DURATION = 1500   # int: steps of simulation. # ***
+SIM_DURATION = 3000   # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 20          # int: seed of this simulation.
 
@@ -85,6 +88,7 @@ DEPOT_COO = (750, 750)             # (float, float): coordinates of the depot.
 class RoutingAlgorithm(Enum):
     GEO = GeoRouting
     RND = RandomRouting
+    NO = NoRouting
 
     @staticmethod
     def keylist():
@@ -100,20 +104,32 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.GEO
+ROUTING_ALGORITHM = RoutingAlgorithm.NO  # no routing in this scenario!!
 CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
 
 
 # ------------------------------- MAC PARAMS. ------------------------------- #
 class MACAlgorithm(Enum):
     RND = RandomDepotMAC
+    RR = RoundRobinDepotMAC
+    AI = AIDepotMAC
 
     @staticmethod
     def keylist():
         return list(map(lambda c: c.name, MACAlgorithm))
 
 MAC_ALGORITHM = MACAlgorithm.RND
+MAC_PRINT_STATS = False  # print for each delivered message the feedback
+# plot histograms at the end of the simulation, about delivered packets
+PLOT_HISTOGRAMS = True
+MATPLOTLIB_TERMINAL = True  # True here requires pip install matplotlib-terminal
 
+class GenerationPattern(Enum):
+    GAUSSIAN = 0
+    UNIFORM = 1
+    FIXED_PROB = 2
+
+RANDOM_GENERATION_PATTERN = GenerationPattern.GAUSSIAN
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.
 GUASSIAN_SCALE = .9            # float [0,1]: scale the error probability of the guassian -> success * GUASSIAN_SCALER

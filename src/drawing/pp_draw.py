@@ -68,16 +68,16 @@ class PathPlanningDrawer():
 
     def draw_drone(self, drone, cur_step):
         coords = drone.coords
-        if drone.buffer_length() > 0:  # change color when find a packet
+        if drone.buffer_length() > 0:
             stddraw.setPenColor(c=stddraw.GREEN)
-        else:     
+        else:
             stddraw.setPenColor(c=stddraw.BLACK)
         stddraw.setPenRadius(0.0055)
         stddraw.point(coords[0], coords[1])
 
         self.__draw_drone_info(drone, cur_step)
-        self.__draw_communication_range(drone)
-        self.__draw_sensing_range(drone)
+        #self.__draw_communication_range(drone)
+        #self.__draw_sensing_range(drone)
         self.__reset_pen()
 
         if config.IS_SHOW_NEXT_TARGET_VEC:
@@ -163,19 +163,23 @@ class PathPlanningDrawer():
 
     def __draw_drone_info(self, drone, cur_step):
         stddraw.setPenRadius(0.0125)
-        stddraw.setPenColor(c=stddraw.BLACK)
-        # life time and speed
-        stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length()))
-        # index
-        stddraw.text(drone.coords[0], drone.coords[1] + (drone.communication_range / 2.0), "id: " + str(drone.identifier))
-
         if drone.buffer_length() > 0:
-            stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: " +
-                         str(drone.routing_algorithm.current_n_transmission))
-
-        # If the buffer is empty, do not show the retransmission counters since they are not updated
+            stddraw.setPenColor(c=stddraw.GREEN)
         else:
-            stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: -- \\ --")
+            stddraw.setPenColor(c=stddraw.BLACK)
+        
+        # life time and speed
+        #stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length()))
+        # index
+        stddraw.text(drone.coords[0], drone.coords[1] + (drone.communication_range / 10.0), "id: " + str(drone.identifier))
+
+        #if drone.buffer_length() > 0:
+        #    stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: " +
+        #                 str(drone.routing_algorithm.current_n_transmission))
+#
+        ## If the buffer is empty, do not show the retransmission counters since they are not updated
+        #else:
+        #    stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: -- \\ --")
 
     def draw_simulation_info(self, cur_step, max_steps):
         TEXT_LEFT = 60

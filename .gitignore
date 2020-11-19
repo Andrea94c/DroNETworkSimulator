@@ -1,4 +1,0 @@
-venv/
-.vscode/
-**/__pycache__/
-data/evaluation_tests/

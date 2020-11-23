@@ -12,7 +12,7 @@ import numpy as np
 import pickle
 from ast import literal_eval as make_tuple
 from src.utilities import random_waypoint_generation
-
+from scipy.special import softmax
 
 def compute_circle_path(radius : int, center : tuple) -> list:
     """ compute a set of finite coordinates to simulate a circle trajectory of input radius around a given center
@@ -111,13 +111,13 @@ class EventGenerator:
         if self.probabilities is None:
             offset = int(self.rnd_drones.randint(0, self.simulator.n_drones) / 2)
             sum_ = 1
-            self.probabilities = [0]*offset
+            tmp_prob = [0]*offset
             for i in range(offset, self.simulator.n_drones):
-                p = self.rnd_drones.random()
-                if p > sum_:
-                    p = sum_
-                sum_ -= p
-                self.probabilities.append(p)
+                p = self.rnd_drones.random() * 2 ** 3
+                tmp_prob += [p]
+
+            self.probabilities = softmax(tmp_prob)
+
     
         return self.probabilities
 

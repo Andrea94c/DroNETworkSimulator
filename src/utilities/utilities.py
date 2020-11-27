@@ -67,7 +67,7 @@ class EventGenerator:
         :param simulator: the main simulator object
         """
         self.simulator = simulator
-        self.rnd_drones = np.random.RandomState(self.simulator.seed)
+        self.rnd_drones = np.random.RandomState(self.simulator.seed + 1)
         self.probabilities = None
 
     def handle_events_generation(self, cur_step : int, drones : list):

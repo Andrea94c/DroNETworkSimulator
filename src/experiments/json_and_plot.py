@@ -143,7 +143,6 @@ if __name__ == "__main__":
 
     parser = ArgumentParser()
     
-    routing_choices = config.RoutingAlgorithm.keylist()
 
     # MANDATORY
     parser.add_argument("-nd", dest='number_of_drones', action="append", type=int,

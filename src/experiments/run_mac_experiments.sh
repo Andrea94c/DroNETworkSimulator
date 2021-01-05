@@ -17,7 +17,7 @@
 #test baselines
 for nd in "2" "5" "8" "10" "15";  # number of drones
 do 
-    for alg in "RND" "RR" "AI";
+    for alg in "RND";
     do 
         echo "run: ${alg} - ndrones ${nd} "
         python3 -m src.experiments.experiment_mac -nd ${nd} -i_s 0 -e_s 10 -alg ${alg} &

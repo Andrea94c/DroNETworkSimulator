@@ -1,11 +1,5 @@
 
-from src.routing_algorithms.georouting import GeoRouting
-from src.routing_algorithms.random_routing import RandomRouting
-from src.routing_algorithms.no_routing import NoRouting
-from src.mac_protocol.depot_mac_rnd import RandomDepotMAC
-from src.mac_protocol.depot_mac_round_robin import RoundRobinDepotMAC
-from src.mac_protocol.ai_depot_mac import AIDepotMAC
-
+from src.mac_protocol.distributed_mac_protocol_rnd import RNDDistributedMAC
 from enum import Enum
 
 
@@ -44,7 +38,7 @@ DEBUG = False                         # bool: whether to print debug strings or 
 EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simulation
 
 # drawaing
-PLOT_SIM = True      # bool: whether to plot or not the simulation.
+PLOT_SIM = False      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
 SKIP_SIM_STEP = 5     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
@@ -57,7 +51,7 @@ SAVE_PLOT_DIR = "data/plots/"
 # add constants here...
 
 # ----------------------------- SIMULATION PARAMS. ---------------------------- #
-SIM_DURATION = 15000   # int: steps of simulation. # ***
+SIM_DURATION = 22000   # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 20          # int: seed of this simulation.
 
@@ -66,7 +60,7 @@ ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 
 # events
-EVENTS_DURATION = 1  # SIM_DURATION  # int: steps, number of time steps that an event lasts  -> to seconds = step * step_duration.
+EVENTS_DURATION = 10  # SIM_DURATION  # int: steps, number of time steps that an event lasts  -> to seconds = step * step_duration.
 D_FEEL_EVENT = 1      # int: steps, a new packet is felt (generated on the drone) every 'D_FEEL_EVENT' steps. # ***
 P_FEEL_EVENT = .8       # float: probability that the drones feels the event generated on the drone. # ***
 
@@ -84,16 +78,6 @@ DEPOT_COMMUNICATION_RANGE = 200  # float: meters, communication range of the dep
 DEPOT_COO = (750, 750)             # (float, float): coordinates of the depot.
 
 
-# ------------------------------- ROUTING PARAMS. ------------------------------- #
-class RoutingAlgorithm(Enum):
-    GEO = GeoRouting
-    RND = RandomRouting
-    NO = NoRouting
-
-    @staticmethod
-    def keylist():
-        return list(map(lambda c: c.name, RoutingAlgorithm))
-
 class ChannelError(Enum):
     UNIFORM = 1
     GAUSSIAN = 2
@@ -104,15 +88,12 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.NO  # no routing in this scenario!!
-CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
+CHANNEL_ERROR_TYPE = ChannelError.NO_ERROR
 
 
 # ------------------------------- MAC PARAMS. ------------------------------- #
 class MACAlgorithm(Enum):
-    RND = RandomDepotMAC
-    RR = RoundRobinDepotMAC
-    AI = AIDepotMAC
+    RND = RNDDistributedMAC
 
     @staticmethod
     def keylist():
@@ -120,6 +101,7 @@ class MACAlgorithm(Enum):
 
 MAC_ALGORITHM = MACAlgorithm.RND
 MAC_PRINT_STATS = False  # print for each delivered message the feedback
+
 # plot histograms at the end of the simulation, about delivered packets
 PLOT_HISTOGRAMS = True
 MATPLOTLIB_TERMINAL = True  # True here requires pip install matplotlib-terminal
@@ -128,6 +110,7 @@ class GenerationPattern(Enum):
     GAUSSIAN = 0
     UNIFORM = 1
     FIXED_PROB = 2
+    NOT_STATIONARY = 3
 
 RANDOM_GENERATION_PATTERN = GenerationPattern.GAUSSIAN
 

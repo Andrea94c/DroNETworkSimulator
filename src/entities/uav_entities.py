@@ -186,21 +186,33 @@ class Depot(Entity):
 
         super().__init__(id(self), coords, simulator)
         self.communication_range = communication_range
-
         self.__buffer = list()          # also with duplicated packets
+        self.__last_received_packet = {}  # drone : packet
 
     def all_packets(self):
         return self.__buffer
 
-    def transfer_notified_packets(self, drone, cur_step):
-        """ function called when a drone wants to offload packets to the depot """
-        
-        packets_to_offload = drone.all_packets()
-        self.__buffer += packets_to_offload
+    def feedback(self, cur_step):
+        l_received = len(self.__last_received_packet)
+        feedback = l_received == 1  # feedback is True only if a single drone communicate at the time
+        for d, p in self.__last_received_packet.items():
+            d.mac_algorithm.feedback(feedback, p)
 
-        for pck in packets_to_offload:
-            # add metrics: all the packets notified to the depot
+        if l_received == 1: # add success delivery
+            drone, pck = list(self.__last_received_packet.items())[0]
             self.add_packet(pck, cur_step)
+            # add metrics: all the packets notified to the depot
+            self.simulator.metrics.delivered_packet_for_drone[drone.identifier] += 1
+        elif l_received > 1:
+            self.simulator.metrics.collisions += 1
+        else:
+            self.simulator.metrics.unused_slots += 1
+
+        self.__last_received_packet = {}
+
+    def receive(self, drone, packet):
+        """ function called when a drone wants to offload packets to the depot """
+        self.__last_received_packet[drone] = packet
 
     def add_packet(self, pck, cur_step):
         """ offload a new packet to the depot buffer """
@@ -237,7 +249,7 @@ class Drone(Entity):
         self.move_routing = False        # if true, it moves to the depot
 
         # setup drone routing algorithm
-        self.routing_algorithm = self.simulator.routing_algorithm.value(self, self.simulator)
+        self.mac_algorithm = self.simulator.mac_algorithm.value(self, self.simulator)
 
         # drop packets since last upload
         self.drop_packet_since_last_upload = 0
@@ -322,10 +334,9 @@ class Drone(Entity):
             if not self.is_known_packet(packet):
                 self.__buffer.append(packet)
 
-    def routing(self, drones, depot, cur_step):
+    def run_mac(self, cur_step):
         """ do the routing """
-        self.distance_from_depot = utilities.euclidean_distance(self.depot.coords, self.coords)
-        self.routing_algorithm.routing(depot, drones, cur_step)
+        self.mac_algorithm.run(cur_step)
 
     def move(self, time):
         """ Move the drone to the next point if self.move_routing is false, else it moves towards the depot. 

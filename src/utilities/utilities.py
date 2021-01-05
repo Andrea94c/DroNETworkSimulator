@@ -14,6 +14,7 @@ from ast import literal_eval as make_tuple
 from src.utilities import random_waypoint_generation
 from scipy.special import softmax
 
+
 def compute_circle_path(radius : int, center : tuple) -> list:
     """ compute a set of finite coordinates to simulate a circle trajectory of input radius around a given center
 
@@ -69,19 +70,26 @@ class EventGenerator:
         self.simulator = simulator
         self.rnd_drones = np.random.RandomState(self.simulator.seed + 1)
         self.probabilities = None
+        self.cur_distr_pattern = 0
+        self.current_distr = config.RANDOM_GENERATION_PATTERN if config.RANDOM_GENERATION_PATTERN != config.GenerationPattern.NOT_STATIONARY else config.GenerationPattern(self.cur_distr_pattern)
 
     def handle_events_generation(self, cur_step : int, drones : list):
         """
-        at fixed time randomly select a drone from the list and sample on it a packet/event.
+        At fixed time randomly select a drone from the list and sample on it a packet/event.
 
         :param cur_step: the current step of the simulation to decide whenever sample an event or not
         :param drones: the drones where to sample the event
         :return: nothing
         """
+        if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.NOT_STATIONARY and cur_step % 7500 == 0:
+            self.cur_distr_pattern += 1
+            if self.cur_distr_pattern > 2:
+                self.cur_distr_pattern = 0
+            self.current_distr = config.GenerationPattern(self.cur_distr_pattern)
 
         if cur_step % self.simulator.event_generation_delay == 0:  # if it's time to generate a new packet
             # Gaussian Generation            
-            if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.GAUSSIAN:
+            if self.current_distr == config.GenerationPattern.GAUSSIAN:
                 # drone that will receive the packet:
                 drone_index = int(self.rnd_drones.normal(int(self.simulator.n_drones / 2), len(drones) * .15))
 
@@ -91,11 +99,11 @@ class EventGenerator:
                     drone_index = 0
 
             # Random Generation
-            if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.UNIFORM:
+            if self.current_distr == config.GenerationPattern.UNIFORM:
                 drone_index = self.rnd_drones.choice(range(self.simulator.n_drones))
            
             # Fixed Weighted Random Generation
-            if config.RANDOM_GENERATION_PATTERN == config.GenerationPattern.FIXED_PROB:
+            if self.current_distr == config.GenerationPattern.FIXED_PROB:
                 prob = self.__sample_probabilities(cur_step)
                 drone_index = self.rnd_drones.choice(range(self.simulator.n_drones), p=prob)
 

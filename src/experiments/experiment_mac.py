@@ -20,14 +20,13 @@ def sim_setup(n_drones, seed, in_algorithm_mac):
     drone_communication_success=0.9
     depot_com_range=200
     depot_coordinates=(750, 0)
-    event_duration=1  # circa 5min
+    event_duration=10  # circa 5min
     event_generation_prob=0.8
     event_generation_delay=1
     packets_max_ttl=len_simulation
     show_plot=False
-    routing_algorithm = config.RoutingAlgorithm.NO
     mac_algorithm = config.MACAlgorithm[in_algorithm_mac]
-    communication_error_type = config.ChannelError.GAUSSIAN
+    communication_error_type = config.ChannelError.NO_ERROR
 
     model_name = "model_" + str(n_drones)
 
@@ -56,7 +55,6 @@ def sim_setup(n_drones, seed, in_algorithm_mac):
                  packets_max_ttl=packets_max_ttl,
 
                  show_plot=show_plot,
-                 routing_algorithm=routing_algorithm,
                  mac_algorithm=mac_algorithm,
                  communication_error_type=communication_error_type,
 

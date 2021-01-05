@@ -3,9 +3,7 @@ from src.drawing import pp_draw
 from src.entities.uav_entities import *
 from src.simulation.metrics import Metrics
 from src.utilities import config, utilities
-from src.routing_algorithms.net_routing import MediumDispatcher
 from collections import defaultdict
-from src.mac_protocol.depot_mac import DepotMAC
 
 import numpy as np
 import math
@@ -41,7 +39,6 @@ class Simulator:
                  event_generation_delay=config.D_FEEL_EVENT,
                  packets_max_ttl=config.PACKETS_MAX_TTL,
                  show_plot=config.PLOT_SIM,
-                 routing_algorithm=config.ROUTING_ALGORITHM,
                  communication_error_type=config.CHANNEL_ERROR_TYPE,
                  prob_size_cell_r=config.CELL_PROB_SIZE_R,
                  mac_algorithm=config.MAC_ALGORITHM,
@@ -68,7 +65,6 @@ class Simulator:
         self.event_generation_delay = event_generation_delay
         self.packets_max_ttl = packets_max_ttl
         self.show_plot = show_plot
-        self.routing_algorithm = routing_algorithm
         self.communication_error_type = communication_error_type
         self.mac_algorithm = mac_algorithm
         self.plot_histograms = plot_histograms
@@ -85,9 +81,6 @@ class Simulator:
         # for stats
         self.metrics = Metrics(self)
 
-        # setup network
-        self.__setup_net_dispatcher()
-
         # Setup the simulation
         self.__set_simulation()
         self.__set_metrics()
@@ -97,9 +90,6 @@ class Simulator:
 
         self.start = time.time()
         self.event_generator = utilities.EventGenerator(self)
-
-    def __setup_net_dispatcher(self):
-        self.network_dispatcher = MediumDispatcher(self.metrics)
 
     def __set_metrics(self):
         """ the method sets up all the parameters in the metrics class """
@@ -132,9 +122,6 @@ class Simulator:
 
         self.environment.add_drones(self.drones)
         self.environment.add_depot(self.depot)
-
-        # MAC_ALGORITHM
-        self.depot_mac_protocol = self.mac_algorithm.value(self, self.depot)
 
         # Set the maximum distance between the drones and the depot
         self.max_dist_drone_depot = utilities.euclidean_distance(self.depot.coords, (self.env_width, self.env_height))
@@ -201,7 +188,13 @@ class Simulator:
             old_vals[2] = old_vals[0] / max(1, old_vals[1])
             self.cell_prob_map[index_cell] = old_vals
 
+    def init_packets(self):
+        """ init the packets in the simulation """
+        for i in range(self.n_drones*2):
+            self.event_generator.handle_events_generation(0, self.drones)
+
     def run(self):
+        self.init_packets()
         """ the method starts the simulation """
         cells_to_travel = None
         for cur_step in range(self.len_simulation):
@@ -209,7 +202,6 @@ class Simulator:
             # check for new events and remove the expired ones from the environment
             # self.environment.update_events(cur_step)
             # sense the area and move drones and sense the area
-            self.network_dispatcher.run_medium(cur_step)
 
             # generates events
             # sense the events
@@ -222,11 +214,10 @@ class Simulator:
                 # 3. actually move the drone towards next waypoint or depot
 
                 drone.update_packets(cur_step)
-                # drone.routing(self.drones, self.depot, cur_step)  # NO ROUTING!
+                drone.run_mac(cur_step)
                 drone.move(self.time_step_duration)
 
-            # run the mac protocol to let drones communicate with the depot
-            self.depot_mac_protocol.run(cur_step)
+            self.depot.feedback(cur_step)
 
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:

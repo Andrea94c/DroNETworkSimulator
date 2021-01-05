@@ -19,6 +19,9 @@ class Metrics:
 
         self.simulator = simulator
 
+        self.collisions = 0
+        self.unused_slots = 0
+
         # all packets in the simulation
         self.all_control_packets_in_simulation = 0
         self.all_data_packets_in_simulation = 0
@@ -120,14 +123,11 @@ class Metrics:
         """ print the overall stats of the alg execution """
         self.other_metrics()
         print("number_of_generated_events", self.number_of_generated_events)
-        print("number_of_detected_events", self.number_of_detected_events)
-        print("all_control_packets_in_simulation", self.all_control_packets_in_simulation)
-        print("all_data_packets_in_simulation", self.all_data_packets_in_simulation)
-        print("number_of_events_to_depot", self.number_of_events_to_depot)
         print("number_of_packets_to_depot", self.number_of_packets_to_depot)
-        print("packet_mean_delivery_time", self.packet_mean_delivery_time)
         print("event_mean_delivery_time", self.event_mean_delivery_time)
         print("Collected Ratio:", sum(self.delivered_packet_for_drone.values()) / sum(self.generated_packet_for_drone.values()))
+        print("Collisions:", self.collisions)
+        print("Un-used slots:", self.unused_slots)
         if self.simulator.plot_histograms:
             self.__plot_packet_distribution(self.generated_packet_for_drone, "Distribution Generated Packet:")
             self.__plot_packet_distribution(self.delivered_packet_for_drone, "Distribution Delivered Packet:")
@@ -183,7 +183,7 @@ class Metrics:
             "event_duration": self.simulator.event_duration,
             "packets_max_ttl": self.simulator.packets_max_ttl,
             "show_plot": self.simulator.show_plot,
-            "routing_algorithm": str(self.simulator.routing_algorithm),
+            "routing_algorithm": str(self.simulator.mac_algorithm),
             "communication_error_type": str(self.simulator.communication_error_type),
             "time_on_active_routing" : str(self.time_on_active_routing)
         }
@@ -210,6 +210,8 @@ class Metrics:
         out_results["drones_packets"] = [pck.to_json() for pck in self.drones_packets]
         out_results["drones_to_depot_packets"] = [(pck.to_json(), delivery_ts) for pck, delivery_ts in self.drones_packets_to_depot]
         out_results["score"] = self.score()
+        out_results["Collisions"] = self.collisions
+        out_results["Unused_slots"] = self.unused_slots
 
         return out_results
 

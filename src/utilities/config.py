@@ -42,9 +42,9 @@ DEBUG = False                         # bool: whether to print debug strings or 
 EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simulation
 
 # drawaing
-PLOT_SIM = True      # bool: whether to plot or not the simulation.
+PLOT_SIM = False      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
-SKIP_SIM_STEP = 30     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
+SKIP_SIM_STEP = 5     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
 IS_SHOW_NEXT_TARGET_VEC = True  # bool : whether show the direction and next target of the drone
 
@@ -54,7 +54,7 @@ SAVE_PLOT_DIR = "data/plots/"
 
 # add constants here...
 # ----------------------------- SIMULATION PARAMS. ---------------------------- #
-SIM_DURATION = 15000 # int: steps of simulation. # ***
+SIM_DURATION = 24000 # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 8          # int: seed of this simulation.
 
@@ -64,7 +64,7 @@ ENV_HEIGHT = 1500     # float: meters, height of environment.
 
 # events
 EVENTS_DURATION = 2000  # SIM_DURATION  # int: steps, number of time steps that an event lasts  -> to seconds = step * step_duration.
-D_FEEL_EVENT = 300      # int: steps, a new packet is felt (generated on the drone) every 'D_FEEL_EVENT' steps. # ***
+D_FEEL_EVENT = 200      # int: steps, a new packet is felt (generated on the drone) every 'D_FEEL_EVENT' steps. # ***
 P_FEEL_EVENT = .8       # float: probability that the drones feels the event generated on the drone. # ***
 
 """ e.g. given D_FEEL_EVENT = 500, P_FEEL_EVENT = .5, every 500 steps with probability .5 the drone will feel an event."""

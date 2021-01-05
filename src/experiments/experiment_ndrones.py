@@ -3,7 +3,7 @@ from src.simulation.simulator import Simulator
 import os
 from argparse import ArgumentParser
 
-LEN_TEST = 18000 # around 3hr of mission
+LEN_TEST = 24000 # around 3hr of mission
 
 def sim_setup(n_drones, seed, algorithm_routing):
     """ return the sim setup """
@@ -22,7 +22,7 @@ def sim_setup(n_drones, seed, algorithm_routing):
     depot_coordinates=(750, 0)
     event_duration=2000 #circa 5min
     event_generation_prob=0.8
-    event_generation_delay=300
+    event_generation_delay=200
     packets_max_ttl=len_simulation
     show_plot=False
     routing_algorithm = config.RoutingAlgorithm[algorithm_routing]

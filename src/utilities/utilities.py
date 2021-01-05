@@ -103,12 +103,15 @@ class EventGenerator:
         :param drones: the drones where to sample the event
         :return: nothing
         """
-        if cur_step % self.simulator.event_generation_delay == 0 \
-                and self.simulator.drones[0].coords != self.simulator.depot_coordinates:  # if it's time to generate a new packet
-            # drone that will receive the packet:
-            #drone_index = self.rnd_drones.randint(0, len(drones))
+        if cur_step % self.simulator.event_generation_delay == 0:
 
-            drone = drones[0]
+            drones_in_mission = [ dr for dr in drones
+                                  if dr.coords != self.simulator.depot_coordinates]
+            if len(drones_in_mission) == 0:
+                return
+            # drone that will receive the packet:
+            drone_index = self.rnd_drones.randint(0, len(drones_in_mission))
+            drone = drones_in_mission[drone_index]
             drone.feel_event(cur_step)
 
 # ------------------ Path manager ----------------------

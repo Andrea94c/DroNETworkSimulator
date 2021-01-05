@@ -220,6 +220,7 @@ class Simulator:
 
             if len(self.restart_mission) == len(self.drones) and self.drones[0].coords != self.depot_coordinates:
                 self.restart_mission = set()
+
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:
                 self.increase_meetings_probs(self.drones, cur_step)
@@ -238,8 +239,6 @@ class Simulator:
     def close(self):
         """ do some stuff at the end of simulation"""
         print("Closing simulation")
-        if self.routing_algorithm.name == "AI":
-            self.drones[0].routing_algorithm.print()
         self.print_metrics(plot_id="final")
         self.save_metrics(config.ROOT_EVALUATION_DATA + self.simulation_name)
 

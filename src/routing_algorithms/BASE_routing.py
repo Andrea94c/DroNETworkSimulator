@@ -89,9 +89,6 @@ class BASE_routing(metaclass=abc.ABCMeta):
             self.current_n_transmission = 0
             return
 
-        if self.drone.identifier != 0:
-            return
-
         # TODO: Aspetta che lo faccia a ogni drone_retransmission_delta
         if cur_step % self.simulator.drone_retransmission_delta == 0:
 

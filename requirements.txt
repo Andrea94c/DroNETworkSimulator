@@ -1,0 +1,10 @@
+# Notice that all these packages are suggested and tested. If you encounter problems you can use previous versions or next ones.
+# Keras (with tensorflow backend) is suggested but fell free to use any other library (for the homeworks).
+scipy==1.4.1
+numpy==1.18.4
+matplotlib==3.2.1
+Keras==2.4.2
+pandas==1.0.5
+tensorflow==2.2.0
+pygame==1.9.6  # you may need to install this package (or dependencies) by apt-get
+seaborn==0.10.1

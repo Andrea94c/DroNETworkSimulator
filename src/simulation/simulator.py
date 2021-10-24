@@ -5,6 +5,7 @@ from src.simulation.metrics import Metrics
 from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher
 from collections import defaultdict
+from tqdm import tqdm
 
 import numpy as np
 import math
@@ -194,7 +195,7 @@ class Simulator:
     def run(self):
         """ the method starts the simulation """
         cells_to_travel = None
-        for cur_step in range(self.len_simulation):
+        for cur_step in tqdm(range(self.len_simulation)):
             self.cur_step = cur_step
             # check for new events and remove the expired ones from the environment
             # self.environment.update_events(cur_step)
@@ -218,11 +219,6 @@ class Simulator:
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:
                 self.increase_meetings_probs(self.drones, cur_step)
-
-            if cur_step % 10000 == 0:
-                end = time.time()
-                print("step: " + str(cur_step), time.strftime("%H:%M:%S", time.gmtime(end - self.start)))
-                self.start = time.time()
 
             if self.show_plot or config.SAVE_PLOT:
                 self.__plot(cur_step)

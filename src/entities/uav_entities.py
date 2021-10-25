@@ -168,7 +168,6 @@ class ACKPacket(Packet):
         self.src_drone = src_drone
         self.dst_drone = dst_drone
 
-
 class HelloPacket(Packet):
     """ The hello message is responsible to give info about neighborhood """
     def __init__(self, src_drone, time_step_creation, simulator, cur_pos, speed, next_target):
@@ -176,7 +175,7 @@ class HelloPacket(Packet):
         self.cur_pos = cur_pos
         self.speed = speed
         self.next_target = next_target
-        self.src_drone = src_drone
+        self.src_drone = src_drone  # Don't use this
 
 
 # ------------------ Depot ----------------------

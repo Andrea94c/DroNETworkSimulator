@@ -101,7 +101,10 @@ class EventGenerator:
         if cur_step % self.simulator.event_generation_delay == 0 \
                 and self.simulator.drones[0].coords != self.simulator.depot_coordinates:  # if it's time to generate a new packet
             # drone that will receive the packet:
-            drone_index = self.rnd_drones.randint(config.FERRY - 1, len(drones))
+            if config.FERRY >= len(drones):
+                return
+
+            drone_index = self.rnd_drones.randint(config.FERRY, len(drones))
             drone = drones[drone_index]
             drone.feel_event(cur_step)
 

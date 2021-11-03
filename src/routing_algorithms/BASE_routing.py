@@ -90,8 +90,8 @@ class BASE_routing(metaclass=abc.ABCMeta):
             return
 
         # only drone 0 will send packets
-        if self.drone.identifier < config.FERRY:
-            return
+        #if self.drone.identifier < config.FERRY:
+        #   return
 
         # TODO: Aspetta che lo faccia a ogni drone_retransmission_delta
         if cur_step % self.simulator.drone_retransmission_delta == 0:

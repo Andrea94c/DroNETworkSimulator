@@ -12,7 +12,27 @@ import numpy as np
 import pickle
 from ast import literal_eval as make_tuple
 from src.utilities import random_waypoint_generation
+from scipy.special import softmax
 
+class DroneCapabilities():
+
+    def __init__(self, simulator):
+        """ The class craete personalized features for each drone """
+        self.simulator = simulator
+        self.device_rnd = np.random.RandomState(self.simulator.seed + 1)
+        self.network_suc_rate = {}   # drone_id : success_rate
+        self.speed = {}  # drone_id : speed of the drone
+        self.__compute()
+
+    def __compute(self):
+        for i in range(self.simulator.n_drones):
+            self.speed[i] = self.device_rnd.randint(self.simulator.drone_speed - int(self.simulator.drone_speed) / 2,
+                                                    self.simulator.drone_speed + int(self.simulator.drone_speed / 4))
+            self.network_suc_rate[i] = self.device_rnd.randint(50, 100) / 100
+
+        self.speed[0] = self.simulator.drone_speed
+        self.network_suc_rate[0] = 1.0
+        self.speed[1] = self.simulator.drone_speed / 1.3
 
 def compute_circle_path(radius : int, center : tuple) -> list:
     """ compute a set of finite coordinates to simulate a circle trajectory of input radius around a given center
@@ -33,7 +53,6 @@ def compute_circle_path(radius : int, center : tuple) -> list:
 
 def date():
     return str(time.strftime("%d%m%Y-%H%M%S"))
-
 
 def euclidean_distance(p1, p2):
     """ Given points p1, p2 in R^2 it returns the norm of the vector connecting them.  """
@@ -79,16 +98,17 @@ class EventGenerator:
         :param drones: the drones where to sample the event
         :return: nothing
         """
-        if cur_step % self.simulator.event_generation_delay == 0:  # if it's time to generate a new packet
+        if cur_step % self.simulator.event_generation_delay == 0 \
+                and self.simulator.drones[0].coords != self.simulator.depot_coordinates:  # if it's time to generate a new packet
             # drone that will receive the packet:
-            drone_index = self.rnd_drones.randint(0, len(drones))
+            drone_index = self.rnd_drones.randint(config.FERRY - 1, len(drones))
             drone = drones[drone_index]
             drone.feel_event(cur_step)
 
 # ------------------ Path manager ----------------------
 class PathManager:
 
-    def __init__(self, path_from_json : bool, json_file: str, seed: int):
+    def __init__(self, path_from_json : bool, json_file: str, seed: int, rnd_state=None):
         """
             path_from_json : wheter generate or load the paths for the drones
             json file to read for take the paths of drones
@@ -98,13 +118,12 @@ class PathManager:
         self.json_file = json_file.format(seed)
         if path_from_json:
             self.path_dict = json_to_paths(self.json_file)
-            self.rnd_paths = None
+            self.rnd_paths = rnd_state
         else:
             self.path_dict = None
-            self.rnd_paths = np.random.RandomState(seed)
+            self.rnd_paths = rnd_state
 
-
-    def path(self, drone_id, simulator):
+    def path(self, drone_id, simulator, residual_energy):
         """ takes the drone id and
             returns a path (list of tuple)
             for it.
@@ -120,8 +139,8 @@ class PathManager:
         elif self.path_from_json:  # paths from loaded json
             return self.path_dict[drone_id]
         else:  # generate dynamic paths
-            return random_waypoint_generation.get_tour(simulator.drone_max_energy, simulator.env_width,
-                                                       simulator.depot_coordinates,
+            return random_waypoint_generation.get_tour(residual_energy, simulator.env_width,
+                                                       simulator.depot_coordinates, index=drone_id,
                                                        random_generator=self.rnd_paths,
                                                        range_decision=config.RANDOM_STEPS,
                                                        random_starting_point=config.RANDOM_START_POINT)

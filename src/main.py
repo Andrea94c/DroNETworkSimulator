@@ -8,7 +8,7 @@ def main():
     sim = Simulator()   # empty constructor means that all the parameters of the simulation are taken from src.utilities.config.py
     sim.run()            # run the simulation
     sim.close()
-
+    sim.score()
 
 if __name__ == "__main__":
     main()

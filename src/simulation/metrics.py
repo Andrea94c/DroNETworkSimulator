@@ -133,6 +133,7 @@ class Metrics:
         print("number_of_packets_to_depot", self.number_of_packets_to_depot)
         print("packet_mean_delivery_time", self.packet_mean_delivery_time)
         print("event_mean_delivery_time", self.event_mean_delivery_time)
+        print("Delivery ratio", self.number_of_events_to_depot / self.number_of_generated_events)
 
     def info_mission(self):
         """ save all the mission / sim setup """

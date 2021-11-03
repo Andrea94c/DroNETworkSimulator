@@ -7,7 +7,7 @@ class RandomRouting(BASE_routing):
     def __init__(self, drone, simulator):
         BASE_routing.__init__(self, drone, simulator)
 
-    def relay_selection(self, opt_neighbors):
+    def relay_selection(self, opt_neighbors, pkd):
         """ arg min score  -> geographical approach, take the drone closest to the depot """
         # opt_neighbors --> [(hck packet : drone istance), (hck packet, drone istance).. .. ]
         return self.simulator.rnd_routing.choice([v[1] for v in opt_neighbors])

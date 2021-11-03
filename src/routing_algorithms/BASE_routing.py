@@ -25,7 +25,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
         self.no_transmission = False
 
     @abc.abstractmethod
-    def relay_selection(self, geo_neighbors):
+    def relay_selection(self, geo_neighbors, pkd):
         pass
 
     def routing_close(self, drones, cur_step):
@@ -81,8 +81,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
             return
 
         # FLOW 1
-        if self.drone.distance_from_depot <= min(self.drone.communication_range,
-                                                 self.drone.depot.communication_range):
+        if util.euclidean_distance(self.simulator.depot.coords, self.drone.coords) <= 5:
             # add error in case
             self.transfer_to_depot(self.drone.depot, cur_step)
 
@@ -90,7 +89,11 @@ class BASE_routing(metaclass=abc.ABCMeta):
             self.current_n_transmission = 0
             return
 
-       # TODO: Aspetta che lo faccia a ogni drone_retransmission_delta
+        # only drone 0 will send packets
+        if self.drone.identifier < config.FERRY:
+            return
+
+        # TODO: Aspetta che lo faccia a ogni drone_retransmission_delta
         if cur_step % self.simulator.drone_retransmission_delta == 0:
 
             opt_neighbors = []
@@ -103,16 +106,17 @@ class BASE_routing(metaclass=abc.ABCMeta):
 
                 opt_neighbors.append((hpk, hpk.src_drone))
 
-            if len(opt_neighbors) > 0:
+            if len(opt_neighbors) == 0:
+                return
+
+            # send packets
+            for pkd in self.drone.all_packets():
                 self.simulator.metrics.mean_numbers_of_possible_relays.append(len(opt_neighbors))
-                best_neighbor = self.relay_selection(opt_neighbors)  # compute score
+                best_neighbor = self.relay_selection(opt_neighbors, pkd)  # compute score
                 if best_neighbor is not None:
+                    self.unicast_message(pkd, self.drone, best_neighbor, cur_step)
 
-                    # send packets
-                    for pkd in self.drone.all_packets():
-                        self.unicast_message(pkd, self.drone, best_neighbor, cur_step)
-
-            self.current_n_transmission += 1
+                self.current_n_transmission += 1
 
     def geo_neighborhood(self, drones, no_error=False):
         """ returns the list all the Drones that are in self.drone neighbourhood (no matter the distance to depot),
@@ -144,6 +148,9 @@ class BASE_routing(metaclass=abc.ABCMeta):
         if self.simulator.communication_error_type == config.ChannelError.NO_ERROR:
             return True
 
+        elif self.simulator.communication_error_type == config.ChannelError.ON_DEVICE:
+            return self.__on_device_error(drones_distance)
+
         elif self.simulator.communication_error_type == config.ChannelError.UNIFORM:
             return self.simulator.rnd_routing.rand() <= self.simulator.drone_communication_success
 
@@ -174,6 +181,16 @@ class BASE_routing(metaclass=abc.ABCMeta):
         self.drone.move_routing = False
 
     # --- PRIVATE ---
+    def __on_device_error(self, drones_distance):
+        # we approximate 3 level of distance and error
+        if drones_distance <= self.drone.communication_range / 3:
+            return self.simulator.rnd_routing.rand() <= self.drone.channel_success_rate
+        elif drones_distance <= self.drone.communication_range * 2 / 3:
+            return self.simulator.rnd_routing.rand() <= self.drone.channel_success_rate * (2 / 3)
+        else:
+            return self.simulator.rnd_routing.rand() <= self.drone.channel_success_rate / 3
+
+
     def __init_guassian(self, mu=0, sigma_wrt_range=1.15, bucket_width_wrt_range=.5):
 
         # bucket width is 0.5 times the communication radius by default

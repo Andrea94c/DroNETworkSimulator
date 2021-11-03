@@ -137,17 +137,10 @@ def set_font():
 
 METRICS_OF_INTEREST = [
         'number_of_generated_events', 
-        'number_of_detected_events', 
-        'number_of_events_to_depot', 
-        'number_of_packets_to_depot', 
-        'packet_mean_delivery_time', 
-        'event_mean_delivery_time', 
-        'time_on_mission',
-        'time_on_active_routing', 
-        'Routing time / mission time',
-        'ratio_delivery_generated',
-        'ratio_delivery_detected']
-
+        'number_of_events_to_depot',
+        'event_mean_delivery_time',
+        'ratio_delivery_detected',
+        "score"]
 
 
 if __name__ == "__main__":
@@ -197,8 +190,3 @@ if __name__ == "__main__":
     print(alg_exp_suffix)
     for metric in METRICS_OF_INTEREST:
         plot_ndrones(pattern_file, n_drones, metric, alg_exp_suffix, n_seeds, out_dir + "_" + str(exp_metric) + "_", exp_metric)
-
-    #size_mission = 3000
-    plot_coverage_distribution(pattern_file, n_drones, config.SAVE_PLOT_DIR + 'coverage_distribution', 
-                            alg_exp_suffix, n_seeds, dim_area)    
-    

@@ -5,7 +5,6 @@ from src.simulation.metrics import Metrics
 from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher
 from collections import defaultdict
-from tqdm import tqdm
 
 import numpy as np
 import math
@@ -68,6 +67,7 @@ class Simulator:
         self.show_plot = show_plot
         self.routing_algorithm = routing_algorithm
         self.communication_error_type = communication_error_type
+        self.restart_mission = set()
 
         # --------------- cell for drones -------------
         self.prob_size_cell_r = prob_size_cell_r
@@ -102,18 +102,19 @@ class Simulator:
         self.metrics.info_mission()
 
     def __set_random_generators(self):
+        self.drone_capabilities = utilities.DroneCapabilities(self)
         if self.seed is not None:
             self.rnd_network = np.random.RandomState(self.seed)
             self.rnd_routing = np.random.RandomState(self.seed)
             self.rnd_env = np.random.RandomState(self.seed)
+            self.rnd_path = np.random.RandomState(self.seed)
             self.rnd_event = np.random.RandomState(self.seed)
+
 
     def __set_simulation(self):
         """ the method creates all the uav entities """
 
         self.__set_random_generators()
-
-        self.path_manager = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.seed)
         self.environment = Environment(self.env_width, self.env_height, self)
 
         self.depot = Depot(self.depot_coordinates, self.depot_com_range, self)
@@ -122,7 +123,8 @@ class Simulator:
 
         # drone 0 is the first
         for i in range(self.n_drones):
-            self.drones.append(Drone(i, self.path_manager.path(i, self), self.depot, self))
+            self.drones.append(Drone(i, None, self.drone_capabilities.speed[i],
+                                    self.drone_capabilities.network_suc_rate[i], self.depot, self))
 
         self.environment.add_drones(self.drones)
         self.environment.add_depot(self.depot)
@@ -195,7 +197,7 @@ class Simulator:
     def run(self):
         """ the method starts the simulation """
         cells_to_travel = None
-        for cur_step in tqdm(range(self.len_simulation)):
+        for cur_step in range(self.len_simulation):
             self.cur_step = cur_step
             # check for new events and remove the expired ones from the environment
             # self.environment.update_events(cur_step)
@@ -216,9 +218,16 @@ class Simulator:
                 drone.routing(self.drones, self.depot, cur_step)
                 drone.move(self.time_step_duration)
 
+            if len(self.restart_mission) == len(self.drones) and self.drones[0].coords != self.depot_coordinates:
+                self.restart_mission = set()
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:
                 self.increase_meetings_probs(self.drones, cur_step)
+
+            if cur_step % 10000 == 0:
+                end = time.time()
+                print("step: " + str(cur_step), time.strftime("%H:%M:%S", time.gmtime(end - self.start)))
+                self.start = time.time()
 
             if self.show_plot or config.SAVE_PLOT:
                 self.__plot(cur_step)
@@ -229,7 +238,8 @@ class Simulator:
     def close(self):
         """ do some stuff at the end of simulation"""
         print("Closing simulation")
-
+        if self.routing_algorithm.name == "AI":
+            self.drones[0].routing_algorithm.print()
         self.print_metrics(plot_id="final")
         self.save_metrics(config.ROOT_EVALUATION_DATA + self.simulation_name)
 

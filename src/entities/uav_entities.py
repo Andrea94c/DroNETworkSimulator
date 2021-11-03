@@ -2,7 +2,6 @@ import numpy as np
 
 from src.utilities import config, utilities
 
-
 class SimulatedEntity:
     """ A simulated entity keeps track of the simulation object, where you can access all the parameters
     of the simulation. No class of this type is directly instantiable.
@@ -168,6 +167,7 @@ class ACKPacket(Packet):
         self.src_drone = src_drone
         self.dst_drone = dst_drone
 
+
 class HelloPacket(Packet):
     """ The hello message is responsible to give info about neighborhood """
     def __init__(self, src_drone, time_step_creation, simulator, cur_pos, speed, next_target):
@@ -175,7 +175,7 @@ class HelloPacket(Packet):
         self.cur_pos = cur_pos
         self.speed = speed
         self.next_target = next_target
-        self.src_drone = src_drone  # Don't use this
+        self.src_drone = src_drone
 
 
 # ------------------ Depot ----------------------
@@ -198,6 +198,11 @@ class Depot(Entity):
         self.__buffer += packets_to_offload
 
         for pck in packets_to_offload:
+            if self.simulator.routing_algorithm.name == "AI":
+                self.simulator.drones[0].routing_algorithm.feedback(drone, pck.event_ref.identifier,
+                                                                    cur_step - pck.event_ref.current_time,
+                                                                    1)
+
             # add metrics: all the packets notified to the depot
             self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))
             self.simulator.metrics.drones_packets_to_depot_list.append((pck, cur_step))
@@ -207,23 +212,27 @@ class Depot(Entity):
 # ------------------ Drone ----------------------
 class Drone(Entity):
 
-    def __init__(self, identifier: int, path: list, depot: Depot, simulator):
+    def __init__(self, identifier: int, path: list, speed : int, channel_success_rate : float, depot: Depot, simulator):
 
-        super().__init__(identifier, path[0], simulator)
+        super().__init__(identifier, depot.coords, simulator)
 
         self.depot = depot
-        self.path = path
-        self.speed = self.simulator.drone_speed
+        self.speed = speed if config.HETEROGENOUS_DRONE_SPEED else self.simulator.drone_speed
+        self.channel_success_rate = channel_success_rate
         self.sensing_range = self.simulator.drone_sen_range
         self.communication_range = self.simulator.drone_com_range
         self.buffer_max_size = self.simulator.drone_max_buffer_size
-        self.residual_energy = self.simulator.drone_max_energy
+
+        self.max_energy = self.simulator.rnd_routing.randint(config.DRONE_MIN_FLIGHT_TIME, config.DRONE_MAX_ENERGY)
+        self.residual_energy = self.max_energy
+        self.path = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.simulator.seed, self.simulator.rnd_path).path(identifier, simulator, self.residual_energy)
         self.come_back_to_mission = False  # if i'm coming back to my applicative mission
         self.last_move_routing = False  # if in the last step i was moving to depot
 
         # dynamic parameters
         self.tightest_event_deadline = None  # used later to check if there is an event that is about to expire
         self.current_waypoint = 0
+        self.waypoint_history = []
 
         self.__buffer = []               # contains the packets
 
@@ -252,6 +261,9 @@ class Drone(Entity):
                 self.tightest_event_deadline = np.nanmin([self.tightest_event_deadline, pck.event_ref.deadline])
             else:
                 to_remove_packets += 1
+                if self.simulator.routing_algorithm.name == "AI":
+                    self.simulator.drones[0].routing_algorithm.feedback(self, pck.event_ref.identifier,
+                                                                        self.simulator.event_duration, -1)
         self.__buffer = tmp_buffer
 
         if self.buffer_length() == 0:
@@ -263,7 +275,7 @@ class Drone(Entity):
 
             This method is optional, there is flag src.utilities.config.ROUTING_IF_EXPIRING
         """
-        time_to_depot = self.distance_from_depot / self.speed
+        time_to_depot = utilities.euclidean_distance(self.depot.coords, self.coords) / self.speed
         event_time_to_dead = (self.tightest_event_deadline - cur_step) * self.simulator.time_step_duration
         return event_time_to_dead - 5 < time_to_depot <= event_time_to_dead  # 5 seconds of tolerance
 
@@ -312,7 +324,6 @@ class Drone(Entity):
 
     def routing(self, drones, depot, cur_step):
         """ do the routing """
-        self.distance_from_depot = utilities.euclidean_distance(self.depot.coords, self.coords)
         self.routing_algorithm.routing(depot, drones, cur_step)
 
     def move(self, time):
@@ -320,28 +331,7 @@ class Drone(Entity):
         
             time -> time_step_duration (how much time between two simulation frame)
         """
-        if self.move_routing or self.come_back_to_mission:
-            # metrics: number of time steps on active routing (movement) a counter that is incremented each time
-            # drone is moving to the depot for active routing, i.e., move_routing = True
-            # or the drone is coming back to its mission
-            self.simulator.metrics.time_on_active_routing += 1
-
-        if self.move_routing:
-            if not self.last_move_routing:  # this is the first time that we are doing move-routing
-                self.last_mission_coords = self.coords
-
-            self.__move_to_depot(time)
-        else:
-            if self.last_move_routing:  # I'm coming back to the mission
-                self.come_back_to_mission = True
-
-            self.__move_to_mission(time)
-
-            # metrics: number of time steps on mission, incremented each time drone is doing sensing mission
-            self.simulator.metrics.time_on_mission += 1
-
-        # set the last move routing
-        self.last_move_routing = self.move_routing
+        self.__move_to_mission(time)
 
     def is_full(self):
         return self.buffer_length() == self.buffer_max_size
@@ -385,8 +375,13 @@ class Drone(Entity):
         """ When invoked the drone moves on the map. TODO: Add comments and clean.
             time -> time_step_duration (how much time between two simulation frame)
         """
+
         if self.current_waypoint >= len(self.path) - 1:
-            self.current_waypoint = -1
+            if len(self.simulator.restart_mission) == self.simulator.n_drones:
+                self.current_waypoint = -1
+            else:
+                self.simulator.restart_mission.add(self.identifier)
+                return
 
         p0 = self.coords
         if self.come_back_to_mission:  # after move
@@ -396,6 +391,11 @@ class Drone(Entity):
 
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = time * self.speed
+
+        self.residual_energy -= distance
+        if self.residual_energy <= 0:
+            self.residual_energy = self.max_energy
+
         if all_distance == 0 or distance == 0:
             self.__update_position(p1)
             return
@@ -409,12 +409,14 @@ class Drone(Entity):
         else:
             self.coords = (((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1]))
 
+
     def __update_position(self, p1):
         if self.come_back_to_mission:
             self.come_back_to_mission = False
             self.coords = p1
         else:
             self.current_waypoint += 1
+            self.waypoint_history.append(p1)
             self.coords = self.path[self.current_waypoint]
 
     def __move_to_depot(self, time):

@@ -41,7 +41,7 @@ def next_target(depot_pos, cur_position, residual_autonomy, edge_area, range_dec
         residual_aut = residual_autonomy - euclidean_distance(cur_position, next_p)
         return next_p, residual_aut
 
-def get_tour(autonomy, edge_area, depot_pos, random_generator, range_decision=None, random_starting_point=True):
+def get_tour(autonomy, edge_area, depot_pos, random_generator, index=None, range_decision=None, random_starting_point=True):
     """ random_starting_point : whether start the mission from a random point (True) or from the depot (False)"""
     if range_decision is None:
         range_decision = config.RANDOM_STEPS
@@ -51,13 +51,32 @@ def get_tour(autonomy, edge_area, depot_pos, random_generator, range_decision=No
         start_point = (random_generator.randint(0, edge_area), random_generator.randint(0, edge_area))
     else:
         start_point = depot_pos
+
+
+    if index is not None and index < config.FERRY:
+        if index == 1:
+            ferry_point = (random_generator.randint(0, edge_area // 2), random_generator.randint(edge_area//2, edge_area))
+        elif index == 2:
+            ferry_point = (random_generator.randint(edge_area // 3, 2 * edge_area // 3), random_generator.randint(edge_area // 2, edge_area))
+        else:
+            ferry_point = (random_generator.randint(edge_area // 2, edge_area), random_generator.randint(edge_area // 2, edge_area))
+
+        autonomy = config.DRONE_MAX_ENERGY
+
     current_point = start_point
     residual_aut = autonomy
     while residual_aut >= min(range_decision) * 1.44 + euclidean_distance(current_point, start_point):
 
-        next_p, residual_aut = next_target(depot_pos, current_point, residual_aut, edge_area, range_decision, random_generator)
-        if next_p == depot_pos:
-            break
+        if index is not None and index < config.FERRY:
+            next_p = ferry_point
+            if current_point == ferry_point:
+                next_p = depot_pos
+            residual_aut -= euclidean_distance(current_point, next_p)
+        else:
+            next_p, residual_aut = next_target(depot_pos, current_point, residual_aut, edge_area, range_decision, random_generator)
+
+            if next_p == depot_pos:
+                break
         tour.append(current_point)
         current_point = next_p
 

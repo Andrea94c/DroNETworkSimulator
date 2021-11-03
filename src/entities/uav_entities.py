@@ -199,9 +199,9 @@ class Depot(Entity):
 
         for pck in packets_to_offload:
             if self.simulator.routing_algorithm.name == "AI":
-                self.simulator.drones[0].routing_algorithm.feedback(drone, pck.event_ref.identifier,
-                                                                    cur_step - pck.event_ref.current_time,
-                                                                    1)
+                for drone in self.simulator.drones:
+                    drone.routing_algorithm.feedback(drone, pck.event_ref.identifier,
+                                                    cur_step - pck.event_ref.current_time, 1)
 
             # add metrics: all the packets notified to the depot
             self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))

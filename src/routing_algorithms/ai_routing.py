@@ -14,11 +14,11 @@ class AIRouting(BASE_routing):
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
         # Packets that we delivered and still need a feedback
-        print(self.taken_actions)
+        print(self.drone.identifier, "----------", self.taken_actions)
 
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
         # Feedback from a delivered or expired packet
-        print(drone, id_event, delay, outcome)
+        print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
 
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
         # NOTE: reward or update using the old action!!

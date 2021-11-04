@@ -3,6 +3,9 @@ import numpy as np
 from src.utilities import utilities as util
 from src.routing_algorithms.BASE_routing import BASE_routing
 from matplotlib import pyplot as plt
+#class action:
+#timestamp
+#enumeration something : keep, give_ferry, give_node
 
 class AIRouting(BASE_routing):
     def __init__(self, drone, simulator):
@@ -19,6 +22,10 @@ class AIRouting(BASE_routing):
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
         # Feedback from a delivered or expired packet
         print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
+
+        # negative reward = -1 <-- hyperpameter tuning
+        # positive if 0 then 1, otherwise 1/delay
+        # here goes the formula
 
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
         # NOTE: reward or update using the old action!!
@@ -42,6 +49,12 @@ class AIRouting(BASE_routing):
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
         # self.drone.residual_energy (that tells us when I'll come back to the depot).
         #  .....
+
+        # AT THE BEGINNING choose the one nearest (advanced geo)
+        # at some point (?) <-- ????????? after we received 10 feedbacks ????
+        # with probability 1-e we choose the one with the highest Q
+        # with probability (2/3)e we choose the nearest
+        # with probability (1/3)e we choose random
 
         # Store your current action --- you can add several stuff if needed to take a reward later
         self.taken_actions[pkd.event_ref.identifier] = (action)

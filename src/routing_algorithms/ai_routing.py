@@ -42,11 +42,13 @@ class AIRouting(BASE_routing):
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
         # Packets that we delivered and still need a feedback
-        print(self.drone.identifier, "----------", self.taken_actions)
-
+        if bool(self.taken_actions):
+            print("----------------", id_event, "----------------")
+            print(self.drone.identifier, "----------", self.taken_actions)
+            print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
         # Feedback from a delivered or expired packet
-        print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
+
 
         # negative reward = -1 <-- hyperpameter tuning
         # positive if 0 then 1, otherwise 1/delay
@@ -75,20 +77,22 @@ class AIRouting(BASE_routing):
         best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
         best_drone = None
 
-        for hpk, drone_istance in opt_neighbors:
+        for hpk, drone_instance in opt_neighbors:
 
             exp_position = self.__estimated_neighbor_drone_position(hpk)
             exp_distance = util.euclidean_distance(exp_position, self.simulator.depot.coords)
             if exp_distance < best_drone_distance_from_depot:
                 best_drone_distance_from_depot = exp_distance
-                best_drone = drone_istance
-                if drone_istance.identifier < self.num_of_ferries:
-                    self.taken_actions[pkd.event_ref.identifier] = (Action.GIVE_FERRY, self.simulator.cur_step)
+                best_drone = drone_instance
+
+                if drone_instance.identifier < self.num_of_ferries:
+                    self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.GIVE_FERRY, self.simulator.cur_step)
+
                 else:
-                    self.taken_actions[pkd.event_ref.identifier] = (Action.GIVE_NODE,
-                                                                    self.simulator.cur_step)
+                    self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.GIVE_NODE, self.simulator.cur_step)
+
             else:
-                self.taken_actions[pkd.event_ref.identifier] = (Action.KEEP, self.simulator.cur_step)
+                self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.KEEP, self.simulator.cur_step)
 
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
         # self.drone.residual_energy (that tells us when I'll come back to the depot).
@@ -112,6 +116,15 @@ class AIRouting(BASE_routing):
         pass
 
     #Private methods
+    def __update_actions(self, pkd_id, neighbor, type_action, timestamp):
+        if pkd_id in self.taken_actions:
+            value = self.taken_actions.get(pkd_id)
+            value.append(tuple((neighbor, type_action, timestamp)))
+            self.taken_actions[pkd_id] = value
+
+        else:
+            self.taken_actions[pkd_id] = list(tuple((neighbor, type_action, timestamp)))
+
     def __incremental_estimate_method(self, drone, reward):
         self.action_drones[drone.identifier] += 1
         self.total_reward[drone.identifier] += reward

@@ -42,26 +42,22 @@ class AIRouting(BASE_routing):
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
         # Packets that we delivered and still need a feedback
-        if bool(self.taken_actions):
+        if id_event in self.taken_actions:
             print("----------------", id_event, "----------------")
             print(self.drone.identifier, "----------", self.taken_actions)
             print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
         # Feedback from a delivered or expired packet
 
-
-        # negative reward = -1 <-- hyperpameter tuning
-        # positive if 0 then 1, otherwise 1/delay
-        # here goes the formula
-
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
         # NOTE: reward or update using the old action!!
         # STORE WHICH ACTION DID YOU TAKE IN THE PAST.
         # do something or train the model (?)
-        history = {}
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
-
+            # negative reward = -1 <-- hyperpameter tuning
+            # positive if 0 then 1, otherwise 1/delay
+            # here goes the formula
             del self.taken_actions[id_event]
 
     def relay_selection(self, opt_neighbors, pkd):
@@ -85,15 +81,6 @@ class AIRouting(BASE_routing):
                 best_drone_distance_from_depot = exp_distance
                 best_drone = drone_instance
 
-                if drone_instance.identifier < self.num_of_ferries:
-                    self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.GIVE_FERRY, self.simulator.cur_step)
-
-                else:
-                    self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.GIVE_NODE, self.simulator.cur_step)
-
-            else:
-                self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.KEEP, self.simulator.cur_step)
-
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
         # self.drone.residual_energy (that tells us when I'll come back to the depot).
         #  .....
@@ -105,6 +92,17 @@ class AIRouting(BASE_routing):
         # with probability (1/3)e we choose random
 
         # Store your current action --- you can add several stuff if needed to take a reward later
+
+
+        if best_drone == None:
+            self.__update_actions(pkd.event_ref.identifier, drone_instance, Action.KEEP, self.simulator.cur_step)
+
+        if best_drone.identifier < self.num_of_ferries:
+            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_FERRY, self.simulator.cur_step)
+
+        else:
+            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_NODE, self.simulator.cur_step)
+
 
         return best_drone  # here you should return a drone object!
 

@@ -43,8 +43,8 @@ EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simula
 
 # drawaing
 PLOT_SIM = True      # bool: whether to plot or not the simulation.
-WAIT_SIM_STEP = 0     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
-SKIP_SIM_STEP = 30     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
+WAIT_SIM_STEP = 0    # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
+SKIP_SIM_STEP = 5     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
 IS_SHOW_NEXT_TARGET_VEC = True  # bool : whether show the direction and next target of the drone
 

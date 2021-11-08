@@ -5,7 +5,7 @@ import src.utilities.config
 from src.utilities import utilities as util
 from src.routing_algorithms.BASE_routing import BASE_routing
 from enum import Enum, auto
-from matplotlib import pyplot as plt
+
 
 class Action(Enum):
     KEEP = auto()
@@ -18,7 +18,7 @@ class AIRouting(BASE_routing):
         BASE_routing.__init__(self, drone, simulator)
         # random generator
         self.rnd_for_routing_ai = np.random.RandomState(self.simulator.seed)
-        self.taken_actions = {}  #id event : (old_action)
+        self.taken_actions = {}  # id event : (old_action)
 
         num_of_drones = simulator.n_drones
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
@@ -42,7 +42,6 @@ class AIRouting(BASE_routing):
     def __get_number_of_ferries():
         return src.utilities.config.FERRY
 
-
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
         # Packets that we delivered and still need a feedback
@@ -64,15 +63,15 @@ class AIRouting(BASE_routing):
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
             if outcome == -1:
-                a = list(set(action))
+                action = list(dict.fromkeys(action))
                 i = min(5, len(action))
-                reward_per_action = dict(zip(a[-i:][::-1], neg_rew[:i]))
-                reward_per_action.update(dict.fromkeys(a[0:-i], 0.1))
-                #print(self.drone.identifier, len(action), "ACTION\n", action, "\nREWARD\n", reward_per_action)
+                reward_per_action = dict(zip(action[-i:][::-1], neg_rew[:i]))
+                reward_per_action.update(dict.fromkeys(action[0:-i], 0.1))
+                # print(self.drone.identifier, len(action), "ACTION\n", action, "\nREWARD\n", reward_per_action)
             else:
                 reward_per_action = dict.fromkeys(action, 1/delay)
             
-            #update Q_table according to reward_per_action
+            # update Q_table according to reward_per_action
 
             del self.taken_actions[id_event]
 
@@ -91,13 +90,13 @@ class AIRouting(BASE_routing):
         prob = np.random.random()
 
         if prob > self.epsilon and self.simulator.cur_step > 300:
-            #drones that are my neighbours
+            # drones that are my neighbours
             neighbors = [t[1].identifier for t in opt_neighbors]
-            #the right choice could be to keep the packet
+            # the right choice could be to keep the packet
             neighbors.append(self.drone.identifier)
-            #extracting max of q_values for neighbours
+            # extracting max of q_values for neighbours
             max_ind = np.argmax(self.Q_table[neighbors])
-            #getting the drone
+            # getting the drone
             best_drone = None if max_ind == len(opt_neighbors) else opt_neighbors[max_ind][1]
 
         elif prob > (2/3 * self.epsilon) or self.simulator.cur_step < 300:
@@ -120,7 +119,7 @@ class AIRouting(BASE_routing):
 
         action = ""
 
-        if best_drone == None:
+        if best_drone is None:
             self.__update_actions(pkd.event_ref.identifier, best_drone, Action.KEEP)
             action = Action.KEEP
 
@@ -132,7 +131,7 @@ class AIRouting(BASE_routing):
             self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_NODE)
             action = Action.GIVE_NODE
 
-        #print(self.drone.identifier, action, pkd.event_ref.identifier, best_drone)
+        # print(self.drone.identifier, action, pkd.event_ref.identifier, best_drone)
 
         return best_drone  # here you should return a drone object!
 
@@ -143,11 +142,11 @@ class AIRouting(BASE_routing):
         """
         pass
 
-    #Private methods
+    # Private methods
     def __update_actions(self, pkd_id, neighbor, type_action):
         if pkd_id in self.taken_actions:
             value = self.taken_actions.get(pkd_id)
-            if (value[-1] != tuple((neighbor, type_action))):
+            if value[-1] != tuple((neighbor, type_action)):
                 value.append(tuple((neighbor, type_action)))
             self.taken_actions[pkd_id] = value
 
@@ -195,4 +194,3 @@ class AIRouting(BASE_routing):
         c = a + (distance_traveled * v_)
 
         return tuple(c)
-

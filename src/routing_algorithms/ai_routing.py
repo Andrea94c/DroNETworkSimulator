@@ -147,7 +147,8 @@ class AIRouting(BASE_routing):
     def __update_actions(self, pkd_id, neighbor, type_action):
         if pkd_id in self.taken_actions:
             value = self.taken_actions.get(pkd_id)
-            value.append(tuple((neighbor, type_action)))
+            if (value[-1] != tuple((neighbor, type_action))):
+                value.append(tuple((neighbor, type_action)))
             self.taken_actions[pkd_id] = value
 
         else:

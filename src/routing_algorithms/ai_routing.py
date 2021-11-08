@@ -58,15 +58,17 @@ class AIRouting(BASE_routing):
         # STORE WHICH ACTION DID YOU TAKE IN THE PAST.
         # do something or train the model (?)
 
-        neg_rew = np.linspace(-1, -0.2, 5)
+        neg_rew = [-1, -0.8, -0.6, -0.4, -0.2]
         reward_per_action = {}
 
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
-            i = min(5, len(action))
             if outcome == -1:
-                reward_per_action = dict.fromkeys(action[-i:][::-1], neg_rew[:i])
-                reward_per_action.update(dict.fromkeys(action[0:-i], 0.1))
+                a = list(set(action))
+                i = min(5, len(action))
+                reward_per_action = dict(zip(a[-i:][::-1], neg_rew[:i]))
+                reward_per_action.update(dict.fromkeys(a[0:-i], 0.1))
+                #print(self.drone.identifier, len(action), "ACTION\n", action, "\nREWARD\n", reward_per_action)
             else:
                 reward_per_action = dict.fromkeys(action, 1/delay)
             
@@ -130,7 +132,7 @@ class AIRouting(BASE_routing):
             self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_NODE)
             action = Action.GIVE_NODE
 
-        print(self.drone.identifier, action, pkd.event_ref.identifier, best_drone)
+        #print(self.drone.identifier, action, pkd.event_ref.identifier, best_drone)
 
         return best_drone  # here you should return a drone object!
 
@@ -149,7 +151,7 @@ class AIRouting(BASE_routing):
             self.taken_actions[pkd_id] = value
 
         else:
-            self.taken_actions[pkd_id] = list(tuple((neighbor, type_action)))
+            self.taken_actions[pkd_id] = [tuple((neighbor, type_action))]
 
     def __incremental_estimate_method(self, drone, reward):
         self.action_drones[drone.identifier] += 1

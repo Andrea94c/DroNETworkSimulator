@@ -42,6 +42,9 @@ class AIRouting(BASE_routing):
     def __get_number_of_ferries():
         return src.utilities.config.FERRY
 
+    def __is_a_ferry(self, drone):
+        return drone.identifier < self.num_of_ferries
+
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
         # Packets that we delivered and still need a feedback
@@ -62,14 +65,15 @@ class AIRouting(BASE_routing):
 
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
+            # action = list(dict.fromkeys(action))
             if outcome == -1:
-                action = list(dict.fromkeys(action))
                 i = min(5, len(action))
                 reward_per_action = dict(zip(action[-i:][::-1], neg_rew[:i]))
                 reward_per_action.update(dict.fromkeys(action[0:-i], 0.1))
                 # print(self.drone.identifier, len(action), "ACTION\n", action, "\nREWARD\n", reward_per_action)
             else:
-                reward_per_action = dict.fromkeys(action, 1/delay)
+                # print(self.drone.identifier, "-->", action)
+                reward_per_action = dict.fromkeys(action, 1/(delay/1000))
             
             # update Q_table according to reward_per_action
 
@@ -81,35 +85,34 @@ class AIRouting(BASE_routing):
         # Only if you need --> several features:
         # cell_index = util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
         #                                                width_area=self.simulator.env_width,
-        #                                                x_pos=self.drone.coords[0],  # e.g. 1500
-        #                                                y_pos=self.drone.coords[1])[0]  # e.g. 500
+        #                                                 x_pos=self.drone.coords[0],  # e.g. 1500
+        #                                                 y_pos=self.drone.coords[1])[0]  # e.g. 500
         # print(cell_index)
 
         best_drone = None
-        
         prob = np.random.random()
 
-        if prob > self.epsilon and self.simulator.cur_step > 300:
-            # drones that are my neighbours
-            neighbors = [t[1].identifier for t in opt_neighbors]
-            # the right choice could be to keep the packet
-            neighbors.append(self.drone.identifier)
-            # extracting max of q_values for neighbours
-            max_ind = np.argmax(self.Q_table[neighbors])
-            # getting the drone
-            best_drone = None if max_ind == len(opt_neighbors) else opt_neighbors[max_ind][1]
+        # if prob > self.epsilon and self.simulator.cur_step > 300:
+        #     # drones that are my neighbours
+        #     neighbors = [t[1].identifier for t in opt_neighbors]
+        #     # the right choice could be to keep the packet
+        #     neighbors.append(self.drone.identifier)
+        #     # extracting max of q_values for neighbours
+        #     max_ind = np.argmax(self.Q_table[neighbors])
+        #     # getting the drone
+        #     best_drone = None if max_ind == len(opt_neighbors) else opt_neighbors[max_ind][1]
 
-        elif prob > (2/3 * self.epsilon) or self.simulator.cur_step < 300:
-            best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
-            for hpk, drone_instance in opt_neighbors:
-                exp_position = self.__estimated_neighbor_drone_position(hpk)
-                exp_distance = util.euclidean_distance(exp_position, self.simulator.depot.coords)
-                if exp_distance < best_drone_distance_from_depot:
-                    best_drone_distance_from_depot = exp_distance                    
-                    best_drone = drone_instance
+        #elif prob > (2/3 * self.epsilon) or self.simulator.cur_step < 300:
+        best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords, )
+        for hpk, drone_instance in opt_neighbors:
+            exp_position = self.__estimated_neighbor_drone_position(hpk)
+            exp_distance = util.euclidean_distance(exp_position, self.simulator.depot.coords)
+            if exp_distance < best_drone_distance_from_depot:
+                best_drone_distance_from_depot = exp_distance
+                best_drone = drone_instance
         
-        else:
-            best_drone = self.simulator.rnd_routing.choice([v[1] for v in opt_neighbors])
+        #else:
+            #best_drone = self.simulator.rnd_routing.choice([v[1] for v in opt_neighbors])
 
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
         # self.drone.residual_energy (that tells us when I'll come back to the depot).
@@ -119,16 +122,20 @@ class AIRouting(BASE_routing):
 
         action = ""
 
+        # check when we need to add the waypoint_history to the action
+        ferry = self.__set_ferry_flag(best_drone)
+
+        # add all the action information collected so far
         if best_drone is None:
-            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.KEEP)
+            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.KEEP, ferry, self.simulator.cur_step)
             action = Action.KEEP
 
         elif best_drone.identifier < self.num_of_ferries:
-            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_FERRY)
+            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_FERRY, ferry, self.simulator.cur_step)
             action = Action.GIVE_FERRY
 
         else:
-            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_NODE)
+            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_NODE, ferry, self.simulator.cur_step)
             action = Action.GIVE_NODE
 
         # print(self.drone.identifier, action, pkd.event_ref.identifier, best_drone)
@@ -143,15 +150,25 @@ class AIRouting(BASE_routing):
         pass
 
     # Private methods
-    def __update_actions(self, pkd_id, neighbor, type_action):
+    def __update_actions(self, pkd_id, neighbor, type_action, ferry, timestamp):
+
+        drone = neighbor if neighbor is not None else self.drone
+
         if pkd_id in self.taken_actions:
             value = self.taken_actions.get(pkd_id)
-            if value[-1] != tuple((neighbor, type_action)):
-                value.append(tuple((neighbor, type_action)))
+            # if (value[-1])[:2] != tuple((neighbor, type_action)):
+            if ferry:
+                value.append(tuple((neighbor, type_action, tuple([]), timestamp)))
+            else:
+                waypoints = drone.waypoint_history[-1] if drone.waypoint_history else self.drone.depot.coords
+                value.append(tuple((neighbor, type_action, tuple(waypoints), timestamp)))
+            #value.append(tuple((neighbor, type_action)))
             self.taken_actions[pkd_id] = value
 
         else:
-            self.taken_actions[pkd_id] = [tuple((neighbor, type_action))]
+            waypoints = drone.waypoint_history[-1] if drone.waypoint_history else self.drone.depot.coords
+            self.taken_actions[pkd_id] = [tuple((neighbor, type_action, tuple([]), timestamp))] if ferry \
+                else [tuple((neighbor, type_action, tuple(waypoints), timestamp))]
 
     def __incremental_estimate_method(self, drone, reward):
         self.action_drones[drone.identifier] += 1
@@ -169,6 +186,16 @@ class AIRouting(BASE_routing):
     def __epsilon_greedy(self, epsilon):
         p = np.random.random()
         return random.choice(self.Q_table) if p < epsilon else self.__greedy()
+
+    def __set_ferry_flag(self, best_drone):
+        ferry = False
+        if best_drone is None and self.__is_a_ferry(self.drone):
+            ferry = True
+        elif self.__is_a_ferry(self.drone) and (best_drone is not None and self.__is_a_ferry(best_drone)):
+            ferry = True
+
+        return ferry
+
 
     def __estimated_neighbor_drone_position(self, hello_message):
         """ estimate the current position of the drone """

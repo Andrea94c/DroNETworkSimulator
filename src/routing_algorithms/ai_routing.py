@@ -155,17 +155,17 @@ class AIRouting(BASE_routing):
             value = self.taken_actions.get(pkd_id)
             # if (value[-1])[:2] != tuple((neighbor, type_action)):
             if ferry:
-                value.append(tuple((neighbor, type_action, tuple([]), timestamp)))
+                value.append(tuple((neighbor, type_action, None, timestamp)))
             else:
-                waypoints = drone.waypoint_history[-1] if drone.waypoint_history else self.drone.depot.coords
-                value.append(tuple((neighbor, type_action, tuple(waypoints), timestamp)))
+                region = self.__assign_region(int(drone.coords[0]), int(drone.coords[1]))
+                value.append(tuple((neighbor, type_action, region, timestamp)))
             #value.append(tuple((neighbor, type_action)))
             self.taken_actions[pkd_id] = value
 
         else:
-            waypoints = drone.waypoint_history[-1] if drone.waypoint_history else self.drone.depot.coords
-            self.taken_actions[pkd_id] = [tuple((neighbor, type_action, tuple([]), timestamp))] if ferry \
-                else [tuple((neighbor, type_action, tuple(waypoints), timestamp))]
+            region = self.__assign_region(int(drone.coords[0]), int(drone.coords[1]))
+            self.taken_actions[pkd_id] = [tuple((neighbor, type_action, None, timestamp))] if ferry \
+                else [tuple((neighbor, type_action, region, timestamp))]
 
     def __incremental_estimate_method(self, drone, reward):
         self.action_drones[drone.identifier] += 1
@@ -188,13 +188,19 @@ class AIRouting(BASE_routing):
         return drone.identifier < self.num_of_ferries
 
     def __assign_region(self, x, y):
+
         regions_matrix = np.reshape(np.arange(1, 10), (3,3))
 
         size = self.simulator.env_width
-        coords = range(0, size)
-        splitter = size / 3
+        coords = list(range(0, size))
+        splitter = int(size / 3)
 
         split_1, split_2, split_3 = coords[0:splitter], coords[splitter:splitter*2], coords[splitter*2:]
+        coords = (split_1, split_2, split_3)
+        index_x = [i for i in range(len(coords))if x in coords[i]][0]
+        index_y = [i for i in range(len(coords))if y in coords[i]][0]
+
+        return regions_matrix[index_y][index_x]
 
     def __set_ferry_flag(self, best_drone):
         ferry = False

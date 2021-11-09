@@ -6,12 +6,22 @@ from src.utilities import utilities as util
 from src.routing_algorithms.BASE_routing import BASE_routing
 from enum import Enum, auto
 
+from src.utilities.random_waypoint_generation import next_target
+
+def assign_region(x, y, width):
+
+    regions_matrix = np.reshape(np.arange(1, 10), (3,3))
+    size = width
+    splitter = int(size / 3)
+    index_x = 0 if x < splitter else (1 if x < splitter * 2 else 2)
+    index_y = 0 if y < splitter else (1 if y < splitter * 2 else 2)
+
+    return regions_matrix[index_y][index_x]
 
 class Action(Enum):
     KEEP = auto()
     GIVE_FERRY = auto()
     GIVE_NODE = auto()
-
 
 class AIRouting(BASE_routing):
     def __init__(self, drone, simulator):
@@ -23,8 +33,7 @@ class AIRouting(BASE_routing):
         num_of_drones = simulator.n_drones #test
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
 
-        self.epsilon = 0.3
-        np.random.seed(self.drone.identifier)
+        self.epsilon = 0.1
 
         initial_action_values = np.zeros(num_of_drones)
         # Higher values if a drone is a ferry.
@@ -57,22 +66,20 @@ class AIRouting(BASE_routing):
         # STORE WHICH ACTION DID YOU TAKE IN THE PAST.
         # do something or train the model (?)
 
-        neg_rew = [-1, -0.8, -0.6, -0.4, -0.2]
+        neg_rewards = [-1, -0.8, -0.6, -0.4, -0.2]
         reward_per_action = {}
 
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
-            # action = list(dict.fromkeys(action))
             if outcome == -1:
                 i = min(5, len(action))
-                reward_per_action = dict(zip(action[-i:][::-1], neg_rew[:i]))
-                reward_per_action.update(dict.fromkeys(action[0:-i], 0.1))
-                # print(self.drone.identifier, len(action), "ACTION\n", action, "\nREWARD\n", reward_per_action)
+                reward_per_action = dict(zip(action[:i], neg_rewards))
+                reward_per_action.update(dict.fromkeys(action[i:], 0.1))
             else:
-                # print(self.drone.identifier, "-->", action)
                 reward_per_action = dict.fromkeys(action, 1/(delay/1000))
             
-            # update Q_table according to reward_per_action
+            #update Q_table according to reward_per_action
+            #new_estimate = old_estimate + 1/n * Rn - Qn
 
             del self.taken_actions[id_event]
 
@@ -87,7 +94,7 @@ class AIRouting(BASE_routing):
         # print(cell_index)
 
         best_drone = None
-        prob = np.random.random()
+        prob = self.rnd_for_routing_ai.rand()
 
         # if prob > self.epsilon and self.simulator.cur_step > 300:
         #     # drones that are my neighbours
@@ -117,25 +124,8 @@ class AIRouting(BASE_routing):
 
         # Store your current action --- you can add several stuff if needed to take a reward later
 
-        action = ""
-
-        # check when we need to add the waypoint_history to the action
-        ferry = self.__set_ferry_flag(best_drone)
-
-        # add all the action information collected so far
-        if best_drone is None:
-            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.KEEP, ferry, self.simulator.cur_step)
-            action = Action.KEEP
-
-        elif best_drone.identifier < self.num_of_ferries:
-            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_FERRY, ferry, self.simulator.cur_step)
-            action = Action.GIVE_FERRY
-
-        else:
-            self.__update_actions(pkd.event_ref.identifier, best_drone, Action.GIVE_NODE, ferry, self.simulator.cur_step)
-            action = Action.GIVE_NODE
-
-        # print(self.drone.identifier, action, pkd.event_ref.identifier, best_drone)
+        action = Action.KEEP if best_drone is None else (Action.GIVE_FERRY if best_drone.identifier < self.num_of_ferries else Action.GIVE_NODE)
+        self.__update_actions(pkd.event_ref.identifier, action, self.drone.coords[0], self.drone.coords[1], self.drone.current_waypoint)
 
         return best_drone  # here you should return a drone object!
 
@@ -147,25 +137,21 @@ class AIRouting(BASE_routing):
         pass
 
     # Private methods
-    def __update_actions(self, pkd_id, neighbor, type_action, ferry, timestamp):
+    def __update_actions(self, pkd_id, type_action, x, y, step):
 
-        drone = neighbor if neighbor is not None else self.drone
+        #getting region for my coordinates
+        region = assign_region(x, y, self.simulator.env_width)
 
         if pkd_id in self.taken_actions:
+            #extracting previuos actions for the packet
             value = self.taken_actions.get(pkd_id)
-            # if (value[-1])[:2] != tuple((neighbor, type_action)):
-            if ferry:
-                value.append(tuple((neighbor, type_action, None, timestamp)))
-            else:
-                region = self.__assign_region(int(drone.coords[0]), int(drone.coords[1]))
-                value.append(tuple((neighbor, type_action, region, timestamp)))
-            #value.append(tuple((neighbor, type_action)))
-            self.taken_actions[pkd_id] = value
+            #save new action only if it's different from last one
+            if (value[-1]) != tuple((type_action, region, step)):
+                value.append(tuple((type_action, region, step)))
+                self.taken_actions[pkd_id] = value
 
         else:
-            region = self.__assign_region(int(drone.coords[0]), int(drone.coords[1]))
-            self.taken_actions[pkd_id] = [tuple((neighbor, type_action, None, timestamp))] if ferry \
-                else [tuple((neighbor, type_action, region, timestamp))]
+            self.taken_actions[pkd_id] = [tuple((type_action, region, step))]
 
     def __incremental_estimate_method(self, drone, reward):
         self.action_drones[drone.identifier] += 1
@@ -186,21 +172,6 @@ class AIRouting(BASE_routing):
 
     def __is_a_ferry(self, drone):
         return drone.identifier < self.num_of_ferries
-
-    def __assign_region(self, x, y):
-
-        regions_matrix = np.reshape(np.arange(1, 10), (3,3))
-
-        size = self.simulator.env_width
-        coords = list(range(0, size))
-        splitter = int(size / 3)
-
-        split_1, split_2, split_3 = coords[0:splitter], coords[splitter:splitter*2], coords[splitter*2:]
-        coords = (split_1, split_2, split_3)
-        index_x = [i for i in range(len(coords))if x in coords[i]][0]
-        index_y = [i for i in range(len(coords))if y in coords[i]][0]
-
-        return regions_matrix[index_y][index_x]
 
     def __set_ferry_flag(self, best_drone):
         ferry = False

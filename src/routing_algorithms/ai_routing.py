@@ -20,7 +20,7 @@ class AIRouting(BASE_routing):
         self.rnd_for_routing_ai = np.random.RandomState(self.simulator.seed)
         self.taken_actions = {}  # id event : (old_action)
 
-        num_of_drones = simulator.n_drones
+        num_of_drones = simulator.n_drones #test
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
 
         self.epsilon = 0.3

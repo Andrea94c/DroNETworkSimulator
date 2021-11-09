@@ -42,9 +42,6 @@ class AIRouting(BASE_routing):
     def __get_number_of_ferries():
         return src.utilities.config.FERRY
 
-    def __is_a_ferry(self, drone):
-        return drone.identifier < self.num_of_ferries
-
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
         # Packets that we delivered and still need a feedback
@@ -186,6 +183,18 @@ class AIRouting(BASE_routing):
     def __epsilon_greedy(self, epsilon):
         p = np.random.random()
         return random.choice(self.Q_table) if p < epsilon else self.__greedy()
+
+    def __is_a_ferry(self, drone):
+        return drone.identifier < self.num_of_ferries
+
+    def __assign_region(self, x, y):
+        regions_matrix = np.reshape(np.arange(1, 10), (3,3))
+
+        size = self.simulator.env_width
+        coords = range(0, size)
+        splitter = size / 3
+
+        split_1, split_2, split_3 = coords[0:splitter], coords[splitter:splitter*2], coords[splitter*2:]
 
     def __set_ferry_flag(self, best_drone):
         ferry = False

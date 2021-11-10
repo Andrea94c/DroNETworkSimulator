@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 import src.utilities.config
 from src.utilities import utilities as util
@@ -29,7 +27,6 @@ class AIRouting(BASE_routing):
         self.rnd_for_routing_ai = np.random.RandomState(self.simulator.seed)
         self.taken_actions = {}  # id event : (old_action)
 
-        num_of_drones = simulator.n_drones
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
 
         self.epsilon = 0.1
@@ -74,15 +71,15 @@ class AIRouting(BASE_routing):
                 reward_per_action = dict.fromkeys(action, 1/delay * 1000)
             
             #update Q_table according to reward_per_action
-            #new_estimate = old_estimate + 1/n * Rn - Qn
+
             n_previous = [self.n_actions[a]+1 if a in self.n_actions else 1 for a in action]
-            self.n_actions = dict(zip(action, n_previous))
+            self.n_actions.update(dict(zip(action, n_previous)))
 
             r_previous = [self.rew_actions[a]+reward_per_action[a] if a in self.rew_actions else reward_per_action[a] for a in action]
-            self.rew_actions = dict(zip(action, r_previous))
+            self.rew_actions.update(dict(zip(action, r_previous)))
 
             q = [self.rew_actions[a]/self.n_actions[a] for a in action]
-            self.Q_table = dict(zip(action, q))
+            self.Q_table.update(dict(zip(action, q)))
 
             del self.taken_actions[id_event]
 
@@ -100,19 +97,21 @@ class AIRouting(BASE_routing):
         region = assign_region(self.drone.coords[0], self.drone.coords[1], self.simulator.env_width)
         prob = self.rnd_for_routing_ai.rand()
 
+        waypoint = self.drone.current_waypoint
 
+        #already did at least one round
+        if waypoint != -1 and waypoint < len(self.drone.waypoint_history): #and prob > self.epsilon
+            # # drones that are my neighbours
+            # neighbors = [t[1].identifier for t in opt_neighbors]
+            # # the right choice could be to keep the packet
+            # neighbors.append(self.drone.identifier)
+            # # extracting max of q_values for neighbours
+            # max_ind = np.argmax(self.Q_table[neighbors])
+            # # getting the drone
+            # best_drone = None if max_ind == len(opt_neighbors) else opt_neighbors[max_ind][1]
+            actions_taken = [(idx,q) if q[1] == region and q[2] == waypoint else -1 for idx,q in enumerate(self.Q_table)]
+            print(self.drone.identifier, region, waypoint, actions_taken)
 
-        # if prob > self.epsilon and self.simulator.cur_step > 300:
-        #     # drones that are my neighbours
-        #     neighbors = [t[1].identifier for t in opt_neighbors]
-        #     # the right choice could be to keep the packet
-        #     neighbors.append(self.drone.identifier)
-        #     # extracting max of q_values for neighbours
-        #     max_ind = np.argmax(self.Q_table[neighbors])
-        #     # getting the drone
-        #     best_drone = None if max_ind == len(opt_neighbors) else opt_neighbors[max_ind][1]
-
-        #elif prob > (2/3 * self.epsilon) or self.simulator.cur_step < 300:
         best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
         for hpk, drone_instance in opt_neighbors:
             exp_position = self.__estimated_neighbor_drone_position(hpk)
@@ -131,7 +130,7 @@ class AIRouting(BASE_routing):
         # Store your current action --- you can add several stuff if needed to take a reward later
 
         action = Action.KEEP if best_drone is None else (Action.GIVE_FERRY if best_drone.identifier < self.num_of_ferries else Action.GIVE_NODE)
-        self.__update_actions(pkd.event_ref.identifier, action.name, region, self.drone.current_waypoint)
+        self.__update_actions(pkd.event_ref.identifier, action, region, self.drone.current_waypoint)
 
         return best_drone  # here you should return a drone object!
 

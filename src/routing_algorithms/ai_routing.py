@@ -63,6 +63,7 @@ class AIRouting(BASE_routing):
 
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
+            action.reverse()
             if outcome == -1:
                 i = min(5, len(action))
                 reward_per_action = dict(zip(action[:i], neg_rewards))
@@ -75,6 +76,7 @@ class AIRouting(BASE_routing):
             n_previous = [self.n_actions[a]+1 if a in self.n_actions else 1 for a in action]
             self.n_actions.update(dict(zip(action, n_previous)))
 
+            #r_previous = [self.rew_actions[a]+reward_per_action[a] if a in self.rew_actions else (reward_per_action[a]+1 if a[0]==Action.GIVE_FERRY and outcome == 0 else reward_per_action[a]) for a in action]
             r_previous = [self.rew_actions[a]+reward_per_action[a] if a in self.rew_actions else reward_per_action[a] for a in action]
             self.rew_actions.update(dict(zip(action, r_previous)))
 
@@ -152,6 +154,9 @@ class AIRouting(BASE_routing):
 
     # Private methods
     def __update_actions(self, pkd_id, type_action, region, step):
+
+        if self.test == "" and self.drone.identifier == 0:
+            self.test = pkd_id
 
         if pkd_id in self.taken_actions:
             #extracting previuos actions for the packet

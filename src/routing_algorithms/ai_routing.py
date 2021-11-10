@@ -98,27 +98,36 @@ class AIRouting(BASE_routing):
         prob = self.rnd_for_routing_ai.rand()
 
         waypoint = self.drone.current_waypoint
+        used_Q = False
+
+        useAI = True
 
         #already did at least one round
-        if waypoint != -1 and waypoint < len(self.drone.waypoint_history): #and prob > self.epsilon
-            # # drones that are my neighbours
-            # neighbors = [t[1].identifier for t in opt_neighbors]
-            # # the right choice could be to keep the packet
-            # neighbors.append(self.drone.identifier)
-            # # extracting max of q_values for neighbours
-            # max_ind = np.argmax(self.Q_table[neighbors])
-            # # getting the drone
-            # best_drone = None if max_ind == len(opt_neighbors) else opt_neighbors[max_ind][1]
-            actions_taken = [(idx,q) if q[1] == region and q[2] == waypoint else -1 for idx,q in enumerate(self.Q_table)]
-            print(self.drone.identifier, region, waypoint, actions_taken)
+        if useAI and waypoint != -1 and waypoint < len(self.drone.waypoint_history): #and prob > self.epsilon
+            key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint]
+            value_actions = [self.Q_table[k] for k in key_actions]
+            if value_actions:
+                max_ind = np.argmax(value_actions)
+                best_action = key_actions[max_ind][0]
+                #drone that are my neighbours
+                neighbours = [t[1] for t in opt_neighbors]
+                if best_action == Action.KEEP:
+                    used_Q = True
+                elif best_action == Action.GIVE_FERRY:
+                    best_drone = next((n for n in neighbours if n.identifier < self.num_of_ferries), None)
+                    used_Q = best_drone is not None
+                else:
+                    best_drone = next((n for n in neighbours if n.identifier > self.num_of_ferries), None)
+                    used_Q = best_drone is not None
 
-        best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
-        for hpk, drone_instance in opt_neighbors:
-            exp_position = self.__estimated_neighbor_drone_position(hpk)
-            exp_distance = util.euclidean_distance(exp_position, self.simulator.depot.coords)
-            if exp_distance < best_drone_distance_from_depot:
-                best_drone_distance_from_depot = exp_distance
-                best_drone = drone_instance
+        if not used_Q:
+            best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
+            for hpk, drone_instance in opt_neighbors:
+                exp_position = self.__estimated_neighbor_drone_position(hpk)
+                exp_distance = util.euclidean_distance(exp_position, self.simulator.depot.coords)
+                if exp_distance < best_drone_distance_from_depot:
+                    best_drone_distance_from_depot = exp_distance
+                    best_drone = drone_instance
         
         #else:
             #best_drone = self.simulator.rnd_routing.choice([v[1] for v in opt_neighbors])

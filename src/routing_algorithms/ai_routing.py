@@ -105,9 +105,9 @@ class AIRouting(BASE_routing):
 
         #drone that are my neighbours
         neighbours = [t[1] for t in opt_neighbors]
-        #neighbours.append(None)
+        neighbours.append(None)
 
-        key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint]
+        key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint and q[0] in neighbours]
         value_actions = [self.Q_table[k] for k in key_actions]
         if not value_actions:
             possible_actions = [tuple((n, region, waypoint)) for n in neighbours]
@@ -120,10 +120,8 @@ class AIRouting(BASE_routing):
                 best_drone = self.rnd_for_routing_ai.choice(neighbours)
             elif value_actions:
                 max_ind = np.argmax(value_actions)
-                best_action = key_actions[max_ind][0]
-                if best_action in neighbours:
-                    best_drone = best_action
-                    used_Q = True
+                best_drone = key_actions[max_ind][0]
+                used_Q = True
                 '''if best_action == Action.KEEP:
                     used_Q = True
                 elif best_action == Action.GIVE_FERRY:

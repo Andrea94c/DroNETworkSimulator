@@ -34,7 +34,7 @@ class AIRouting(BASE_routing):
         # number of times an action has been taken
         self.n_actions = {}
         # rewards for an action up to now
-        self.rew_actions = {}
+        #self.rew_actions = {}
         # Q_table
         self.Q_table = {}
 
@@ -45,18 +45,10 @@ class AIRouting(BASE_routing):
     #if outcome positive then drone is the drone that delivered the package to the depot
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
-        # Packets that we delivered and still need a feedback
-        # if id_event in self.taken_actions:
-        #     print("----------------", id_event, "----------------")
-        #     print(self.drone.identifier, "----------", self.taken_actions)
-        #     print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
-        # # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
+        # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
         # Feedback from a delivered or expired packet
 
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
-        # NOTE: reward or update using the old action!!
-        # STORE WHICH ACTION DID YOU TAKE IN THE PAST.
-        # do something or train the model (?)
 
         neg_rewards = [-1, -0.8, -0.6, -0.4, -0.2]
         reward_per_action = {}
@@ -76,12 +68,19 @@ class AIRouting(BASE_routing):
             n_previous = [self.n_actions[a]+1 if a in self.n_actions else 1 for a in action]
             self.n_actions.update(dict(zip(action, n_previous)))
 
-            #r_previous = [self.rew_actions[a]+reward_per_action[a] if a in self.rew_actions else (reward_per_action[a]+1 if a[0]==Action.GIVE_FERRY and outcome == 0 else reward_per_action[a]) for a in action]
-            r_previous = [self.rew_actions[a]+reward_per_action[a] if a in self.rew_actions else reward_per_action[a] for a in action]
-            self.rew_actions.update(dict(zip(action, r_previous)))
+            #r_previous = [self.rew_actions[a]+reward_per_action[a] if a in self.rew_actions else reward_per_action[a] for a in action]
+            #self.rew_actions.update(dict(zip(action, r_previous)))
 
-            q = [self.rew_actions[a]/self.n_actions[a] for a in action]
+            q = [self.Q_table[a] + 1/self.n_actions[a]*(reward_per_action[a]-self.Q_table[a]) if a in self.Q_table else reward_per_action[a] for a in action]
+
+            #excluded = [tuple((type_a, a[1], a[2])) for a in action for type_a in Action if not tuple((type_a, a[1], a[2])) in self.rew_actions]
+            #self.rew_actions.update(dict.fromkeys(excluded, 1))
+
+            #q = [self.rew_actions[a]/self.n_actions[a] for a in action]
             self.Q_table.update(dict(zip(action, q)))
+
+            #q = [self.rew_actions[e] for e in excluded]
+            #self.Q_table.update(dict(zip(excluded, q)))
 
             del self.taken_actions[id_event]
 
@@ -104,23 +103,40 @@ class AIRouting(BASE_routing):
 
         useAI = True
 
+        #drone that are my neighbours
+        neighbours = [t[1] for t in opt_neighbors]
+        #neighbours.append(None)
+
+        key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint]
+        value_actions = [self.Q_table[k] for k in key_actions]
+        if not value_actions:
+            possible_actions = [tuple((n, region, waypoint)) for n in neighbours]
+            self.Q_table.update(dict.fromkeys(possible_actions, 1))
+
         #already did at least one round
         if useAI and waypoint != -1 and waypoint < len(self.drone.waypoint_history): #and prob > self.epsilon
-            key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint]
-            value_actions = [self.Q_table[k] for k in key_actions]
-            if value_actions:
+            if prob < self.epsilon:
+                used_Q = True
+                best_drone = self.rnd_for_routing_ai.choice(neighbours)
+            elif value_actions:
                 max_ind = np.argmax(value_actions)
                 best_action = key_actions[max_ind][0]
-                #drone that are my neighbours
-                neighbours = [t[1] for t in opt_neighbors]
-                if best_action == Action.KEEP:
+                if best_action in neighbours:
+                    best_drone = best_action
+                    used_Q = True
+                '''if best_action == Action.KEEP:
                     used_Q = True
                 elif best_action == Action.GIVE_FERRY:
                     best_drone = next((n for n in neighbours if n.identifier < self.num_of_ferries), None)
                     used_Q = best_drone is not None
                 else:
                     best_drone = next((n for n in neighbours if n.identifier > self.num_of_ferries), None)
-                    used_Q = best_drone is not None
+                    used_Q = best_drone is not None'''
+            '''else:
+                #used_Q = True
+                possible_actions = [tuple((n, region, waypoint)) for n in neighbours]
+                self.Q_table.update(dict.fromkeys(possible_actions, 1))
+                #best_drone = self.rnd_for_routing_ai.choice(neighbours)'''
 
         if not used_Q:
             best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
@@ -130,9 +146,6 @@ class AIRouting(BASE_routing):
                 if exp_distance < best_drone_distance_from_depot:
                     best_drone_distance_from_depot = exp_distance
                     best_drone = drone_instance
-        
-        #else:
-            #best_drone = self.simulator.rnd_routing.choice([v[1] for v in opt_neighbors])
 
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
         # self.drone.residual_energy (that tells us when I'll come back to the depot).
@@ -140,8 +153,8 @@ class AIRouting(BASE_routing):
 
         # Store your current action --- you can add several stuff if needed to take a reward later
 
-        action = Action.KEEP if best_drone is None else (Action.GIVE_FERRY if best_drone.identifier < self.num_of_ferries else Action.GIVE_NODE)
-        self.__update_actions(pkd.event_ref.identifier, action, region, self.drone.current_waypoint)
+        #action = Action.KEEP if best_drone is None else (Action.GIVE_FERRY if best_drone.identifier < self.num_of_ferries else Action.GIVE_NODE)
+        self.__update_actions(pkd.event_ref.identifier, best_drone, region, waypoint)
 
         return best_drone  # here you should return a drone object!
 
@@ -153,21 +166,18 @@ class AIRouting(BASE_routing):
         pass
 
     # Private methods
-    def __update_actions(self, pkd_id, type_action, region, step):
-
-        if self.test == "" and self.drone.identifier == 0:
-            self.test = pkd_id
+    def __update_actions(self, pkd_id, neighbour, region, step):
 
         if pkd_id in self.taken_actions:
             #extracting previuos actions for the packet
             value = self.taken_actions.get(pkd_id)
             #save new action only if it's different from last one
-            if (value[-1]) != tuple((type_action, region, step)):
-                value.append(tuple((type_action, region, step)))
+            if (value[-1]) != tuple((neighbour, region, step)):
+                value.append(tuple((neighbour, region, step)))
                 self.taken_actions[pkd_id] = value
 
         else:
-            self.taken_actions[pkd_id] = [tuple((type_action, region, step))]
+            self.taken_actions[pkd_id] = [tuple((neighbour, region, step))]
 
     def __is_a_ferry(self, drone):
         return drone.identifier < self.num_of_ferries

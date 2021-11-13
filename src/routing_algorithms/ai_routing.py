@@ -8,10 +8,10 @@ from src.utilities.random_waypoint_generation import next_target
 
 def assign_region(x, y, width):
 
-    regions_matrix = np.reshape(np.arange(1, 10), (3,3))
-    splitter = int(width / 3)
-    index_x = 0 if x < splitter else (1 if x < splitter * 2 else 2)
-    index_y = 0 if y < splitter else (1 if y < splitter * 2 else 2)
+    regions_matrix = np.reshape(np.arange(1, 17), (4,4))
+    splitter = int(width / 4)
+    index_x = 0 if x < splitter else (1 if x < splitter * 2 else (2 if x < splitter * 3 else 3))
+    index_y = 0 if y < splitter else (1 if y < splitter * 2 else (2 if y < splitter * 3 else 3))
 
     return regions_matrix[index_y][index_x]
 
@@ -48,16 +48,17 @@ class AIRouting(BASE_routing):
 
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
 
-        neg_rewards = [-1, -0.8, -0.6, -0.4, -0.2]
+        #neg_rewards = [-2, -1.5, -1, -0.5, -0.3]
         reward_per_action = {}
 
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
-            action.reverse()
+            action.reverse() #here actions taken for the packet are from the most recent to the last
             if outcome == -1:
-                i = min(5, len(action))
-                reward_per_action = dict(zip(action[:i], neg_rewards))
-                reward_per_action.update(dict.fromkeys(action[i:], 0.1))
+                #i = min(5, len(action))
+                #reward_per_action = dict(zip(action[:i], neg_rewards))
+                #reward_per_action.update(dict.fromkeys(action[i:], 0.1))
+                reward_per_action = dict.fromkeys(action, -2)
             else:
                 reward_per_action = dict.fromkeys(action, 1/delay * 1000)
             
@@ -73,61 +74,58 @@ class AIRouting(BASE_routing):
             del self.taken_actions[id_event]
 
     def relay_selection(self, opt_neighbors, pkd):
-        """ arg min score  -> geographical approach, take the drone closest to the depot """
-
-        # Only if you need --> several features:
-        # cell_index = util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
-        #                                                width_area=self.simulator.env_width,
-        #                                                 x_pos=self.drone.coords[0],  # e.g. 1500
-        #                                                 y_pos=self.drone.coords[1])[0]  # e.g. 500
-        # print(cell_index)
 
         best_drone = None
+
+        #current region
         region = assign_region(self.drone.coords[0], self.drone.coords[1], self.simulator.env_width)
-        prob = self.rnd_for_routing_ai.rand()
-
+        #current step in our mission
         waypoint = self.drone.current_waypoint
-        used_Q = False
-
-        useAI = True
+        #energy left --> if I have low energy then I should keep the packets, I'm returning to the depot
+        #energy = self.drone.residual_energy > 1500
 
         #drone that are my neighbours
         neighbours = [t[1] for t in opt_neighbors]
+        #I could be the best choice (keep the packet)
         neighbours.append(None)
 
+        #current Q_table values for possible actions in the current region and for the current waypoint
         key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint]
         value_actions = [self.Q_table[k] for k in key_actions]
+        
         #optimistical initial values
         if not value_actions:
             possible_actions = [tuple((type_act, region, waypoint)) for type_act in Action]
-            initial_values = [2 if a[0]==Action.GIVE_FERRY else 1 for a in possible_actions]
+            initial_values = [2 if a[0]==Action.GIVE_FERRY or (a[0]==Action.KEEP and self.drone.identifier < self.num_of_ferries) else 1 for a in possible_actions]
             self.Q_table.update(dict(zip(possible_actions, initial_values)))
+            key_actions = possible_actions
+            value_actions = initial_values
 
         #already did at least one round
-        if useAI and waypoint != -1 and waypoint < len(self.drone.waypoint_history): #and prob > self.epsilon
+        if waypoint < len(self.drone.waypoint_history):# and energy:
+            #epsilon greedy, with low probability we choose a random action
+            prob = self.rnd_for_routing_ai.rand()
             if prob < self.epsilon:
-                used_Q = True
                 best_drone = self.rnd_for_routing_ai.choice(neighbours)
-            elif value_actions:
+            #with high probability we choose what we think is the best action
+            else:
                 max_ind = np.argmax(value_actions)
                 best_action = key_actions[max_ind][0]
-                #best_drone = key_actions[max_ind][0]
-                #used_Q = True
-                if best_action == Action.KEEP:
-                    used_Q = True
-                elif best_action == Action.GIVE_FERRY:
+                #if best_action is Keep then best_drone is already None
+                if best_action == Action.GIVE_FERRY:
                     best_drone = next((n for n in neighbours if n is not None and n.identifier < self.num_of_ferries), None)
-                    used_Q = best_drone is not None
-                else:
+                elif best_action == Action.GIVE_NODE:
                     best_drone = next((n for n in neighbours if n is not None and n.identifier > self.num_of_ferries), None)
-                    used_Q = best_drone is not None
-            '''else:
-                #used_Q = True
-                possible_actions = [tuple((n, region, waypoint)) for n in neighbours]
-                self.Q_table.update(dict.fromkeys(possible_actions, 1))
-                #best_drone = self.rnd_for_routing_ai.choice(neighbours)'''
+                #if the best action is not possible this time, we choose the second best
+                if best_drone is None and best_action != Action.KEEP:
+                    key_actions = [q for q in key_actions if q[0] != best_action]
+                    value_actions = [self.Q_table[k] for k in key_actions]
+                    max_ind = np.argmax(value_actions)
+                    best_action = key_actions[max_ind][0]
+                    best_drone = None if best_action == Action.KEEP else neighbours[0]
 
-        if not used_Q:
+        #for the first round we choose the best drone according to the estimated position
+        else:
             best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
             for hpk, drone_instance in opt_neighbors:
                 exp_position = self.__estimated_neighbor_drone_position(hpk)
@@ -136,16 +134,11 @@ class AIRouting(BASE_routing):
                     best_drone_distance_from_depot = exp_distance
                     best_drone = drone_instance
 
-        # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
-        # self.drone.residual_energy (that tells us when I'll come back to the depot).
-        #  .....
-
-        # Store your current action --- you can add several stuff if needed to take a reward later
-
+        #store the current action. An action is identified by the choice of what to do with the packet, by the region and by the waypoint
         action = Action.KEEP if best_drone is None else (Action.GIVE_FERRY if best_drone.identifier < self.num_of_ferries else Action.GIVE_NODE)
         self.__update_actions(pkd.event_ref.identifier, action, region, waypoint)
 
-        return best_drone  # here you should return a drone object!
+        return best_drone
 
     def print(self):
         """
@@ -166,6 +159,7 @@ class AIRouting(BASE_routing):
                 self.taken_actions[pkd_id] = value
 
         else:
+            #this is the first action for the packet
             self.taken_actions[pkd_id] = [tuple((action, region, step))]
 
     def __is_a_ferry(self, drone):

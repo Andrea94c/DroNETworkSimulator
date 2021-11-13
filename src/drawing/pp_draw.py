@@ -166,6 +166,8 @@ class PathPlanningDrawer():
         stddraw.setPenColor(c=stddraw.BLACK)
         # life time and speed
         stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length()))
+        # life time and speed
+        stddraw.text(drone.coords[0]+75, drone.coords[1], " e:" + str(int(drone.residual_energy)))
         # index
         stddraw.text(drone.coords[0], drone.coords[1] + (drone.communication_range / 2.0), "id: " + str(drone.identifier))
 

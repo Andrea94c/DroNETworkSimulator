@@ -226,6 +226,8 @@ class Drone(Entity):
         self.max_energy = self.simulator.rnd_routing.randint(config.DRONE_MIN_FLIGHT_TIME, config.DRONE_MAX_ENERGY)
         self.residual_energy = self.max_energy
         self.path = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.simulator.seed, self.simulator.rnd_path).path(identifier, simulator, self.residual_energy)
+
+        self.ferry_check()
         self.come_back_to_mission = False  # if i'm coming back to my applicative mission
         self.last_move_routing = False  # if in the last step i was moving to depot
 
@@ -247,6 +249,15 @@ class Drone(Entity):
         # last mission coord to restore the mission after movement
         self.last_mission_coords = None
 
+    def ferry_check(self):
+        self.is_ferry = self.identifier <= config.FERRY
+        # NOTE: not realistic, but for hmw1 is fine! to remove in future
+        if self.is_ferry:  # update energy with corrected value
+            self.max_energy = 0
+            cycle = self.path + [self.depot.coords]
+            for i in range(len(cycle) - 1):
+                self.max_energy += utilities.euclidean_distance(cycle[i], cycle[i+1])
+            self.residual_energy = self.max_energy
 
     def update_packets(self, cur_step):
         """ removes the expired packets from the buffer
@@ -376,10 +387,10 @@ class Drone(Entity):
         """ When invoked the drone moves on the map. TODO: Add comments and clean.
             time -> time_step_duration (how much time between two simulation frame)
         """
-
         if self.current_waypoint >= len(self.path) - 1:
             if len(self.simulator.restart_mission) == self.simulator.n_drones:
                 self.current_waypoint = -1
+                self.residual_energy = self.max_energy
             else:
                 self.simulator.restart_mission.add(self.identifier)
                 return
@@ -392,14 +403,14 @@ class Drone(Entity):
 
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = time * self.speed
-
-        self.residual_energy -= distance
-        if self.residual_energy <= 0:
-            self.residual_energy = self.max_energy
+                #if self.residual_energy <= 0 and self.distance_from_depot == 0:
+        #    self.residual_energy = self.max_energy
 
         if all_distance == 0 or distance == 0:
             self.__update_position(p1)
             return
+
+        self.residual_energy -= distance
 
         t = distance / all_distance
         if t >= 1:

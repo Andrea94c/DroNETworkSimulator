@@ -93,10 +93,11 @@ class AIRouting(BASE_routing):
 
         #drone that are my neighbours
         neighbours = [t[1] for t in opt_neighbors]
-        #neighbours.append(None)
+        neighbours.append(None)
 
         key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint]
         value_actions = [self.Q_table[k] for k in key_actions]
+        #optimistical initial values
         if not value_actions:
             possible_actions = [tuple((type_act, region, waypoint)) for type_act in Action]
             initial_values = [2 if a[0]==Action.GIVE_FERRY else 1 for a in possible_actions]

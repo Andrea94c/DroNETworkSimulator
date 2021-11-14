@@ -28,6 +28,7 @@ class AIRouting(BASE_routing):
         self.taken_actions = {}  # id event : (old_action)
 
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
+        self.is_ferry = self.drone.identifier < self.num_of_ferries
 
         self.epsilon = 0.1
 
@@ -98,7 +99,8 @@ class AIRouting(BASE_routing):
             t = tuple((n, region, waypoint))
             if t not in key_actions:
                 key_actions.append(t)
-                value = 2 if (n is None and self.drone.identifier < self.num_of_ferries) or (n is not None and n.identifier < self.num_of_ferries) else 1
+                #at the beginning we are going to assume that give packets to the ferries is the right choice 
+                value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1
                 value_actions.append(value)
                 self.Q_table[t] = value
 
@@ -111,8 +113,15 @@ class AIRouting(BASE_routing):
             key_actions = possible_actions
             value_actions = initial_values'''
 
+        #if I'm a ferry I'm going to keep the packets most of the time
+        ferry = False
+        if self.is_ferry:
+            prob = self.rnd_for_routing_ai.rand()
+            if prob > 0.01:
+                ferry = True
+
         #already did at least one round
-        if waypoint < len(self.drone.waypoint_history) and energy:
+        if waypoint < len(self.drone.waypoint_history) and energy and not ferry:
             #epsilon greedy, with low probability we choose a random action
             prob = self.rnd_for_routing_ai.rand()
             if prob < self.epsilon:
@@ -136,7 +145,7 @@ class AIRouting(BASE_routing):
                     best_drone = None if best_action == Action.KEEP else neighbours[0]'''
 
         #for the first round we choose the best drone according to the estimated position
-        elif energy:
+        elif energy and not ferry:
             best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
             for hpk, drone_instance in opt_neighbors:
                 exp_position = self.__estimated_neighbor_drone_position(hpk)
@@ -172,9 +181,6 @@ class AIRouting(BASE_routing):
         else:
             #this is the first action for the packet
             self.taken_actions[pkd_id] = [tuple((action, region, step))]
-
-    def __is_a_ferry(self, drone):
-        return drone.identifier < self.num_of_ferries
 
     def __estimated_neighbor_drone_position(self, hello_message):
         """ estimate the current position of the drone """

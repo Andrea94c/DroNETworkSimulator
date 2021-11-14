@@ -8,17 +8,15 @@ from src.utilities.random_waypoint_generation import next_target
 
 def assign_region(x, y, width):
 
+    #regions_matrix = np.reshape(np.arange(1, 5), (2,2))
     regions_matrix = np.reshape(np.arange(1, 17), (4,4))
+    #splitter = int(width / 2)
     splitter = int(width / 4)
+    #index_x = 0 if x < splitter else 1
     index_x = 0 if x < splitter else (1 if x < splitter * 2 else (2 if x < splitter * 3 else 3))
     index_y = 0 if y < splitter else (1 if y < splitter * 2 else (2 if y < splitter * 3 else 3))
 
     return regions_matrix[index_y][index_x]
-
-class Action(Enum):
-    KEEP = auto()
-    GIVE_FERRY = auto()
-    GIVE_NODE = auto()
 
 class AIRouting(BASE_routing):
     def __init__(self, drone, simulator):
@@ -43,11 +41,7 @@ class AIRouting(BASE_routing):
 
     #if outcome positive then drone is the drone that delivered the package to the depot
     def feedback(self, drone, id_event, delay, outcome):
-        """ return a possible feedback, if the destination drone has received the packet """
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
-        # Feedback from a delivered or expired packet
-
-        # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
 
         #neg_rewards = [-2, -1.5, -1, -0.5, -0.3]
         reward_per_action = {}
@@ -82,8 +76,9 @@ class AIRouting(BASE_routing):
         region = assign_region(self.drone.coords[0], self.drone.coords[1], self.simulator.env_width)
         #current step in our mission
         waypoint = self.drone.current_waypoint
-        #energy left --> if I have low energy then I should keep the packets, I'm returning to the depot
-        energy = self.drone.residual_energy > 1500
+        #THIS IS COMMENTED FOR THE INITIAL TESTING
+        '''#energy left --> if I have low energy then I should keep the packets, I'm returning to the depot
+        energy = self.drone.residual_energy > 1500'''
 
         #drone that are my neighbours
         neighbours = [t[1] for t in opt_neighbors]
@@ -99,53 +94,35 @@ class AIRouting(BASE_routing):
             t = tuple((n, region, waypoint))
             if t not in key_actions:
                 key_actions.append(t)
-                #at the beginning we are going to assume that give packets to the ferries is the right choice 
-                value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1
+                #THIS IS COMMENTED FOR THE INITIAL TESTING
+                '''#at the beginning we are going to assume that give packets to the ferries is the right choice 
+                value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1'''
+                value = 0
                 value_actions.append(value)
                 self.Q_table[t] = value
 
-        '''if not value_actions:
-            #possible_actions = [tuple((type_act, region, waypoint)) for type_act in Action]
-            possible_actions = [tuple((n, region, waypoint)) for n in neighbours]
-            initial_values = [2 if (n is None and self.drone.identifier < self.num_of_ferries) or n.identifier < self.num_of_ferries else 1 for n in neighbours]
-            #initial_values = [2 if a[0]==Action.GIVE_FERRY or (a[0]==Action.KEEP and self.drone.identifier < self.num_of_ferries) else 1 for a in possible_actions]
-            self.Q_table.update(dict(zip(possible_actions, initial_values)))
-            key_actions = possible_actions
-            value_actions = initial_values'''
-
-        #if I'm a ferry I'm going to keep the packets most of the time
+        #THIS IS COMMENTED FOR THE INITIAL TESTING
+        '''#if I'm a ferry I'm going to keep the packets most of the time
         ferry = False
         if self.is_ferry:
             prob = self.rnd_for_routing_ai.rand()
             if prob > 0.01:
-                ferry = True
+                ferry = True'''
 
         #already did at least one round
-        if waypoint < len(self.drone.waypoint_history) and energy and not ferry:
-            #epsilon greedy, with low probability we choose a random action
+        if waypoint < len(self.drone.waypoint_history): #and energy and not ferry
+            #THIS IS COMMENTED FOR THE INITIAL TESTING
+            '''#epsilon greedy, with low probability we choose a random action
             prob = self.rnd_for_routing_ai.rand()
             if prob < self.epsilon:
                 best_drone = self.rnd_for_routing_ai.choice(neighbours)
             #with high probability we choose what we think is the best action
-            else:
-                max_ind = np.argmax(value_actions)
-                #best_action = key_actions[max_ind][0]
-                best_drone = key_actions[max_ind][0]
-                '''#if best_action is Keep then best_drone is already None
-                if best_action == Action.GIVE_FERRY:
-                    best_drone = next((n for n in neighbours if n is not None and n.identifier < self.num_of_ferries), None)
-                elif best_action == Action.GIVE_NODE:
-                    best_drone = next((n for n in neighbours if n is not None and n.identifier > self.num_of_ferries), None)
-                #if the best action is not possible this time, we choose the second best
-                if best_drone is None and best_action != Action.KEEP:
-                    key_actions = [q for q in key_actions if q[0] != best_action]
-                    value_actions = [self.Q_table[k] for k in key_actions]
-                    max_ind = np.argmax(value_actions)
-                    best_action = key_actions[max_ind][0]
-                    best_drone = None if best_action == Action.KEEP else neighbours[0]'''
+            else:'''
+            max_ind = np.argmax(value_actions)
+            best_drone = key_actions[max_ind][0]
 
         #for the first round we choose the best drone according to the estimated position
-        elif energy and not ferry:
+        else: #elif energy and not ferry
             best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
             for hpk, drone_instance in opt_neighbors:
                 exp_position = self.__estimated_neighbor_drone_position(hpk)

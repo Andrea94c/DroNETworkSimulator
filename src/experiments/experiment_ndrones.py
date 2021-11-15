@@ -3,7 +3,7 @@ from src.simulation.simulator import Simulator
 import os
 from argparse import ArgumentParser
 
-LEN_TEST = 18000 # around 3hr of mission
+LEN_TEST = 48000 # around 3hr of mission
 
 def sim_setup(n_drones, seed, algorithm_routing):
     """ return the sim setup """

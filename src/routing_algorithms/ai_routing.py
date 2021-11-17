@@ -27,9 +27,9 @@ class AIRouting(BASE_routing):
         self.is_ferry = self.drone.identifier < self.num_of_ferries
 
         #to implement epsilon_greedy
-        self.epsilon = 0.3
+        self.epsilon = 0.3 #also tested 0.01, 0.05, 0.1
         #to implemente UCB
-        self.confidence = 0.7
+        self.confidence = 0.7 #also tested 0.1, 0.3, 0.5
 
         # number of times an action has been taken
         self.n_actions = {}
@@ -142,12 +142,12 @@ class AIRouting(BASE_routing):
             This method is called at the end of the simulation, can be useful to print some
                 metrics about the learning process
         """
-        return self.changes
+        pass
 
     #this was for UCB
     def __calculate_uncertainty(self, t, action):
         if action not in self.n_actions: return float('inf')                         
-        return self.c * (np.sqrt(np.log(t) / self.n_actions[action]))
+        return self.confidence * (np.sqrt(np.log(t) / self.n_actions[action]))
 
     def __update_actions(self, pkd_id, action, region, step):
         if pkd_id in self.taken_actions:

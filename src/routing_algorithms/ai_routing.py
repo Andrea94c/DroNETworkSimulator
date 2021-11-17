@@ -7,6 +7,8 @@ from src.utilities.random_waypoint_generation import next_target
 
 def assign_region(x, y, width):
 
+    #tested for #regions = 4, 9, 16, 25, 36 (also some with 45)
+    #best value turned out to be 36
     regions_matrix = np.reshape(np.arange(1, 37), (6,6))
     splitter = int(width / 6)
     index_x = 0 if x < splitter else (1 if x < splitter * 2 else (2 if x < splitter * 3 else (3 if x < splitter * 4 else (4 if x < splitter * 5 else 5))))
@@ -24,23 +26,24 @@ class AIRouting(BASE_routing):
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
         self.is_ferry = self.drone.identifier < self.num_of_ferries
 
+        #to implement epsilon_greedy
         self.epsilon = 0.3
-        self.c = 0.7
+        #to implemente UCB
+        self.confidence = 0.7
 
         # number of times an action has been taken
         self.n_actions = {}
-        # Q_table
+        # Q_table, each drone has its own
         self.Q_table = {}
 
     @staticmethod
     def __get_number_of_ferries():
         return src.utilities.config.FERRY
 
-    #if outcome positive then drone is the drone that delivered the package to the depot
     def feedback(self, drone, id_event, delay, outcome):
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
 
-        neg_rewards = [-1, -0.8, -0.6, -0.4, -0.2]
+        neg_rewards = [-1, -0.8, -0.6, -0.4, -0.2] #also tested neg_rewards = -2, -1, [-2, -1.5, -1, -0.5, -0.3]
         reward_per_action = {}
 
         if id_event in self.taken_actions:
@@ -55,11 +58,13 @@ class AIRouting(BASE_routing):
             
             #update Q_table according to reward_per_action
 
+            #counting how many times the actions have been taken
             n_previous = [self.n_actions[a]+1 if a in self.n_actions else 1 for a in action]
             self.n_actions.update(dict(zip(action, n_previous)))
 
+            #calculating the new values for the Q-table
             q = [self.Q_table[a] + 1/self.n_actions[a]*(reward_per_action[a]-self.Q_table[a]) if a in self.Q_table else reward_per_action[a] for a in action]
-
+            
             self.Q_table.update(dict(zip(action, q)))
 
             del self.taken_actions[id_event]
@@ -72,9 +77,9 @@ class AIRouting(BASE_routing):
         region = assign_region(self.drone.coords[0], self.drone.coords[1], self.simulator.env_width)
         #current step in our mission
         waypoint = self.drone.current_waypoint
-        #THIS IS COMMENTED FOR THE INITIAL TESTING
-        '''#energy left --> if I have low energy then I should keep the packets, I'm returning to the depot
-        energy = self.drone.residual_energy > 1500'''
+
+        #energy left: if I have low energy then I should keep the packets, I'm returning to the depot
+        energy = self.drone.residual_energy > 500
 
         #drone that are my neighbours
         neighbours = [t[1] for t in opt_neighbors]
@@ -83,45 +88,41 @@ class AIRouting(BASE_routing):
 
         #current Q_table values for possible actions in the current region and for the current waypoint
         key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint and q[0] in neighbours]
-        #value_actions = [self.Q_table[k] for k in key_actions]
+        value_actions = [self.Q_table[k] for k in key_actions]
+        
         #UCB
-        t = self.simulator.cur_step
-        value_actions = [self.Q_table[k] + self.__calculate_uncertainty(t, k) for k in key_actions]
+        #t = self.simulator.cur_step
+        #value_actions = [self.Q_table[k] + self.__calculate_uncertainty(t, k) for k in key_actions]
 
-        #optimistical initial values
+        #initial values
         for n in neighbours:
             t = tuple((n, region, waypoint))
             if t not in key_actions:
                 key_actions.append(t)
-                #at the beginning we are going to assume that give packets to the ferries is the right choice 
-                #value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1'''
-                #value = 0
-                value = float('inf')
+                value = 0 #tested optimistical initial values = 1, 2, 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1
                 value_actions.append(value)
                 self.Q_table[t] = value
 
-        #THIS IS COMMENTED FOR THE INITIAL TESTING
-        '''#if I'm a ferry I'm going to keep the packets most of the time
+        #if I'm a ferry I'm going to keep the packets most of the time
         ferry = False
         if self.is_ferry:
             prob = self.rnd_for_routing_ai.rand()
-            if prob > 0.01:
-                ferry = True'''
+            if prob > 0.5:
+                ferry = True
 
         #already did at least one round
-        if waypoint < len(self.drone.waypoint_history): #and energy and not ferry
+        if waypoint < len(self.drone.waypoint_history) and energy and not ferry:
             #epsilon greedy, with low probability we choose a random action
-            '''prob = self.rnd_for_routing_ai.rand()
+            prob = self.rnd_for_routing_ai.rand()
             if prob < self.epsilon:
                 best_drone = self.rnd_for_routing_ai.choice(neighbours)
             #with high probability we choose what we think is the best action
-            else:'''
-            #UCB
-            max_ind = np.argmax(value_actions)
-            best_drone = key_actions[max_ind][0]
+            else:
+                max_ind = np.argmax(value_actions)
+                best_drone = key_actions[max_ind][0]
 
         #for the first round we choose the best drone according to the estimated position
-        else: #elif energy and not ferry
+        elif energy and not ferry:
             best_drone_distance_from_depot = util.euclidean_distance(self.simulator.depot.coords, self.drone.coords)
             for hpk, drone_instance in opt_neighbors:
                 exp_position = self.__estimated_neighbor_drone_position(hpk)
@@ -141,15 +142,14 @@ class AIRouting(BASE_routing):
             This method is called at the end of the simulation, can be useful to print some
                 metrics about the learning process
         """
-        pass
+        return self.changes
 
+    #this was for UCB
     def __calculate_uncertainty(self, t, action):
         if action not in self.n_actions: return float('inf')                         
         return self.c * (np.sqrt(np.log(t) / self.n_actions[action]))
 
-
     def __update_actions(self, pkd_id, action, region, step):
-
         if pkd_id in self.taken_actions:
             #extracting previuos actions for the packet
             value = self.taken_actions.get(pkd_id)
@@ -157,7 +157,6 @@ class AIRouting(BASE_routing):
             if (value[-1]) != tuple((action, region, step)):
                 value.append(tuple((action, region, step)))
                 self.taken_actions[pkd_id] = value
-
         else:
             #this is the first action for the packet
             self.taken_actions[pkd_id] = [tuple((action, region, step))]

@@ -86,7 +86,7 @@ class AIRouting(BASE_routing):
         key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint and q[0] in neighbours]
         #value_actions = [self.Q_table[k] for k in key_actions]
         #UCB
-        t = self.simulator.curr_step
+        t = self.simulator.cur_step
         value_actions = [self.Q_table[k] + self.c * math.sqrt(math.log(t)/self.n_actions[k]) for k in key_actions]
 
         #optimistical initial values

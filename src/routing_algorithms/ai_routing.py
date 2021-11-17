@@ -2,7 +2,6 @@ import numpy as np
 import src.utilities.config
 from src.utilities import utilities as util
 from src.routing_algorithms.BASE_routing import BASE_routing
-import math
 
 from src.utilities.random_waypoint_generation import next_target
 
@@ -26,7 +25,7 @@ class AIRouting(BASE_routing):
         self.is_ferry = self.drone.identifier < self.num_of_ferries
 
         self.epsilon = 0.3
-        self.c = 0.3
+        self.c = 0.7
 
         # number of times an action has been taken
         self.n_actions = {}
@@ -87,7 +86,7 @@ class AIRouting(BASE_routing):
         #value_actions = [self.Q_table[k] for k in key_actions]
         #UCB
         t = self.simulator.cur_step
-        value_actions = [self.Q_table[k] + self.c * math.sqrt(math.log(t)/self.n_actions[k]) for k in key_actions]
+        value_actions = [self.Q_table[k] + self.__calculate_uncertainty(t, k) for k in key_actions]
 
         #optimistical initial values
         for n in neighbours:
@@ -97,7 +96,7 @@ class AIRouting(BASE_routing):
                 #at the beginning we are going to assume that give packets to the ferries is the right choice 
                 #value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1'''
                 #value = 0
-                value = self.c * math.sqrt(math.log(t))
+                value = float('inf')
                 value_actions.append(value)
                 self.Q_table[t] = value
 
@@ -144,7 +143,11 @@ class AIRouting(BASE_routing):
         """
         pass
 
-    # Private methods
+    def __calculate_uncertainty(self, t, action):
+        if action not in self.n_actions: return float('inf')                         
+        return self.c * (np.sqrt(np.log(t) / self.n_actions[action]))
+
+
     def __update_actions(self, pkd_id, action, region, step):
 
         if pkd_id in self.taken_actions:

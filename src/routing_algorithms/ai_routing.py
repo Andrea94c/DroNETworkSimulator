@@ -2,19 +2,16 @@ import numpy as np
 import src.utilities.config
 from src.utilities import utilities as util
 from src.routing_algorithms.BASE_routing import BASE_routing
-from enum import Enum, auto
+import math
 
 from src.utilities.random_waypoint_generation import next_target
 
 def assign_region(x, y, width):
 
-    #regions_matrix = np.reshape(np.arange(1, 5), (2,2))
-    regions_matrix = np.reshape(np.arange(1, 17), (4,4))
-    #splitter = int(width / 2)
-    splitter = int(width / 4)
-    #index_x = 0 if x < splitter else 1
-    index_x = 0 if x < splitter else (1 if x < splitter * 2 else (2 if x < splitter * 3 else 3))
-    index_y = 0 if y < splitter else (1 if y < splitter * 2 else (2 if y < splitter * 3 else 3))
+    regions_matrix = np.reshape(np.arange(1, 37), (6,6))
+    splitter = int(width / 6)
+    index_x = 0 if x < splitter else (1 if x < splitter * 2 else (2 if x < splitter * 3 else (3 if x < splitter * 4 else (4 if x < splitter * 5 else 5))))
+    index_y = 0 if y < splitter else (1 if y < splitter * 2 else (2 if y < splitter * 3 else (3 if y < splitter * 4 else (4 if y < splitter * 5 else 5))))
 
     return regions_matrix[index_y][index_x]
 
@@ -28,7 +25,8 @@ class AIRouting(BASE_routing):
         self.num_of_ferries = AIRouting.__get_number_of_ferries()
         self.is_ferry = self.drone.identifier < self.num_of_ferries
 
-        self.epsilon = 0.1
+        self.epsilon = 0.3
+        self.c = 0.3
 
         # number of times an action has been taken
         self.n_actions = {}
@@ -43,17 +41,16 @@ class AIRouting(BASE_routing):
     def feedback(self, drone, id_event, delay, outcome):
         # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
 
-        #neg_rewards = [-2, -1.5, -1, -0.5, -0.3]
+        neg_rewards = [-1, -0.8, -0.6, -0.4, -0.2]
         reward_per_action = {}
 
         if id_event in self.taken_actions:
             action = self.taken_actions[id_event]
             action.reverse() #here actions taken for the packet are from the most recent to the last
             if outcome == -1:
-                #i = min(5, len(action))
-                #reward_per_action = dict(zip(action[:i], neg_rewards))
-                #reward_per_action.update(dict.fromkeys(action[i:], 0.1))
-                reward_per_action = dict.fromkeys(action, -2)
+                i = min(5, len(action))
+                reward_per_action = dict(zip(action[:i], neg_rewards))
+                reward_per_action.update(dict.fromkeys(action[i:], 0.1))
             else:
                 reward_per_action = dict.fromkeys(action, 1/delay * 1000)
             
@@ -87,17 +84,20 @@ class AIRouting(BASE_routing):
 
         #current Q_table values for possible actions in the current region and for the current waypoint
         key_actions = [q for q in self.Q_table if q[1] == region and q[2] == waypoint and q[0] in neighbours]
-        value_actions = [self.Q_table[k] for k in key_actions]
-        
+        #value_actions = [self.Q_table[k] for k in key_actions]
+        #UCB
+        t = self.simulator.curr_step
+        value_actions = [self.Q_table[k] + self.c * math.sqrt(math.log(t)/self.n_actions[k]) for k in key_actions]
+
         #optimistical initial values
         for n in neighbours:
             t = tuple((n, region, waypoint))
             if t not in key_actions:
                 key_actions.append(t)
-                #THIS IS COMMENTED FOR THE INITIAL TESTING
-                '''#at the beginning we are going to assume that give packets to the ferries is the right choice 
-                value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1'''
-                value = 0
+                #at the beginning we are going to assume that give packets to the ferries is the right choice 
+                #value = 2 if (n is None and self.is_ferry) or (n is not None and n.identifier < self.num_of_ferries) else 1'''
+                #value = 0
+                value = self.c * math.sqrt(math.log(t))
                 value_actions.append(value)
                 self.Q_table[t] = value
 
@@ -111,13 +111,13 @@ class AIRouting(BASE_routing):
 
         #already did at least one round
         if waypoint < len(self.drone.waypoint_history): #and energy and not ferry
-            #THIS IS COMMENTED FOR THE INITIAL TESTING
-            '''#epsilon greedy, with low probability we choose a random action
-            prob = self.rnd_for_routing_ai.rand()
+            #epsilon greedy, with low probability we choose a random action
+            '''prob = self.rnd_for_routing_ai.rand()
             if prob < self.epsilon:
                 best_drone = self.rnd_for_routing_ai.choice(neighbours)
             #with high probability we choose what we think is the best action
             else:'''
+            #UCB
             max_ind = np.argmax(value_actions)
             best_drone = key_actions[max_ind][0]
 

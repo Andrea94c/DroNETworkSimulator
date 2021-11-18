@@ -376,4 +376,3 @@ class TraversedCells:
 
         x_cells = np.ceil(width_area / size_cell)  # numero di celle su X
         return x_cell_coords + (x_cells * y_cell_coords)
-

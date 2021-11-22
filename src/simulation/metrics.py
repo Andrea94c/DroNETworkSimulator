@@ -46,6 +46,7 @@ class Metrics:
         # number of time steps on mission, incremented each time drone is doing sensing mission
         self.time_on_mission = 0
 
+        self.energy_spent_for_active_movement = defaultdict(int)
         self.time_on_active_routing = 0
 
     def score(self, undelivered_penalty=1.5):
@@ -158,8 +159,7 @@ class Metrics:
             "packets_max_ttl": self.simulator.packets_max_ttl,
             "show_plot": self.simulator.show_plot,
             "routing_algorithm": str(self.simulator.routing_algorithm),
-            "communication_error_type": str(self.simulator.communication_error_type),
-            "time_on_active_routing" : str(self.time_on_active_routing)
+            "communication_error_type": str(self.simulator.communication_error_type)
         }
 
     def __dictionary_represenation(self):
@@ -185,6 +185,9 @@ class Metrics:
         out_results["drones_to_depot_packets"] = [(pck.to_json(), delivery_ts) for pck, delivery_ts in self.drones_packets_to_depot]
         out_results["score"] = self.score()
         out_results["mean_number_of_relays"] = np.nanmean(self.mean_numbers_of_possible_relays)
+        out_results["time_on_active_routing"] = self.time_on_active_routing
+        out_results["energy_move_routing"] = self.energy_spent_for_active_movement
+
 
         return out_results
 

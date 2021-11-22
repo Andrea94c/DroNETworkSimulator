@@ -80,6 +80,11 @@ def mean_std_of_metric(filename_format : str, ndrones : int,
             elif metric == "ratio_delivery_detected":
                 data.append(ktri_0["number_of_events_to_depot"] 
                                 / ktri_0["number_of_detected_events"])
+            elif metric == "Routing time / mission time":
+                data.append(ktri_0["time_on_active_routing"]
+                                / ktri_0["time_on_mission"])
+            elif metric == "energy_move_routing":
+                data.append(sum(ktri_0[metric].values()))
             else:
                 data.append(ktri_0[metric])
 
@@ -140,6 +145,8 @@ METRICS_OF_INTEREST = [
         'number_of_events_to_depot',
         'event_mean_delivery_time',
         'ratio_delivery_detected',
+        'Routing time / mission time',
+        "energy_move_routing",
         "score"]
 
 

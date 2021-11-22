@@ -98,22 +98,9 @@ class EventGenerator:
         :param drones: the drones where to sample the event
         :return: nothing
         """
-        if cur_step % self.simulator.event_generation_delay == 0:
-            # if it's time to generate a new packet
+        if cur_step % self.simulator.event_generation_delay == 0:  # if it's time to generate a new packet
             # drone that will receive the packet:
-            if config.FERRY >= len(drones):
-                return
-
-            # take only drones that are doing the mission, are not recharging
-            drones_in_mission = [
-                    i for i in range(config.FERRY, len(drones))
-                    if self.simulator.drones[i].coords != self.simulator.depot_coordinates
-                ]
-            if len(drones_in_mission) > 0:
-                drone_index = self.rnd_drones.choice(drones_in_mission)
-            else:
-                drone_index = self.rnd_drones.randint(config.FERRY, len(drones))
-
+            drone_index = self.rnd_drones.randint(0, len(drones))
             drone = drones[drone_index]
             drone.feel_event(cur_step)
 

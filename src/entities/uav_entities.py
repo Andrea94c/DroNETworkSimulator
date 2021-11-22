@@ -170,13 +170,26 @@ class ACKPacket(Packet):
 
 class HelloPacket(Packet):
     """ The hello message is responsible to give info about neighborhood """
-    def __init__(self, src_drone, time_step_creation, simulator, cur_pos, speed, next_target):
+    def __init__(self, src_drone, time_step_creation, simulator, cur_pos, speed,
+                 move_to_depot, npackets, next_target):
         super().__init__(time_step_creation, simulator, None)
         self.cur_pos = cur_pos
         self.speed = speed
         self.next_target = next_target
+        self.move_to_depot = move_to_depot
+        self.npackets = npackets
         self.src_drone = src_drone
 
+    def __repr__(self):
+        return ("Src Hello Packet: " + str(self.src_drone) +  " - " +
+        "\n cur_pos: " +  str(self.cur_pos) +
+        "\n speed: " +  str(self.speed) +
+        "\n next_target: " +  str(self.next_target) +
+        "\n move_to_depot: " +  str(self.move_to_depot) +
+        "\n npackets: " +  str(self.npackets))
+
+    def __hash__(self):
+        return hash((self.identifier))
 
 # ------------------ Depot ----------------------
 class Depot(Entity):
@@ -218,6 +231,9 @@ class Drone(Entity):
 
         self.depot = depot
         self.speed = speed if config.HETEROGENOUS_DRONE_SPEED else self.simulator.drone_speed
+        if config.DEBUG:
+            print("Drone {} - speed:".format(identifier), self.speed)
+        #    print("Drone {} - radio performance".format(identifier), channel_success_rate)
         self.channel_success_rate = channel_success_rate
         self.sensing_range = self.simulator.drone_sen_range
         self.communication_range = self.simulator.drone_com_range
@@ -227,7 +243,6 @@ class Drone(Entity):
         self.residual_energy = self.max_energy
         self.path = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.simulator.seed, self.simulator.rnd_path).path(identifier, simulator, self.residual_energy)
 
-        self.ferry_check()
         self.come_back_to_mission = False  # if i'm coming back to my applicative mission
         self.last_move_routing = False  # if in the last step i was moving to depot
 
@@ -248,16 +263,6 @@ class Drone(Entity):
 
         # last mission coord to restore the mission after movement
         self.last_mission_coords = None
-
-    def ferry_check(self):
-        self.is_ferry = self.identifier <= config.FERRY
-        # NOTE: not realistic, but for hmw1 is fine! to remove in future
-        if self.is_ferry:  # update energy with corrected value
-            self.max_energy = 0
-            cycle = self.path + [self.depot.coords]
-            for i in range(len(cycle) - 1):
-                self.max_energy += utilities.euclidean_distance(cycle[i], cycle[i+1])
-            self.residual_energy = self.max_energy
 
     def update_packets(self, cur_step):
         """ removes the expired packets from the buffer
@@ -343,7 +348,29 @@ class Drone(Entity):
         
             time -> time_step_duration (how much time between two simulation frame)
         """
-        self.__move_to_mission(time)
+        if self.move_routing or self.come_back_to_mission:
+            # metrics: number of time steps on active routing (movement) a counter that is incremented each time
+            # drone is moving to the depot for active routing, i.e., move_routing = True
+            # or the drone is coming back to its mission
+            self.simulator.metrics.time_on_active_routing += 1
+            self.simulator.metrics.energy_spent_for_active_movement[self.identifier] += 1
+
+        if self.move_routing:
+            if not self.last_move_routing:  # this is the first time that we are doing move-routing
+                self.last_mission_coords = self.coords
+
+            self.__move_to_depot(time)
+        else:
+            if self.last_move_routing:  # I'm coming back to the mission
+                self.come_back_to_mission = True
+
+            self.__move_to_mission(time)
+
+            # metrics: number of time steps on mission, incremented each time drone is doing sensing mission
+            self.simulator.metrics.time_on_mission += 1
+
+        # set the last move routing
+        self.last_move_routing = self.move_routing
 
     def is_full(self):
         return self.buffer_length() == self.buffer_max_size
@@ -388,12 +415,7 @@ class Drone(Entity):
             time -> time_step_duration (how much time between two simulation frame)
         """
         if self.current_waypoint >= len(self.path) - 1:
-            if len(self.simulator.restart_mission) == self.simulator.n_drones:
-                self.current_waypoint = -1
-                self.residual_energy = self.max_energy
-            else:
-                self.simulator.restart_mission.add(self.identifier)
-                return
+            self.current_waypoint = -1
 
         p0 = self.coords
         if self.come_back_to_mission:  # after move
@@ -403,14 +425,10 @@ class Drone(Entity):
 
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = time * self.speed
-                #if self.residual_energy <= 0 and self.distance_from_depot == 0:
-        #    self.residual_energy = self.max_energy
 
         if all_distance == 0 or distance == 0:
             self.__update_position(p1)
             return
-
-        self.residual_energy -= distance
 
         t = distance / all_distance
         if t >= 1:

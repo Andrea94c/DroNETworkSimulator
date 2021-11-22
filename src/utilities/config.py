@@ -1,5 +1,6 @@
 
 from src.routing_algorithms.georouting import GeoRouting
+from src.routing_algorithms.georouting_w_move import GeoMoveRouting
 from src.routing_algorithms.random_routing import RandomRouting
 from src.routing_algorithms.closeset_to_me_routing import CloRouting
 from src.routing_algorithms.ai_routing import AIRouting
@@ -44,7 +45,7 @@ EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simula
 # drawaing
 PLOT_SIM = True      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
-SKIP_SIM_STEP = 30     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
+SKIP_SIM_STEP = 5     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
 IS_SHOW_NEXT_TARGET_VEC = True  # bool : whether show the direction and next target of the drone
 
@@ -58,12 +59,12 @@ SIM_DURATION = 15000 # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 5          # int: seed of this simulation.
 
-N_DRONES = 5  # int: number of drones. # ***
+N_DRONES = 20  # int: number of drones. # ***
 ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 
 # events
-EVENTS_DURATION = 2000  # SIM_DURATION  # int: steps, number of time steps that an event lasts  -> to seconds = step * step_duration.
+EVENTS_DURATION = 8000  # SIM_DURATION  # int: steps, number of time steps that an event lasts  -> to seconds = step * step_duration.
 D_FEEL_EVENT = 300      # int: steps, a new packet is felt (generated on the drone) every 'D_FEEL_EVENT' steps. # ***
 P_FEEL_EVENT = .8       # float: probability that the drones feels the event generated on the drone. # ***
 
@@ -74,13 +75,13 @@ COMMUNICATION_RANGE_DRONE = 200  # float: meters, communication range of the dro
 SENSING_RANGE_DRONE = 0        # float: meters, the sensing range of the drones.
 DRONE_SPEED = 8                  # float: m/s, drone speed.
 DRONE_MAX_BUFFER_SIZE = 100     # int: max number of packets in the buffer of a drone.
-DRONE_MAX_ENERGY = 12000           # int: max energy of a drone, possible travelled distance (meters)
-DRONE_MIN_FLIGHT_TIME = 3200  #  possible travelled distance (meters)
+DRONE_MAX_ENERGY = 12000000           # int: max energy of a drone, possible travelled distance (meters)
+DRONE_MIN_FLIGHT_TIME = 3200000  #  possible travelled distance (meters)
 HETEROGENOUS_DRONE_SPEED = True
-FERRY = 3
+FERRY = 0
 
 # depot
-DEPOT_COMMUNICATION_RANGE = 5  # float: meters, communication range of the depot.
+DEPOT_COMMUNICATION_RANGE = 200  # float: meters, communication range of the depot.
 DEPOT_COO = (750, 0)             # (float, float): coordinates of the depot.
 
 
@@ -88,6 +89,7 @@ DEPOT_COO = (750, 0)             # (float, float): coordinates of the depot.
 class RoutingAlgorithm(Enum):
     GEO = GeoRouting
     RND = RandomRouting
+    MGEO = GeoMoveRouting
     CLO = CloRouting
     AI = AIRouting
 
@@ -106,7 +108,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.AI
+ROUTING_ALGORITHM = RoutingAlgorithm.MGEO
 CHANNEL_ERROR_TYPE = ChannelError.ON_DEVICE
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.

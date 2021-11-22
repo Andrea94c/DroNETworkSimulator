@@ -113,7 +113,6 @@ class Simulator:
 
     def __set_simulation(self):
         """ the method creates all the uav entities """
-
         self.__set_random_generators()
         self.environment = Environment(self.env_width, self.env_height, self)
 

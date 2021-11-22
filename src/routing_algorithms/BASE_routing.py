@@ -59,7 +59,10 @@ class BASE_routing(metaclass=abc.ABCMeta):
             return
 
         my_hello = HelloPacket(self.drone, cur_step, self.simulator, self.drone.coords,
-                               self.drone.speed, self.drone.next_target())
+                               self.drone.speed,
+                               self.drone.move_routing and not self.drone.come_back_to_mission,
+                               self.drone.buffer_length(),
+                               self.drone.next_target())
 
         self.broadcast_message(my_hello, self.drone, drones, cur_step)
 
@@ -81,7 +84,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
             return
 
         # FLOW 1
-        if util.euclidean_distance(self.simulator.depot.coords, self.drone.coords) <= 5:
+        if util.euclidean_distance(self.simulator.depot.coords, self.drone.coords) <= self.simulator.depot.communication_range:
             # add error in case
             self.transfer_to_depot(self.drone.depot, cur_step)
 
@@ -106,14 +109,16 @@ class BASE_routing(metaclass=abc.ABCMeta):
 
                 opt_neighbors.append((hpk, hpk.src_drone))
 
-            if len(opt_neighbors) == 0:
-                return
-
             # send packets
             for pkd in self.drone.all_packets():
                 self.simulator.metrics.mean_numbers_of_possible_relays.append(len(opt_neighbors))
                 best_neighbor = self.relay_selection(opt_neighbors, pkd)  # compute score
-                if best_neighbor is not None:
+                if best_neighbor == -1:
+                    if not self.drone.move_routing:
+                        # add penalty to change trajectories
+                        self.simulator.metrics.energy_spent_for_active_movement[self.drone.identifier] += 25
+                    self.drone.move_routing = True
+                elif best_neighbor is not None:
                     self.unicast_message(pkd, self.drone, best_neighbor, cur_step)
 
                 self.current_n_transmission += 1

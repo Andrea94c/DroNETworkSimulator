@@ -70,13 +70,18 @@ class PathPlanningDrawer():
         coords = drone.coords
         if drone.buffer_length() > 0:  # change color when find a packet
             stddraw.setPenColor(c=stddraw.GREEN)
-        else:     
+        else:
             stddraw.setPenColor(c=stddraw.BLACK)
         stddraw.setPenRadius(0.0055)
         stddraw.point(coords[0], coords[1])
 
         self.__draw_drone_info(drone, cur_step)
-        self.__draw_communication_range(drone)
+        if drone.move_routing or drone.come_back_to_mission:
+            color = stddraw.RED
+        else:
+            color = stddraw.BLUE
+
+        self.__draw_communication_range(drone, color=color)
         self.__draw_sensing_range(drone)
         self.__reset_pen()
 
@@ -135,9 +140,10 @@ class PathPlanningDrawer():
                         body.sensing_range)
         stddraw.setPenColor(c=stddraw.BLACK)
         
-    def __draw_communication_range(self, body):
+    def __draw_communication_range(self, body, color=stddraw.BLUE):
         stddraw.setPenRadius(0.0015)
-        stddraw.setPenColor(c=stddraw.BLUE)
+
+        stddraw.setPenColor(c=color)
         stddraw.circle(body.coords[0], body.coords[1], 
                         body.communication_range)
         stddraw.setPenColor(c=stddraw.BLACK)
@@ -167,7 +173,7 @@ class PathPlanningDrawer():
         # life time and speed
         stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length()))
         # life time and speed
-        stddraw.text(drone.coords[0]+75, drone.coords[1], " e:" + str(int(drone.residual_energy)))
+        #stddraw.text(drone.coords[0]+75, drone.coords[1], " e:" + str(int(drone.residual_energy)))
         # index
         stddraw.text(drone.coords[0], drone.coords[1] + (drone.communication_range / 2.0), "id: " + str(drone.identifier))
 

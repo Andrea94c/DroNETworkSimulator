@@ -3,6 +3,7 @@ import numpy as np
 from src.utilities import utilities as util
 from src.routing_algorithms.BASE_routing import BASE_routing
 from matplotlib import pyplot as plt
+from src.utilities import config
 
 class AIRouting(BASE_routing):
     def __init__(self, drone, simulator):
@@ -13,12 +14,14 @@ class AIRouting(BASE_routing):
 
     def feedback(self, drone, id_event, delay, outcome):
         """ return a possible feedback, if the destination drone has received the packet """
-        # Packets that we delivered and still need a feedback
-        print(self.drone.identifier, "----------", self.taken_actions)
+        if config.DEBUG:
+            # Packets that we delivered and still need a feedback
+            print("Drone: ", self.drone.identifier, "---------- has delivered: ", self.taken_actions)
 
-        # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
-        # Feedback from a delivered or expired packet
-        print(self.drone.identifier, "----------", drone, id_event, delay, outcome)
+            # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
+            # Feedback from a delivered or expired packet
+            print("Drone: ", self.drone.identifier, "---------- just received a feedback:",
+                  "Drone:", drone, " - id-event:", id_event, " - delay:",  delay, " - outcome:", outcome)
 
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
         # NOTE: reward or update using the old action!!
@@ -30,6 +33,9 @@ class AIRouting(BASE_routing):
 
     def relay_selection(self, opt_neighbors, pkd):
         """ arg min score  -> geographical approach, take the drone closest to the depot """
+        # Notice all the drones have different speed, and radio performance!!
+        # you know the speed, not the radio performance.
+        # self.drone.speed
 
         # Only if you need --> several features:
         # cell_index = util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
@@ -42,11 +48,19 @@ class AIRouting(BASE_routing):
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)
         # self.drone.residual_energy (that tells us when I'll come back to the depot).
         #  .....
+        for hpk, drone_instance in opt_neighbors:
+            #print(hpk)
+            continue
 
         # Store your current action --- you can add several stuff if needed to take a reward later
         self.taken_actions[pkd.event_ref.identifier] = (action)
 
+        # return action:
+        # None --> no transmission
+        # -1 --> move to depot
+        # 0, ... , self.ndrones --> send packet to this drone
         return None  # here you should return a drone object!
+
 
     def print(self):
         """

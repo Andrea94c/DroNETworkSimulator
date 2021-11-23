@@ -188,7 +188,6 @@ class Metrics:
         out_results["time_on_active_routing"] = self.time_on_active_routing
         out_results["energy_move_routing"] = self.energy_spent_for_active_movement
 
-
         return out_results
 
     def save(self, filename):

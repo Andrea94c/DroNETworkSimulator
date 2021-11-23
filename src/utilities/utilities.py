@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from ast import literal_eval as make_tuple
-from src.utilities import random_waypoint_generation
+from src.utilities import random_waypoint_generation, sweep_waypoint_generator
 from scipy.special import softmax
 
 class DroneCapabilities():
@@ -107,12 +107,13 @@ class EventGenerator:
 # ------------------ Path manager ----------------------
 class PathManager:
 
-    def __init__(self, path_from_json : bool, json_file: str, seed: int, rnd_state=None):
+    def __init__(self, simulator, path_from_json : bool, json_file: str, seed: int, rnd_state=None):
         """
             path_from_json : wheter generate or load the paths for the drones
             json file to read for take the paths of drones
             We assume json_file.format(seed)
         """
+        self.simulator = simulator
         self.path_from_json = path_from_json
         self.json_file = json_file.format(seed)
         if path_from_json:
@@ -135,6 +136,14 @@ class PathManager:
             return self.__demo_path(drone_id)
         if config.CIRCLE_PATH:
             return self.__cirlce_path(drone_id, simulator)
+        if config.SWEEP_PATH:
+            return sweep_waypoint_generator.get_tour(config.LENGHT_METERS_TOUR, self.simulator.env_width,
+                                            self.simulator.depot_coordinates,
+                                            random_generator=self.rnd_paths,
+                                            ndrones=self.simulator.n_drones,
+                                            sensing_range=self.simulator.drone_sen_range,
+                                            random_starting_point=config.RANDOM_START_POINT)
+
         elif self.path_from_json:  # paths from loaded json
             return self.path_dict[drone_id]
         else:  # generate dynamic paths

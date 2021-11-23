@@ -241,7 +241,7 @@ class Drone(Entity):
 
         self.max_energy = self.simulator.rnd_routing.randint(config.DRONE_MIN_FLIGHT_TIME, config.DRONE_MAX_ENERGY)
         self.residual_energy = self.max_energy
-        self.path = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.simulator.seed, self.simulator.rnd_path).path(identifier, simulator, self.residual_energy)
+        self.path = utilities.PathManager(self.simulator, config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.simulator.seed, self.simulator.rnd_path).path(identifier, simulator, self.residual_energy)
 
         self.come_back_to_mission = False  # if i'm coming back to my applicative mission
         self.last_move_routing = False  # if in the last step i was moving to depot

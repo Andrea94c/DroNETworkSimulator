@@ -27,6 +27,9 @@ Attributes that one needs tweak often are tagged with # ***
 # ----------------------------------------------------------------------------------
 
 # ----------------------- PATH DRONES -----------------------------------------#
+SWEEP_PATH = True
+LENGHT_METERS_TOUR = 30000 # (DO NOT CHANGE)
+HOVERING = 600  # int : steps of hovering
 CIRCLE_PATH = False # bool: whether to use cirlce paths around the depot
 DEMO_PATH = False   # bool: whether to use handcrafted tours or not
 # to set up handcrafted torus see utilities.utilities
@@ -35,7 +38,7 @@ PATH_FROM_JSON = False                   # bool: whether to use the path (for dr
 JSONS_PATH_PREFIX = "data/tours/RANDOM_mission_d30_s{}.json"     # str: the path to the drones tours,
                                             # the {} should be used to specify the seed -> es. data/tours/RANDOM_missions1.json for seed 1.
 RANDOM_STEPS = [250, 500, 700, 900, 1100, 1400]  # the step after each new random directions is taken, in case of dynamic generation
-RANDOM_START_POINT = False  # bool whether the drones start the mission at random positions
+RANDOM_START_POINT = True  # bool whether the drones start the mission at random positions
 
 # ------------------------------- CONSTANTS ------------------------------- #
 
@@ -57,9 +60,9 @@ SAVE_PLOT_DIR = "data/plots/"
 # ----------------------------- SIMULATION PARAMS. ---------------------------- #
 SIM_DURATION = 15000 # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
-SEED = 5          # int: seed of this simulation.
+SEED = 2            # int: seed of this simulation.
 
-N_DRONES = 20  # int: number of drones. # ***
+N_DRONES = 5  # int: number of drones. # ***
 ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 

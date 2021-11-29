@@ -111,6 +111,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
+ROUTING_ALGORITHM_W_FEEDBACK = ["AI", "ALGO1", "ALGO2"]
 ROUTING_ALGORITHM = RoutingAlgorithm.MGEO
 CHANNEL_ERROR_TYPE = ChannelError.ON_DEVICE
 

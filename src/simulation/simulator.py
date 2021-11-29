@@ -135,6 +135,12 @@ class Simulator:
             self.draw_manager = pp_draw.PathPlanningDrawer(self.environment, self, borders=True)
 
 
+        self.cell_to_center_coords = {}
+        for cell, cell_center in utilities.TraversedCells.all_centers(self.env_width, self.env_height,
+                                                                      self.prob_size_cell):
+            index_cell = int(cell[0])
+            self.cell_to_center_coords[index_cell] = cell_center
+
     def __sim_name(self):
         """
             return the identification name for
@@ -184,6 +190,7 @@ class Simulator:
                                                                           self.prob_size_cell):
 
             index_cell = int(cell[0])
+            self.cell_to_center_coords[index_cell] = cell_center
             old_vals = self.cell_prob_map[index_cell]
 
             if index_cell in cells:

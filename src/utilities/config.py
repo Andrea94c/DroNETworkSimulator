@@ -62,7 +62,7 @@ SIM_DURATION = 15000 # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 2            # int: seed of this simulation.
 
-N_DRONES = 5  # int: number of drones. # ***
+N_DRONES = 2  # int: number of drones. # ***
 ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 
@@ -112,7 +112,7 @@ class ChannelError(Enum):
 
 
 ROUTING_ALGORITHM_W_FEEDBACK = ["AI", "ALGO1", "ALGO2"]
-ROUTING_ALGORITHM = RoutingAlgorithm.MGEO
+ROUTING_ALGORITHM = RoutingAlgorithm.AI
 CHANNEL_ERROR_TYPE = ChannelError.ON_DEVICE
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.
@@ -132,4 +132,4 @@ NN_MODEL_PATH = "data/nnmodels/"
 
 # --------------- new cell probabilities -------------- #
 CELL_PROB_SIZE_R = 1.875  # the percentage of cell size with respect to drone com range
-ENABLE_PROBABILITIES = False
+ENABLE_PROBABILITIES = False  # is slow when you use True!

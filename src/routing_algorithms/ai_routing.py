@@ -38,11 +38,11 @@ class AIRouting(BASE_routing):
         # self.drone.speed
 
         # Only if you need --> several features:
-        cell_index = util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
-                                                        width_area=self.simulator.env_width,
-                                                        x_pos=self.drone.coords[0],  # e.g. 1500
-                                                        y_pos=self.drone.coords[1])[0]  # e.g. 500
-        print("Drone: ", self.drone.identifier, " - i-th cell:",  cell_index, " - center:", self.simulator.cell_to_center_coords[cell_index])
+        #cell_index = util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
+        #                                                width_area=self.simulator.env_width,
+        #                                                x_pos=self.drone.coords[0],  # e.g. 1500
+        #                                                y_pos=self.drone.coords[1])[0]  # e.g. 500
+        #print("Drone: ", self.drone.identifier, " - i-th cell:",  cell_index, " - center:", self.simulator.cell_to_center_coords[cell_index])
         action = None
 
         # self.drone.history_path (which waypoint I traversed. We assume the mission is repeated)

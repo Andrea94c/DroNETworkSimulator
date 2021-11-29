@@ -211,7 +211,7 @@ class Depot(Entity):
         self.__buffer += packets_to_offload
 
         for pck in packets_to_offload:
-            if self.simulator.routing_algorithm.name == "AI":
+            if self.simulator.routing_algorithm.name in config.ROUTING_ALGORITHM_W_FEEDBACK:
                 for drone_squad in self.simulator.drones:
                     drone_squad.routing_algorithm.feedback(drone, pck.event_ref.identifier,
                                                     cur_step - pck.event_ref.current_time, 1)
@@ -277,7 +277,7 @@ class Drone(Entity):
                 self.tightest_event_deadline = np.nanmin([self.tightest_event_deadline, pck.event_ref.deadline])
             else:
                 to_remove_packets += 1
-                if self.simulator.routing_algorithm.name == "AI":
+                if self.simulator.routing_algorithm.name in config.ROUTING_ALGORITHM_W_FEEDBACK:
                     for drone_squad in self.simulator.drones:
                         drone_squad.routing_algorithm.feedback(self, pck.event_ref.identifier,
                                                                         self.simulator.event_duration, -1)

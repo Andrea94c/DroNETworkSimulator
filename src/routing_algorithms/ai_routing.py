@@ -12,7 +12,7 @@ class AIRouting(BASE_routing):
         self.rnd_for_routing_ai = np.random.RandomState(self.simulator.seed)
         self.taken_actions = {}  #id event : (old_action)
 
-    def feedback(self, drone, id_event, delay, outcome):
+    def feedback(self, drone, id_event, delay, outcome, depot_index=None):
         """ return a possible feedback, if the destination drone has received the packet """
         if config.DEBUG:
             # Packets that we delivered and still need a feedback
@@ -21,7 +21,8 @@ class AIRouting(BASE_routing):
             # outcome == -1 if the packet/event expired; 0 if the packets has been delivered to the depot
             # Feedback from a delivered or expired packet
             print("Drone: ", self.drone.identifier, "---------- just received a feedback:",
-                  "Drone:", drone, " - id-event:", id_event, " - delay:",  delay, " - outcome:", outcome)
+                  "Drone:", drone, " - id-event:", id_event, " - delay:",  delay, " - outcome:", outcome,
+                  " - to depot: ", depot_index)
 
         # Be aware, due to network errors we can give the same event to multiple drones and receive multiple feedback for the same packet!!
         # NOTE: reward or update using the old action!!

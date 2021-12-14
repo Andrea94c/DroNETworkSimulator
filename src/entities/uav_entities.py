@@ -201,7 +201,7 @@ class Depot(Entity):
     def all_packets(self):
         return self.__buffer
 
-    def transfer_notified_packets(self, drone, cur_step):
+    def transfer_notified_packets(self, drone, cur_step, depot_index):
         """ function called when a drone wants to offload packets to the depot """
         
         packets_to_offload = drone.all_packets()
@@ -211,7 +211,7 @@ class Depot(Entity):
             if self.simulator.routing_algorithm.name in config.ROUTING_ALGORITHM_W_FEEDBACK:
                 for drone_squad in self.simulator.drones:
                     drone_squad.routing_algorithm.feedback(drone, pck.event_ref.identifier,
-                                                    cur_step - pck.event_ref.current_time, 1)
+                                                    cur_step - pck.event_ref.current_time, 1, depot_index)
 
             # add metrics: all the packets notified to the depot
             self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))
@@ -232,7 +232,7 @@ class MultiDepot():
     def all_packets(self):
         return self.__buffer
 
-    def transfer_notified_packets(self, drone, cur_step):
+    def transfer_notified_packets(self, drone, cur_step, depot_index):
         """ function called when a drone wants to offload packets to the depot """
 
         packets_to_offload = drone.all_packets()
@@ -242,7 +242,7 @@ class MultiDepot():
             if self.simulator.routing_algorithm.name in config.ROUTING_ALGORITHM_W_FEEDBACK:
                 for drone_squad in self.simulator.drones:
                     drone_squad.routing_algorithm.feedback(drone, pck.event_ref.identifier,
-                                                           cur_step - pck.event_ref.current_time, 1)
+                                                           cur_step - pck.event_ref.current_time, 1, depot_index)
 
             # add metrics: all the packets notified to the depot
             self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))

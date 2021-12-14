@@ -87,7 +87,8 @@ class BASE_routing(metaclass=abc.ABCMeta):
         for coords in self.simulator.depot.list_of_coords:
             if util.euclidean_distance(coords, self.drone.coords) <= self.simulator.depot.communication_range:
                 # add error in case
-                self.transfer_to_depot(self.drone.depot, cur_step)
+                depot_index = -1 if coords == self.simulator.depot.list_of_coords[0] else -2
+                self.transfer_to_depot(self.drone.depot, cur_step, depot_index)
 
                 self.drone.move_routing = False
                 self.current_n_transmission = 0
@@ -179,11 +180,11 @@ class BASE_routing(metaclass=abc.ABCMeta):
         bucket_id = int(drones_distance / self.radius_corona) * self.radius_corona
         return self.buckets_probability[bucket_id] * config.GUASSIAN_SCALE
 
-    def transfer_to_depot(self, depot, cur_step):
+    def transfer_to_depot(self, depot, cur_step, depot_index):
         """ self.drone is close enough to depot and offloads its buffer to it, restarting the monitoring
                 mission from where it left it
         """
-        depot.transfer_notified_packets(self.drone, cur_step)
+        depot.transfer_notified_packets(self.drone, cur_step, depot_index)
         self.drone.empty_buffer()
         self.drone.move_routing = False
 

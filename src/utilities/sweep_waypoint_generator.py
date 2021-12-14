@@ -26,9 +26,9 @@ def get_sweepcoverage_tour(autonomy, edge_area, ndrones, sensing_radius, random_
 
     if fixed_starting_point:
         fixed_starting_points = [(random_generator.randint(0,25), random_generator.randint(0,25)),
-                                 (random_generator.randint(980, 1020), random_generator.randint(0,25)),
-                                 (random_generator.randint(0,25), random_generator.randint(980, 1020)),
-                                 (random_generator.randint(980, 1020), random_generator.randint(980, 1020))]
+                                 (random_generator.randint(980, 1250), random_generator.randint(0,25)),
+                                 (random_generator.randint(0,25), random_generator.randint(980, 1250)),
+                                 (random_generator.randint(980, 1250), random_generator.randint(980, 1250))]
         start_point = fixed_starting_points[random_generator.randint(0, len(fixed_starting_points))]
     else:
         start_point = (random_generator.randint(0, edge_area), random_generator.randint(0, edge_area))

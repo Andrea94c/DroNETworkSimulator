@@ -107,9 +107,6 @@ class Packet(Entity):
         # if the packet was sent with move routing or not
         self.is_move_packet = None
 
-    def distance_from_depot(self):
-        return utilities.euclidean_distance(self.simulator.depot_coordinates, self.coords)
-
     def age_of_packet(self, cur_step):
         return cur_step - self.time_step_creation
 
@@ -222,26 +219,57 @@ class Depot(Entity):
             pck.time_delivery = cur_step
 
 
+class MultiDepot():
+    """ The depot is an Entity. """
+
+    def __init__(self, list_of_coords, communication_range, simulator):
+        self.communication_range = communication_range
+        self.simulator = simulator
+        self.list_of_coords = list_of_coords
+        self.communication_range = communication_range
+        self.__buffer = list()  # also with duplicated packets
+
+    def all_packets(self):
+        return self.__buffer
+
+    def transfer_notified_packets(self, drone, cur_step):
+        """ function called when a drone wants to offload packets to the depot """
+
+        packets_to_offload = drone.all_packets()
+        self.__buffer += packets_to_offload
+
+        for pck in packets_to_offload:
+            if self.simulator.routing_algorithm.name in config.ROUTING_ALGORITHM_W_FEEDBACK:
+                for drone_squad in self.simulator.drones:
+                    drone_squad.routing_algorithm.feedback(drone, pck.event_ref.identifier,
+                                                           cur_step - pck.event_ref.current_time, 1)
+
+            # add metrics: all the packets notified to the depot
+            self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))
+            self.simulator.metrics.drones_packets_to_depot_list.append((pck, cur_step))
+            pck.time_delivery = cur_step
 # ------------------ Drone ----------------------
 class Drone(Entity):
 
     def __init__(self, identifier: int, path: list, speed : int, channel_success_rate : float, depot: Depot, simulator):
 
-        super().__init__(identifier, depot.coords, simulator)
+        super().__init__(identifier, depot.list_of_coords[0], simulator)
 
         self.depot = depot
         self.speed = speed if config.HETEROGENOUS_DRONE_SPEED else self.simulator.drone_speed
         if config.DEBUG:
             print("Drone {} - speed:".format(identifier), self.speed)
-        #    print("Drone {} - radio performance".format(identifier), channel_success_rate)
+
         self.channel_success_rate = channel_success_rate
         self.sensing_range = self.simulator.drone_sen_range
         self.communication_range = self.simulator.drone_com_range
         self.buffer_max_size = self.simulator.drone_max_buffer_size
-
         self.max_energy = self.simulator.rnd_routing.randint(config.DRONE_MIN_FLIGHT_TIME, config.DRONE_MAX_ENERGY)
         self.residual_energy = self.max_energy
         self.path = utilities.PathManager(self.simulator, config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.simulator.seed, self.simulator.rnd_path).path(identifier, simulator, self.residual_energy)
+        self.return_coords = self.path[0]
+        self.coords = self.path[0]
+
 
         self.come_back_to_mission = False  # if i'm coming back to my applicative mission
         self.last_move_routing = False  # if in the last step i was moving to depot
@@ -292,7 +320,10 @@ class Drone(Entity):
 
             This method is optional, there is flag src.utilities.config.ROUTING_IF_EXPIRING
         """
-        time_to_depot = utilities.euclidean_distance(self.depot.coords, self.coords) / self.speed
+        time_to_depot = np.inf
+        for coords in self.depot.list_of_coords:
+            time_to_depot = min(time_to_depot, utilities.euclidean_distance(coords, self.coords) / self.speed)
+
         event_time_to_dead = (self.tightest_event_deadline - cur_step) * self.simulator.time_step_duration
         return event_time_to_dead - 5 < time_to_depot <= event_time_to_dead  # 5 seconds of tolerance
 
@@ -401,7 +432,7 @@ class Drone(Entity):
 
     def next_target(self):
         if self.move_routing:
-            return self.depot.coords
+            return self.return_coords
         elif self.come_back_to_mission:
             return self.last_mission_coords
         else:
@@ -454,7 +485,7 @@ class Drone(Entity):
             time -> time_step_duration (how much time between two simulation frame)
         """
         p0 = self.coords
-        p1 = self.depot.coords
+        p1 = self.return_coords
 
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = time * self.speed

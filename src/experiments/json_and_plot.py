@@ -88,7 +88,7 @@ def mean_std_of_metric(filename_format : str, ndrones : int,
             else:
                 data.append(ktri_0[metric])
 
-    return np.mean(data), np.std(data)
+    return np.nanmean(data), np.nanstd(data)
 
 
 def plot_ndrones(filename_format : list, ndrones :list, metric : str, 
@@ -141,7 +141,7 @@ def set_font():
     matplotlib.rc('font', **font)
 
 METRICS_OF_INTEREST = [
-        'number_of_generated_events', 
+        'number_of_generated_events',
         'number_of_events_to_depot',
         'event_mean_delivery_time',
         'ratio_delivery_detected',

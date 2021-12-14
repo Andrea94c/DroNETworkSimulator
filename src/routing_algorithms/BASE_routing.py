@@ -84,13 +84,14 @@ class BASE_routing(metaclass=abc.ABCMeta):
             return
 
         # FLOW 1
-        if util.euclidean_distance(self.simulator.depot.coords, self.drone.coords) <= self.simulator.depot.communication_range:
-            # add error in case
-            self.transfer_to_depot(self.drone.depot, cur_step)
+        for coords in self.simulator.depot.list_of_coords:
+            if util.euclidean_distance(coords, self.drone.coords) <= self.simulator.depot.communication_range:
+                # add error in case
+                self.transfer_to_depot(self.drone.depot, cur_step)
 
-            self.drone.move_routing = False
-            self.current_n_transmission = 0
-            return
+                self.drone.move_routing = False
+                self.current_n_transmission = 0
+                return
 
         # only drone 0 will send packets
         #if self.drone.identifier < config.FERRY:
@@ -113,8 +114,9 @@ class BASE_routing(metaclass=abc.ABCMeta):
             for pkd in self.drone.all_packets():
                 self.simulator.metrics.mean_numbers_of_possible_relays.append(len(opt_neighbors))
                 best_neighbor = self.relay_selection(opt_neighbors, pkd)  # compute score
-                if best_neighbor == -1:
+                if best_neighbor == -1 or best_neighbor == -2:
                     if not self.drone.move_routing:
+                        self.drone.return_coords = self.simulator.depot.list_of_coords[(best_neighbor*-1)-1]
                         # add penalty to change trajectories
                         self.simulator.metrics.energy_spent_for_active_movement[self.drone.identifier] += 25
                     self.drone.move_routing = True

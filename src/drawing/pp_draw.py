@@ -1,5 +1,5 @@
 from src.drawing import stddraw
-from src.entities.uav_entities import Environment
+from src.entities.uav_entities import Environment, MultiDepot
 from src.utilities import config, utilities
 from collections import defaultdict
 
@@ -81,7 +81,7 @@ class PathPlanningDrawer():
         else:
             color = stddraw.BLUE
 
-        self.__draw_communication_range(drone, color=color)
+        self.__draw_communication_range(drone.coords, drone.communication_range, color=color)
         self.__draw_sensing_range(drone)
         self.__reset_pen()
 
@@ -119,19 +119,25 @@ class PathPlanningDrawer():
     
 
     def draw_depot(self, depot):
-        coords = depot.coords
-        stddraw.setPenRadius(0.0100)
-        stddraw.setPenColor(c=stddraw.DARK_RED)
-        size_depot = 50
-        stddraw.filledPolygon([coords[0] - (size_depot / 2), coords[0], coords[0] + (size_depot / 2)],
-                        [coords[1], coords[1] + size_depot, coords[1]])
-        self.__draw_communication_range(depot)
-        self.__reset_pen()
+        all_coords = []
+        if isinstance(depot, MultiDepot):
+            all_coords = depot.list_of_coords
+        else:
+            all_coords = [depot.coords]
 
-        # draw the buffer size
-        stddraw.setPenRadius(0.0125)
-        stddraw.setPenColor(c=stddraw.BLACK)
-        stddraw.text(depot.coords[0], depot.coords[1]+100, "pk: " + str(len(depot.all_packets())))
+        for coords in all_coords:
+            stddraw.setPenRadius(0.0100)
+            stddraw.setPenColor(c=stddraw.DARK_RED)
+            size_depot = 50
+            stddraw.filledPolygon([coords[0] - (size_depot / 2), coords[0], coords[0] + (size_depot / 2)],
+                            [coords[1], coords[1] + size_depot, coords[1]])
+            self.__draw_communication_range(coords, depot.communication_range)
+            self.__reset_pen()
+
+            # draw the buffer size
+            stddraw.setPenRadius(0.0125)
+            stddraw.setPenColor(c=stddraw.BLACK)
+            stddraw.text(coords[0], coords[1]+100, "pk: " + str(len(depot.all_packets())))
 
     def __draw_sensing_range(self, body):
         stddraw.setPenRadius(0.0015)
@@ -140,12 +146,12 @@ class PathPlanningDrawer():
                         body.sensing_range)
         stddraw.setPenColor(c=stddraw.BLACK)
         
-    def __draw_communication_range(self, body, color=stddraw.BLUE):
+    def __draw_communication_range(self, coords, communication_range, color=stddraw.BLUE):
         stddraw.setPenRadius(0.0015)
 
         stddraw.setPenColor(c=color)
-        stddraw.circle(body.coords[0], body.coords[1], 
-                        body.communication_range)
+        stddraw.circle(coords[0], coords[1],
+                        communication_range)
         stddraw.setPenColor(c=stddraw.BLACK)
 
     def draw_blocks(self, drone_coo, target, size_cell, cells):

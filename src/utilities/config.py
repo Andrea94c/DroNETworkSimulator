@@ -46,7 +46,7 @@ DEBUG = False                         # bool: whether to print debug strings or 
 EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simulation
 
 # drawaing
-PLOT_SIM = True      # bool: whether to plot or not the simulation.
+PLOT_SIM = False      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
 SKIP_SIM_STEP = 5     # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
@@ -62,7 +62,7 @@ SIM_DURATION = 15000 # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 2            # int: seed of this simulation.
 
-N_DRONES = 2  # int: number of drones. # ***
+N_DRONES = 4  # int: number of drones. # ***
 ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 
@@ -85,8 +85,9 @@ FERRY = 0
 
 # depot
 DEPOT_COMMUNICATION_RANGE = 200  # float: meters, communication range of the depot.
-DEPOT_COO = (750, 0)             # (float, float): coordinates of the depot.
-
+# old depot coordinates
+# DEPOT_COO = (750, 0)             # (float, float): coordinates of the depot.
+DEPOT_COORDINATES = [(750, 0), (750, 1400)]
 
 # ------------------------------- ROUTING PARAMS. ------------------------------- #
 class RoutingAlgorithm(Enum):
@@ -112,7 +113,7 @@ class ChannelError(Enum):
 
 
 ROUTING_ALGORITHM_W_FEEDBACK = ["AI", "ALGO1", "ALGO2"]
-ROUTING_ALGORITHM = RoutingAlgorithm.AI
+ROUTING_ALGORITHM = RoutingAlgorithm.RND
 CHANNEL_ERROR_TYPE = ChannelError.ON_DEVICE
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.

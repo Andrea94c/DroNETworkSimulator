@@ -19,7 +19,7 @@ def sim_setup(n_drones, seed, algorithm_routing):
     drone_retransmission_delta=10
     drone_communication_success=0.9 # TODO
     depot_com_range=200
-    depot_coordinates=(750, 0)
+    depot_coordinates=[(750, 0), (750, 1400)]
     event_duration=8000 #circa 20min
     event_generation_prob=0.8
     event_generation_delay=300

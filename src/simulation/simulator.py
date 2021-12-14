@@ -34,7 +34,7 @@ class Simulator:
                  drone_retransmission_delta=config.RETRANSMISSION_DELAY,
                  drone_communication_success=config.COMMUNICATION_P_SUCCESS,
                  depot_com_range=config.DEPOT_COMMUNICATION_RANGE,
-                 depot_coordinates=config.DEPOT_COO,
+                 depot_coordinates=config.DEPOT_COORDINATES,
                  event_duration=config.EVENTS_DURATION,
                  event_generation_prob=config.P_FEEL_EVENT,
                  event_generation_delay=config.D_FEEL_EVENT,
@@ -116,7 +116,7 @@ class Simulator:
         self.__set_random_generators()
         self.environment = Environment(self.env_width, self.env_height, self)
 
-        self.depot = Depot(self.depot_coordinates, self.depot_com_range, self)
+        self.depot = MultiDepot(self.depot_coordinates, self.depot_com_range, self)
 
         self.drones = []
 
@@ -128,8 +128,6 @@ class Simulator:
         self.environment.add_drones(self.drones)
         self.environment.add_depot(self.depot)
 
-        # Set the maximum distance between the drones and the depot
-        self.max_dist_drone_depot = utilities.euclidean_distance(self.depot.coords, (self.env_width, self.env_height))
 
         if self.show_plot or config.SAVE_PLOT:
             self.draw_manager = pp_draw.PathPlanningDrawer(self.environment, self, borders=True)
@@ -224,7 +222,7 @@ class Simulator:
                 drone.routing(self.drones, self.depot, cur_step)
                 drone.move(self.time_step_duration)
 
-            if len(self.restart_mission) == len(self.drones) and self.drones[0].coords != self.depot_coordinates:
+            if len(self.restart_mission) == len(self.drones) and self.drones[0].coords != self.depot_coordinates[0]:
                 self.restart_mission = set()
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:

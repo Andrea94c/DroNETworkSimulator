@@ -137,8 +137,9 @@ class PathManager:
         if config.CIRCLE_PATH:
             return self.__cirlce_path(drone_id, simulator)
         if config.SWEEP_PATH:
+            depot_id = 0 if drone_id % 2 == 0 else 1
             return sweep_waypoint_generator.get_tour(config.LENGHT_METERS_TOUR, self.simulator.env_width,
-                                            self.simulator.depot_coordinates,
+                                            self.simulator.depot_coordinates[depot_id],
                                             random_generator=self.rnd_paths,
                                             ndrones=self.simulator.n_drones,
                                             sensing_range=self.simulator.drone_sen_range,
@@ -147,15 +148,16 @@ class PathManager:
         elif self.path_from_json:  # paths from loaded json
             return self.path_dict[drone_id]
         else:  # generate dynamic paths
+            depot_id = 0 if drone_id % 2 == 0 else 1
             return random_waypoint_generation.get_tour(residual_energy, simulator.env_width,
-                                                       simulator.depot_coordinates, index=drone_id,
+                                                       simulator.depot_coordinates[depot_id], index=drone_id,
                                                        random_generator=self.rnd_paths,
                                                        range_decision=config.RANDOM_STEPS,
                                                        random_starting_point=config.RANDOM_START_POINT)
 
     def __cirlce_path(self, drone_id, simulator, center=None, radius=None):
         if center is None:
-            center = simulator.depot_coordinates
+            center = simulator.depot_coordinates[0]
         if radius is None:
             radius = simulator.depot_com_range - 10
         n_drones = simulator.n_drones
@@ -261,7 +263,7 @@ class PathToDepot():
         # only channel mode
         if abs(drone_pos[
                    0] - self.x_position) < 1:  # the drone is already on the channel with an error of 1 meter
-            return self.simulator.depot_coordinates
+            return self.simulator.depot_coordinates[0]
         else:
             return self.x_position, drone_pos[1]  # the closest point to the channel
 

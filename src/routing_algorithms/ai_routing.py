@@ -57,7 +57,8 @@ class AIRouting(BASE_routing):
 
         # return action:
         # None --> no transmission
-        # -1 --> move to depot
+        # -1 --> move to first depot (self.simulator.depot.list_of_coords[0]
+        # -2 --> move to second depot (self.simulator.depot.list_of_coords[1]
         # 0, ... , self.ndrones --> send packet to this drone
         return None  # here you should return a drone object!
 

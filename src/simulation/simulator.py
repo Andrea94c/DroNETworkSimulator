@@ -1,6 +1,6 @@
 
 from src.drawing import pp_draw
-from src.entities.uav_entities import *
+from src.entities.uavs.uav_entities import *
 from src.simulation.metrics import Metrics
 from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher

@@ -7,11 +7,6 @@ import seaborn as sb
 import json
 import matplotlib.pyplot as plt
 
-from src.entities.uav_entities import DataPacket
-from collections import defaultdict
-from src.utilities import utilities as util
-from src.utilities import config
-
 """ Metrics class keeps track of all the metrics during all the simulation. """
 
 

@@ -1,6 +1,5 @@
-
-
-from src.entities.uav_entities import DataPacket, ACKPacket, HelloPacket, Packet
+from src.entities.events.event import Event
+from src.entities.packets.packets import Packet, HelloPacket, DataPacket, ACKPacket
 from src.utilities import utilities as util
 from src.utilities import config
 
@@ -41,7 +40,8 @@ class BASE_routing(metaclass=abc.ABCMeta):
             self.no_transmission = True
             self.drone.accept_packets([packet])
             # build ack for the reception
-            ack_packet = ACKPacket(self.drone, src_drone, self.simulator, packet, current_ts)
+            null_event = Event((-1, -1), -1, self.simulator)
+            ack_packet = ACKPacket(self.drone, src_drone, self.simulator, packet,  null_event, current_ts)
             self.unicast_message(ack_packet, self.drone, src_drone, current_ts)
 
         elif isinstance(packet, ACKPacket):
@@ -59,7 +59,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
             return
 
         my_hello = HelloPacket(self.drone, cur_step, self.simulator, self.drone.coords,
-                               self.drone.speed, self.drone.next_target())
+                               self.drone.speed, self.drone.next_target(), event_ref=Event((-1, -1), -1, self.simulator))
 
         self.broadcast_message(my_hello, self.drone, drones, cur_step)
 

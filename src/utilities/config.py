@@ -41,7 +41,7 @@ DEBUG = False                         # bool: whether to print debug strings or 
 EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simulation
 
 # drawaing
-PLOT_SIM = True      # bool: whether to plot or not the simulation.
+PLOT_SIM = False      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0 #.1     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
 SKIP_SIM_STEP = 5      # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
@@ -101,7 +101,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.AND_GEO
+ROUTING_ALGORITHM = RoutingAlgorithm.RND
 CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.

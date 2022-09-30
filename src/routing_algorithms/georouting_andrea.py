@@ -26,8 +26,8 @@ class AndreaGeoRouting(BASE_routing):
             next_target_close_drone = hll_pck.next_target
 
             # util.euclidean_distance( --> meters
-            delta_timesteps = None
-            delta_seconds = delta_timesteps * self.simulator.time_step_duration
+            #delta_timesteps = None
+            #delta_seconds = delta_timesteps * self.simulator.time_step_duration
             distance_close_drone_to_bs = util.euclidean_distance(close_drone_pos,
                                                                  depot_pos)
 

@@ -3,8 +3,17 @@ from src.entities.packets.packets import DataPacket
 
 
 class Event(Entity):
-    """ An event is any kind of event that the drone detects on the aoi. It is an Entity. """
+    """
+    An Event object is any kind of event that the drone detects in the Area-of-Interest
+    """
     def __init__(self, coords: tuple, current_time: int, simulator, deadline=None):
+        """
+
+        @param coords:
+        @param current_time:
+        @param simulator:
+        @param deadline:
+        """
 
         super().__init__(id(self), coords, simulator)
         self.current_time = current_time
@@ -27,20 +36,25 @@ class Event(Entity):
                 "id": self.identifier
                 }
 
-    def is_expired(self, cur_step):
-        """ return true if the deadline expired """
-        return cur_step > self.deadline
+    @property
+    def is_expired(self):
+        """
+        Check if the Event is expired
+        @return: True if the event is expired False otherwise
+        """
+        return self.simulator.cur_step > self.deadline
 
     def as_packet(self, time_step_creation, drone):
-        """ build a packet out of the event, by default the packet has deadline set to that of the event
-            so the packet dies at the same time of the event, then add the input drone as first hop
+        """
+        Build a Packet out of the Event, by default the packet has the same deadline of the event
+        so the packet expire at the same time of the event.
         """
         # Notice: called only when a packet is created
 
-        pck = DataPacket(time_step_creation, self.simulator, event_ref=self)
+        packet = DataPacket(self.simulator, event_ref=self)
         # if config.DEBUG_PRINT_PACKETS: print("data", pck, pck.src_drone, pck.dst_drone, self.current_time)
-        pck.add_hop(drone)
-        return pck
+        packet.add_hop(drone)
+        return packet
 
     def __repr__(self):
         return "Ev id:" + str(self.identifier) + " c:" + str(self.coords)

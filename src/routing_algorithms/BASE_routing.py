@@ -41,14 +41,14 @@ class BASE_routing(metaclass=abc.ABCMeta):
             self.drone.accept_packets([packet])
             # build ack for the reception
             null_event = Event((-1, -1), -1, self.simulator)
-            ack_packet = ACKPacket(self.drone, src_drone, self.simulator, packet,  null_event, current_ts)
+            ack_packet = ACKPacket(self.drone, src_drone, self.simulator, packet, null_event)
             self.unicast_message(ack_packet, self.drone, src_drone, current_ts)
 
         elif isinstance(packet, ACKPacket):
             self.drone.remove_packets([packet.acked_packet])
             # packet.acked_packet.optional_data
             # print(self.is_packet_received_drone_reward, "ACK", self.drone.identifier)
-            if self.drone.buffer_length() == 0:
+            if self.drone.buffer_length == 0:
                 self.current_n_transmission = 0
                 self.drone.move_routing = False
 
@@ -58,8 +58,8 @@ class BASE_routing(metaclass=abc.ABCMeta):
         if cur_step % config.HELLO_DELAY != 0:  # still not time to communicate
             return
 
-        my_hello = HelloPacket(self.drone, cur_step, self.simulator, self.drone.coords,
-                               self.drone.speed, self.drone.next_target(), event_ref=Event((-1, -1), -1, self.simulator))
+        my_hello = HelloPacket(self.drone, self.simulator, self.drone.coords, self.drone.speed,
+                               self.drone.next_target(), event_ref=Event((-1, -1), -1, self.simulator))
 
         self.broadcast_message(my_hello, self.drone, drones, cur_step)
 
@@ -77,7 +77,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
         """ procedure 3 -> choice next hop and try to send it the data packet """
 
         # FLOW 0
-        if self.no_transmission or self.drone.buffer_length() == 0:
+        if self.no_transmission or self.drone.buffer_length == 0:
             return
 
         # FLOW 1
@@ -109,7 +109,7 @@ class BASE_routing(metaclass=abc.ABCMeta):
                 if best_neighbor is not None:
 
                     # send packets
-                    for pkd in self.drone.all_packets():
+                    for pkd in self.drone.all_packets:
                         self.unicast_message(pkd, self.drone, best_neighbor, cur_step)
 
             self.current_n_transmission += 1

@@ -20,7 +20,7 @@ class AndreaGeoRouting(BASE_routing):
         drone_to_send = None
         current_score = my_distance_from_bs
         for hll_pck, close_drone in opt_neighbors:
-            close_drone_pos = hll_pck.cur_pos
+            close_drone_pos = hll_pck.current_position
             close_drone_speed = hll_pck.speed  # m / s
             hll_pck_timestep_creation = hll_pck.time_step_creation
             next_target_close_drone = hll_pck.next_target

@@ -194,7 +194,6 @@ class Simulator:
 
     def run(self):
         """ the method starts the simulation """
-        cells_to_travel = None
         for cur_step in tqdm(range(self.len_simulation)):
             self.cur_step = cur_step
             # check for new events and remove the expired ones from the environment

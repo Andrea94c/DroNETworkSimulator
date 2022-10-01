@@ -8,7 +8,6 @@ from src.utilities import config, utilities
 
 class Depot(Entity):
     """ The depot is an Entity. """
-
     def __init__(self, coords, communication_range, simulator):
         super().__init__(id(self), coords, simulator)
 

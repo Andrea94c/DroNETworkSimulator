@@ -1,7 +1,6 @@
 from src.entities.generic.entity import Entity
 from src.entities.packets.packets import DataPacket
 
-
 class Event(Entity):
     """
     An Event object is any kind of event that the drone detects in the Area-of-Interest
@@ -58,3 +57,4 @@ class Event(Entity):
 
     def __repr__(self):
         return "Ev id:" + str(self.identifier) + " c:" + str(self.coords)
+

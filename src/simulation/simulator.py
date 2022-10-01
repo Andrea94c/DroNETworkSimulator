@@ -110,8 +110,9 @@ class Simulator:
 
     def __set_simulation(self):
         """ the method creates all the uav entities """
-
+        from src.entities.generic.entity import Environment
         self.__set_random_generators()
+
 
         self.path_manager = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.seed)
         self.environment = Environment(self.env_width, self.env_height, self)

@@ -24,7 +24,7 @@ class Depot(Entity):
 
         return self.__buffer
 
-    def transfer_notified_packets(self, drone, cur_step):
+    def transfer_notified_packets(self, drone):
         """
         This function is called when a Drone wants to offload packets to the depot
         """
@@ -34,9 +34,9 @@ class Depot(Entity):
 
         for pck in packets_to_offload:
             # add metrics: all the packets notified to the depot
-            self.simulator.metrics.drones_packets_to_depot.add((pck, cur_step))
-            self.simulator.metrics.drones_packets_to_depot_list.append((pck, cur_step))
-            pck.time_delivery = cur_step
+            self.simulator.metrics.drones_packets_to_depot.add((pck, self.simulator.cur_step))
+            self.simulator.metrics.drones_packets_to_depot_list.append((pck, self.simulator.cur_step))
+            pck.time_delivery = self.simulator.cur_step
 
 
 class Drone(Entity):
@@ -173,7 +173,7 @@ class Drone(Entity):
         """ do the routing """
 
         self.distance_from_depot = utilities.euclidean_distance(self.depot.coords, self.coords)
-        self.routing_algorithm.routing(depot, drones, cur_step)
+        self.routing_algorithm.routing(drones, cur_step)
 
     def move(self, time):
         """

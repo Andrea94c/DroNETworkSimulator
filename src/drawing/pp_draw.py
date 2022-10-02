@@ -68,7 +68,7 @@ class PathPlanningDrawer():
 
     def draw_drone(self, drone, cur_step):
         coords = drone.coords
-        if drone.buffer_length() > 0:  # change color when find a packet
+        if drone.buffer_length > 0:  # change color when find a packet
             stddraw.setPenColor(c=stddraw.GREEN)
         else:     
             stddraw.setPenColor(c=stddraw.BLACK)
@@ -126,7 +126,7 @@ class PathPlanningDrawer():
         # draw the buffer size
         stddraw.setPenRadius(0.0125)
         stddraw.setPenColor(c=stddraw.BLACK)
-        stddraw.text(depot.coords[0], depot.coords[1]+100, "pk: " + str(len(depot.all_packets())))
+        stddraw.text(depot.coords[0], depot.coords[1]+100, "pk: " + str(len(depot.all_packets)))
 
     def __draw_sensing_range(self, body):
         stddraw.setPenRadius(0.0015)
@@ -165,11 +165,11 @@ class PathPlanningDrawer():
         stddraw.setPenRadius(0.0125)
         stddraw.setPenColor(c=stddraw.BLACK)
         # life time and speed
-        stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length()))
+        stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length))
         # index
         stddraw.text(drone.coords[0], drone.coords[1] + (drone.communication_range / 2.0), "id: " + str(drone.identifier))
 
-        if drone.buffer_length() > 0:
+        if drone.buffer_length > 0:
             stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: " +
                          str(drone.routing_algorithm.current_n_transmission))
 

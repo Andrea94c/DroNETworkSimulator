@@ -194,7 +194,10 @@ class Simulator:
             self.cell_prob_map[index_cell] = old_vals
 
     def run(self):
-        """ the method starts the simulation """
+        """
+        the method starts the simulation
+        """
+
         for cur_step in tqdm(range(self.len_simulation)):
             self.cur_step = cur_step
             # check for new events and remove the expired ones from the environment

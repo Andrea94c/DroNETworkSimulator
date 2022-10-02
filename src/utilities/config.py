@@ -41,7 +41,7 @@ DEBUG = False                         # bool: whether to print debug strings or 
 EXPERIMENTS_DIR = "data/experiments/"  # output data : the results of the simulation
 
 # drawaing
-PLOT_SIM = False      # bool: whether to plot or not the simulation.
+PLOT_SIM = True      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0 #.1     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
 SKIP_SIM_STEP = 5      # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
@@ -58,9 +58,9 @@ SIM_DURATION = 15000   # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 20         # int: seed of this simulation.
 
-N_DRONES = 5      # int: number of drones. # ***
-ENV_WIDTH = 1500      # float: meters, width of environment.
-ENV_HEIGHT = 1500     # float: meters, height of environment.
+N_DRONES = 10     # int: number of drones. # ***
+ENV_WIDTH = 2500      # float: meters, width of environment.
+ENV_HEIGHT = 2500     # float: meters, height of environment.
 
 # events
 EVENTS_DURATION = 2000  # SIM_DURATION  # int: steps, number of time steps that an event lasts  -> to seconds = step * step_duration.
@@ -101,7 +101,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.RND
+ROUTING_ALGORITHM = RoutingAlgorithm.GEO
 CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.

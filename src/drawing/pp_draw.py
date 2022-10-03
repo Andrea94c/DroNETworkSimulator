@@ -159,7 +159,7 @@ class PathPlanningDrawer():
         # draw the buffer size
         stddraw.setPenRadius(0.0125)
         stddraw.setPenColor(c=stddraw.BLACK)
-        stddraw.text(depot.coordinates[0], depot.coordinates[1] + 100, f"packets delivered: " + str(len(depot.all_packets)))
+        stddraw.text(depot.coordinates[0], depot.coordinates[1] + 100, f"packets delivered: " + str(len(depot.all_packets_correctly_sent_by_drones)))
 
     def __draw_sensing_range(self, body):
         stddraw.setPenRadius(0.0015)

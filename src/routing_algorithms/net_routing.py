@@ -7,13 +7,13 @@ from src.simulation.metrics import Metrics
 
 class MediumDispatcher:
 
-    def __init__(self, metric_class: Metrics):
+    def __init__(self, simulator):
         """
 
-        @param metric_class:
+        @param simulator:
         """
         self.packets = []
-        self.metric_class = metric_class
+        self.simulator = simulator
 
     def send_packet_to_medium(self, packet_to_send, source_drone, destination_drone, to_send_ts):
         """
@@ -26,11 +26,11 @@ class MediumDispatcher:
 
         if isinstance(packet_to_send, DataPacket):
 
-            self.metric_class.all_data_packets_in_simulation += 1
+            self.simulator.metrics.all_data_packets_in_simulation += 1
 
         else:
 
-            self.metric_class.all_control_packets_in_simulation += 1
+            self.simulator.metrics.all_control_packets_in_simulation += 1
 
         self.packets.append((packet_to_send, source_drone, destination_drone, to_send_ts))
 
@@ -65,6 +65,10 @@ class MediumDispatcher:
 
                             # destination drone receives packet_to_send
                             destination_drone.routing_algorithm.drone_reception(source_drone, packet_to_send)
+
+                            self.simulator.logger.add_drones_packet(timestep=self.simulator.cur_step,
+                                                                    packet=packet_to_send,
+                                                                    source_drone=source_drone)
 
         self_packets_deep_copy = [self_packets_deep_copy[i] for i in range(len(self_packets_deep_copy)) if i not in indices_to_drop]
 

@@ -159,7 +159,6 @@ class BaseRouting(metaclass=abc.ABCMeta):
 
             if opt_neighbors:
 
-                self.simulator.metrics.mean_numbers_of_possible_relays.append(len(opt_neighbors))
                 best_neighbor = self.relay_selection(opt_neighbors)  # compute score
 
                 if best_neighbor is not None:

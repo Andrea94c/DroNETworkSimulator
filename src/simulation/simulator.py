@@ -1,5 +1,6 @@
 from src.drawing import pp_draw
 from src.entities.uavs.uav_entities import *
+from src.simulation.logger import Logger
 from src.simulation.metrics import Metrics
 from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher
@@ -67,6 +68,7 @@ class Simulator:
         self.show_plot = show_plot
         self.routing_algorithm = routing_algorithm
         self.communication_error_type = communication_error_type
+        self.cur_step = 0
 
         # --------------- cell for drones -------------
         self.prob_size_cell_r = prob_size_cell_r
@@ -78,14 +80,14 @@ class Simulator:
 
         # Setup vari
         # for stats
-        self.metrics = Metrics(self)
+        self.metrics = Metrics()
+        self.logger = Logger()
 
         # setup network
         self.__setup_net_dispatcher()
 
-        # Setup the simulation
+        # Set up the simulation
         self.__set_simulation()
-        self.__set_metrics()
 
         self.simulation_name = "test-" + utilities.date() + "_" + str(simulation_name) + "_" + str(self.seed)
         self.simulation_test_dir = self.simulation_name + "/"
@@ -99,15 +101,8 @@ class Simulator:
         @return:
         """
 
-        self.network_dispatcher = MediumDispatcher(self.metrics)
+        self.network_dispatcher = MediumDispatcher(self)
 
-    def __set_metrics(self):
-        """
-        The method sets up all the parameters in the metrics class
-        @return:
-        """
-
-        self.metrics.info_mission()
 
     def __set_random_generators(self):
         if self.seed is not None:
@@ -245,18 +240,36 @@ class Simulator:
 
         if config.DEBUG:
 
-            print("End of simulation, sim time: " + str((cur_step + 1) * self.time_step_duration) + " sec, #iteration: " + str(cur_step + 1))
+            print("End of simulation, sim time: " + str((self.cur_step + 1) * self.time_step_duration) + " sec, #iteration: " + str(cur_step + 1))
 
     def close(self):
         """ do some stuff at the end of simulation"""
         print("Closing simulation")
 
-        self.print_metrics(plot_id="final")
+        self.compute_final_metrics()
+        self.print_metrics(metrics=True, logger=False)
         self.save_metrics(config.ROOT_EVALUATION_DATA + self.simulation_name)
 
-    def print_metrics(self, plot_id="final"):
-        """ add signature """
-        self.metrics.print_overall_stats()
+    def compute_final_metrics(self):
+        """
+
+        @return:
+        """
+        self.metrics.drones_packets_to_depot = len(self.logger.drones_packets_to_depot)
+        self.metrics.all_packets_correctly_sent_by_drones = len(self.logger.drones_packets)
+
+    def print_metrics(self, metrics: bool = True, logger: bool = False):
+        """
+
+        @return:
+        """
+        if metrics:
+
+            print(self.metrics)
+
+        if logger:
+
+            print(self.logger)
 
     def save_metrics(self, filename_path, save_pickle=False):
         """ add signature """

@@ -26,7 +26,8 @@ class Event(Entity):
         # add metrics: all the events generated during the simulation
         # GENERATED_EVENTS
         if not coordinates == (-1, -1) and not current_time == -1:
-            self.simulator.metrics.events.add(self)
+
+            self.simulator.logger.add_event(timestep=current_time, event=self)
 
     @property
     def is_expired(self):

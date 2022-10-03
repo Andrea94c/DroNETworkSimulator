@@ -36,10 +36,13 @@ class Depot(Entity):
 
         for packet in packets_to_offload:
 
-            # add metrics: all the packets notified to the depot
-            self.simulator.metrics.drones_packets_to_depot.add((packet, self.simulator.cur_step))
-            self.simulator.metrics.drones_packets_to_depot_list.append((packet, self.simulator.cur_step))
             packet.time_delivery = self.simulator.cur_step
+
+            # add metrics: all the packets notified to the depot
+            self.simulator.logger.add_drones_packet_to_depot(timestep=self.simulator.cur_step,
+                                                             packet=packet,
+                                                             source_drone=drone)
+
 
 
 class Drone(Entity):
@@ -143,7 +146,7 @@ class Drone(Entity):
         # store the events that are missing due to movement routing
         else:
 
-            self.simulator.metrics.events_not_listened.add(generated_event)
+            self.simulator.logger.add_event_not_listened(timestep=self.simulator.cur_step, event=generated_event)
 
     def accept_packets(self, packets):
         """

@@ -1,7 +1,4 @@
-""" To clean. """
-
 from src.utilities import config
-
 import pathlib
 import time
 import json

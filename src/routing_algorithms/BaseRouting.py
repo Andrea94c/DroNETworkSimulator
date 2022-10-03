@@ -91,12 +91,12 @@ class BaseRouting(metaclass=abc.ABCMeta):
             return 0
 
         null_event = Event(simulator=self.simulator,
-                           coords=(-1, -1),
+                           coordinates=(-1, -1),
                            current_time=-1)
 
         hello_packet = HelloPacket(simulator=self.simulator,
                                    source_drone=self.drone,
-                                   current_position=self.drone.coords,
+                                   current_position=self.drone.coordinates,
                                    current_speed=self.drone.speed,
                                    next_target=self.drone.next_target(),
                                    event_ref=null_event)
@@ -126,12 +126,12 @@ class BaseRouting(metaclass=abc.ABCMeta):
         @return:
         """
 
-        # FLOW 0: if it is not possible to communicate with other Entities or there are no packets to send
+        # FLOW 1: if it is not possible to communicate with other Entities or there are no packets to send
         if self.no_transmission or self.drone.buffer_length == 0:
 
             return 0
 
-        # FLOW 1: the Depot is close enough to offload packets directly
+        # FLOW 2: the Depot is close enough to offload packets directly
         communication_radius_scaling_factor = 0.98
         if self.drone.distance_from_depot <= (self.drone.communication_range + self.drone.depot.communication_range) * communication_radius_scaling_factor:
 
@@ -141,7 +141,7 @@ class BaseRouting(metaclass=abc.ABCMeta):
 
             return 0
 
-        # FLOW 2: find the best relay through the routing algorithm
+        # FLOW 3: find the best relay through the routing algorithm
         if self.simulator.cur_step % self.simulator.drone_retransmission_delta == 0:
 
             opt_neighbors = []
@@ -183,8 +183,8 @@ class BaseRouting(metaclass=abc.ABCMeta):
 
         for other_drone in drones:
             if self.drone.identifier != other_drone.identifier:  # not the same drone
-                drones_distance = util.euclidean_distance(self.drone.coords,
-                                                          other_drone.coords)  # distance between two drones
+                drones_distance = util.euclidean_distance(self.drone.coordinates,
+                                                          other_drone.coordinates)  # distance between two drones
 
                 if drones_distance <= min(self.drone.communication_range,
                                           other_drone.communication_range):  # one feels the other & vv
@@ -201,7 +201,7 @@ class BaseRouting(metaclass=abc.ABCMeta):
         goes through, false otherwise.
         """
 
-        assert (drones_distance <= self.drone.communication_range)
+        assert drones_distance <= self.drone.communication_range
 
         if no_error:
 
@@ -251,7 +251,7 @@ class BaseRouting(metaclass=abc.ABCMeta):
     def gaussian_success_handler(self, drones_distance):
         """ get the probability of the drone bucket """
         bucket_id = int(drones_distance / self.radius_corona) * self.radius_corona
-        return self.buckets_probability[bucket_id] * config.GUASSIAN_SCALE
+        return self.buckets_probability[bucket_id] * config.GAUSSIAN_SCALE
 
     def transfer_to_depot(self, depot):
         """

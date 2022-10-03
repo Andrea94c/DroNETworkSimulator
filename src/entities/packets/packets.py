@@ -10,14 +10,13 @@ class Packet(Entity):
     def __init__(self, simulator, event_ref=None):
         """
 
-        @param time_step_creation:
         @param simulator:
         @param event_ref:
         """
 
         # id(self) is the id of this instance (unique for every new created packet),
         # the coordinates are those of the event
-        super().__init__(simulator, id(self), event_ref.coords)
+        super().__init__(simulator=simulator, identifier=id(self), coordinates=event_ref.coordinates)
 
         self.__TTL = -1  # TTL is the number of hops that the packet crossed
         self.__max_TTL = self.simulator.packets_max_ttl
@@ -44,7 +43,7 @@ class Packet(Entity):
         @return: A float number representing the distance between the Depot and the current packet
         """
 
-        return utilities.euclidean_distance(self.simulator.depot_coordinates, self.coords)
+        return utilities.euclidean_distance(self.simulator.depot_coordinates, self.coordinates)
 
     @property
     def is_expired(self):
@@ -59,7 +58,7 @@ class Packet(Entity):
     def to_json(self):
         """ return the json repr of the obj """
 
-        return {"coord": self.coords,
+        return {"coord": self.coordinates,
                 "i_gen": self.time_step_creation,
                 "i_dead": self.event_ref.deadline,
                 "id": self.identifier,
@@ -94,7 +93,7 @@ class Packet(Entity):
 
         packet_type = str(self.__class__).split(".")[-1].split("'")[0]
 
-        return f"{packet_type} id: {str(self.identifier)} event id: {str(self.event_ref.identifier)} coordinates: {+ str(self.coords)}"
+        return f"{packet_type} id: {str(self.identifier)} event id: {str(self.event_ref.identifier)} coordinates: {+ str(self.coordinates)}"
 
 
 class DataPacket(Packet):

@@ -1,7 +1,8 @@
-
 import src.utilities.utilities as util
 from src.entities.packets.packets import DataPacket
 from src.simulation.metrics import Metrics
+
+# TODO: Write Docs
 
 
 class MediumDispatcher:
@@ -49,19 +50,21 @@ class MediumDispatcher:
 
             packet_to_send, source_drone, destination_drone, to_send_ts = packet
 
-            if to_send_ts == current_ts:  # time to send this packet_to_send
+            # time to send this packet_to_send
+            if to_send_ts == current_ts:
 
                 indices_to_drop.append(index)
 
                 if source_drone.identifier != destination_drone.identifier:
 
-                    drones_distance = util.euclidean_distance(source_drone.coords, destination_drone.coords)
+                    drones_distance = util.euclidean_distance(source_drone.coordinates, destination_drone.coordinates)
 
                     if drones_distance <= min(source_drone.communication_range, destination_drone.communication_range):
 
                         if destination_drone.routing_algorithm.channel_success(drones_distance):
 
-                            destination_drone.routing_algorithm.drone_reception(source_drone, packet_to_send)  # reception of a packet_to_send
+                            # destination drone receives packet_to_send
+                            destination_drone.routing_algorithm.drone_reception(source_drone, packet_to_send)
 
         self_packets_deep_copy = [self_packets_deep_copy[i] for i in range(len(self_packets_deep_copy)) if i not in indices_to_drop]
 

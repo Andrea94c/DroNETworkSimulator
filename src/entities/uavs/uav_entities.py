@@ -1,7 +1,6 @@
 import numpy as np
 from src.entities.events.event import Event
 from src.entities.generic.entity import Entity
-import src.entities.packets.packets as pckts
 from src.utilities import config, utilities
 
 
@@ -11,7 +10,7 @@ class Depot(Entity):
     """
 
     def __init__(self, simulator, coordinates, communication_range):
-        super().__init__(simulator=simulator, identifier=id(self), coords=coordinates)
+        super().__init__(simulator=simulator, identifier=id(self), coordinates=coordinates)
 
         self.communication_range = communication_range
         self.__buffer = list()  # also with duplicated packets
@@ -47,7 +46,7 @@ class Drone(Entity):
 
     def __init__(self, simulator, identifier: int, path: list, depot: Depot):
 
-        super().__init__(simulator=simulator, identifier=identifier, coords=path[0])
+        super().__init__(simulator=simulator, identifier=identifier, coordinates=path[0])
 
         self.depot = depot
         self.path = path
@@ -71,8 +70,6 @@ class Drone(Entity):
         # setup drone routing algorithm
         self.routing_algorithm = self.simulator.routing_algorithm.value(self, self.simulator)
 
-        # drone state simulator
-
         # last mission coord to restore the mission after movement
         self.last_mission_coords = None
 
@@ -82,6 +79,7 @@ class Drone(Entity):
         Returns all the packets within the buffer
         @return: a list of packets or an empty list
         """
+
         return self.__buffer
 
     @property
@@ -90,6 +88,7 @@ class Drone(Entity):
         Returns the buffer length
         @return: an integer describing the current buffer length
         """
+
         return len(self.__buffer)
 
     @property
@@ -98,6 +97,7 @@ class Drone(Entity):
         Return True if the current buffer length is equal to the max length
         @return: True or False
         """
+
         return self.buffer_length == self.buffer_max_size
 
     def update_packets(self):
@@ -131,7 +131,7 @@ class Drone(Entity):
         """
 
         generated_event = Event(simulator=self.simulator,
-                                coords=self.coords,
+                                coordinates=self.coordinates,
                                 current_time=self.simulator.cur_step)
 
         packet = generated_event.as_packet(self)
@@ -168,7 +168,7 @@ class Drone(Entity):
         @return:
         """
 
-        self.distance_from_depot = utilities.euclidean_distance(self.depot.coords, self.coords)
+        self.distance_from_depot = utilities.euclidean_distance(self.depot.coordinates, self.coordinates)
 
         self.routing_algorithm.routing(drones)
 
@@ -185,8 +185,10 @@ class Drone(Entity):
             self.simulator.metrics.time_on_active_routing += 1
 
         if self.move_routing:
+
             if not self.last_move_routing:  # this is the first time that we are doing move-routing
-                self.last_mission_coords = self.coords
+
+                self.last_mission_coords = self.coordinates
 
             self.__move_to_depot(time)
         else:
@@ -250,7 +252,7 @@ class Drone(Entity):
         # case 1: if move_routing then go to the depot
         if self.move_routing:
 
-            return self.depot.coords
+            return self.depot.coordinates
 
         # case 2: if come_back_to_mission then go to the last coordinates known
         elif self.come_back_to_mission:
@@ -271,71 +273,112 @@ class Drone(Entity):
                 return self.path[self.current_waypoint + 1]
 
     def __move_to_mission(self, time):
-        """ When invoked the drone moves on the map. TODO: Add comments and clean.
-            time -> time_step_duration (how much time between two simulation frame)
         """
+        When invoked the drone moves on the map.
+        @param time: Time elapsed between two frames
+        @return:
+        """
+
         if self.current_waypoint >= len(self.path) - 1:
+
             self.current_waypoint = -1
 
-        p0 = self.coords
+        p0 = self.coordinates
+
         if self.come_back_to_mission:  # after move
+
             p1 = self.last_mission_coords
+
         else:
+
             p1 = self.path[self.current_waypoint + 1]
 
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = time * self.speed
+
         if all_distance == 0 or distance == 0:
+
             self.__update_position(p1)
+
             return
 
         t = distance / all_distance
+
         if t >= 1:
+
             self.__update_position(p1)
+
         elif t <= 0:
+
             print("Error move drone, ratio < 0")
             exit(1)
+
         else:
-            self.coords = (((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1]))
+
+            self.coordinates = (((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1]))
 
     def __update_position(self, p1):
+        """
+
+        @param p1:
+        @return:
+        """
         if self.come_back_to_mission:
+
             self.come_back_to_mission = False
-            self.coords = p1
+            self.coordinates = p1
+
         else:
+
             self.current_waypoint += 1
-            self.coords = self.path[self.current_waypoint]
+            self.coordinates = self.path[self.current_waypoint]
 
     def __move_to_depot(self, time):
-        """ When invoked the drone moves to the depot. TODO: Add comments and clean.
-            time -> time_step_duration (how much time between two simulation frame)
         """
-        p0 = self.coords
-        p1 = self.depot.coords
+        When invoked the drone moves to the depot.
+        @param time: Time elapsed between two frames
+        @return:
+        """
 
+        p0 = self.coordinates
+        p1 = self.depot.coordinates
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = time * self.speed
+
         if all_distance == 0:
+
             self.move_routing = False
+
             return
 
         t = distance / all_distance
 
         if t >= 1:
-            self.coords = p1  # with the next step you would surpass the target
+
+            # with the next step you would surpass the target
+            self.coordinates = p1
+
         elif t <= 0:
+
             print("Error routing move drone, ratio < 0")
             exit(1)
+
         else:
-            self.coords = (((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1]))
+
+            self.coordinates = (((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1]))
 
     def __repr__(self):
+        """
+
+        @return:
+        """
+
         return f"Drone {str(self.identifier)}"
 
     def __hash__(self):
         return hash(self.identifier)
 
-###################NOT USED###################
+# ____________________NOT USED____________________
 
     def packet_is_expiring(self):
         """
@@ -357,7 +400,7 @@ class Drone(Entity):
         if current_waypoint >= len(self.path) - 1:
             current_waypoint = -1
 
-        p0 = self.coords
+        p0 = self.coordinates
         p1 = self.path[current_waypoint + 1]
         all_distance = utilities.euclidean_distance(p0, p1)
         distance = self.simulator.time_step_duration * self.speed

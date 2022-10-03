@@ -14,9 +14,9 @@ class AndreaGeoRouting(BaseRouting):
         #if self.drone.identifier == 0:
         #    print(opt_neighbors)
 
-        depot_pos = self.drone.depot.coords
+        depot_pos = self.drone.depot.coordinates
         cur_step = self.simulator.cur_step
-        my_distance_from_bs = util.euclidean_distance(self.drone.coords, depot_pos)
+        my_distance_from_bs = util.euclidean_distance(self.drone.coordinates, depot_pos)
         drone_to_send = None
         current_score = my_distance_from_bs
         for hll_pck, close_drone in neighbors:

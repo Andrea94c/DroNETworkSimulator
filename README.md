@@ -1,8 +1,8 @@
-# UAV-Networks Simulator - Autonomous Networking - A.A. 20/21
+# UAV-Networks Simulator - Autonomous Networking - A.A. 21/22
 
 UAV-Networks-Routing is a Python simulator for experimenting routing algorithms and mac protocols on unmanned aerial vehicle 
 networks. The project requires Python 3, and several dependencies.
-This code is released for the course of Autonomous Networking - A.A. 2020-2021, to develop and test AI based protocols. 
+This code is released for the course of Autonomous Networking - A.A. 2021-2022, to develop and test AI based protocols. 
 
 ## Execution
 
@@ -54,7 +54,7 @@ On a high level, the two main directories are ``data`` and ``src``. The director
 data of the project, like drones tours, and other input and output of the project. The directory ``src`` 
 contains the source code, organized in several packages. 
 
-* ``src.drawing`` it contains all the classes needed for drawing the simulation on screen. Typically you may 
+* ``src.drawing`` it contains all the classes needed for drawing the simulation on screen. However, you may 
 want to get your hands in this directory if you want to change the aspect of the simulation, display a new 
 object, or label on the area.
 
@@ -75,7 +75,7 @@ and never be hard-coded.
 
 ## Understand the project
 In this section it will be given a high level overview of the project. Before adding any new
-file to the project, as a contribute, you may want to run some simulations, understand the idea
+file to the project, you may want to run some simulations, understand the idea
  behind the simulator, and the routing algorithm available. 
 
 #### Make some simulations 
@@ -121,7 +121,7 @@ depending on what the routing algorithm decides for it.
 
 The UAVs can have any possible path/tour given by a json file (a dict id_drone : list of waypoints).
 Notice that a waypoint is a 2-tuple (x, y), the coordinate of the point. Events are generated right on the
-drone. If an event is successfully "felt", the drone generates a packet out of it and it is responsible to
+drone. If an event is successfully "felt", the drone generates a packet out of it, and it is responsible to
 bring it to the depot according to the routing algorithm currently running. Packets can expire and have a 
 TTL to avoid infinite pin-pongs, _that are seen to be rare_.
 
@@ -140,10 +140,15 @@ To run a simulation with your new routing algorithms, just set the attribute ``R
 with the enumeration variable of your choice.
 
 ## Contacts
-For further information contact Andrea Coletta at **coletta[AT]di.uniroma1.it**.
+For further information contact:
+
+Flavio Giorgi at **giorgi.1614998[AT]studenti.uniroma1.it**.
+
+Giulio Atteni at **atteni.*******[AT]studenti.uniroma1.it**.
+
 
 ## Thanks and License
 The current version of the simulator is free for non-commercial use.
-The simulator was done in collaboration with Matteo Prata, PhD Student at La Sapienza **prata[AT]di.uniroma1.it**.
+The simulator was done in collaboration with Andrea Coletta and Matteo Prata PhD Student at Sapienza University of Rome.
 
 

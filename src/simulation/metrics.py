@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import pickle
 import pandas as pd
@@ -43,37 +41,48 @@ class Metrics:
 
         self.time_on_active_routing = 0
 
-    def score(self, undelivered_penalty=1.5):
-        """ returns a score for the exectued simulation: 
+    def score(self, undelivered_penalty: float = 1.5) -> float:
+        """
+        Returns a score for the executed simulation as:
 
                 sum( event delays )  / number of events
 
-            Notice that, expired or not found events will be counted with a max_delay*penalty
+        Notice that, expired or not found events will be counted with a max_delay * penalty
+        @param undelivered_penalty:
+        @return:
         """
-        # mean delivery time
-        # get best delivery time for each event  
-        all_delivered_events = set([pck.event_ref for pck, _ in self.drones_packets_to_depot])
+
+        # mean delivery time: get the best delivery time for each event
+        all_delivered_events = set([packet.event_ref for packet, _ in self.drones_packets_to_depot])
         event_delivery_times_dict = {ev.identifier: [] for ev in all_delivered_events}
 
         # DELIVERY TIME -> METRIC FOR PLOT
-        for pck, delivery_ts in self.drones_packets_to_depot:
-            # time between event generation and packet delivery to depot -> dict to help computation
-            event_delivery_times_dict[pck.event_ref.identifier].append(delivery_ts - pck.event_ref.current_time)
+        for packets, delivery_ts in self.drones_packets_to_depot:
 
-        # maps every event to the minimum delay of the packet arrival to the depot
+            # time between event generation and packet delivery to depot -> dict to help computation
+            event_delivery_times_dict[packets.event_ref.identifier].append(delivery_ts - packets.event_ref.current_time)
+
+        # maps every event to the minimum delay of the packet arrival at the depot
         event_delivery_times = []
+
         for ev_id in event_delivery_times_dict.keys():
+
             event_delivery_times.append(np.nanmin(event_delivery_times_dict[ev_id]))
 
-        not_delivered_events = len(self.events) - len(all_delivered_events) 
-        assert not_delivered_events >= 0
-         
-        event_delivery_times.extend([undelivered_penalty * self.simulator.event_duration] * not_delivered_events)  # add penalities to not delivered or not found packets
+        not_delivered_events = len(self.events) - len(all_delivered_events)
 
-        return np.nanmean(event_delivery_times)       
+        assert not_delivered_events >= 0
+
+        # add penalties to not delivered or not found packets
+        event_delivery_times.extend([undelivered_penalty * self.simulator.event_duration] * not_delivered_events)
+
+        return float(np.nanmean(event_delivery_times))
 
     def other_metrics(self):
-        """ Metrics evaluated post execution """
+        """
+        Metrics evaluated post execution
+        @return:
+        """
 
         # the number of all the events generated during the simulation
         self.number_of_generated_events = len(self.events)

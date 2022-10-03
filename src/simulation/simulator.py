@@ -94,10 +94,19 @@ class Simulator:
         self.event_generator = utilities.EventGenerator(self)
 
     def __setup_net_dispatcher(self):
+        """
+
+        @return:
+        """
+
         self.network_dispatcher = MediumDispatcher(self.metrics)
 
     def __set_metrics(self):
-        """ the method sets up all the parameters in the metrics class """
+        """
+        The method sets up all the parameters in the metrics class
+        @return:
+        """
+
         self.metrics.info_mission()
 
     def __set_random_generators(self):
@@ -109,69 +118,77 @@ class Simulator:
 
     def __set_simulation(self):
         """ the method creates all the uav entities """
+
         self.__set_random_generators()
-
-
         self.path_manager = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.seed)
         self.environment = Environment(self, self.env_width, self.env_height)
 
-        self.depot = Depot(simulator=self, coordinates=self.depot_coordinates, communication_range=self.depot_com_range)
+        self.depot = Depot(simulator=self,
+                           coordinates=self.depot_coordinates,
+                           communication_range=self.depot_com_range)
 
         self.drones = []
 
         # drone 0 is the first
         for i in range(self.n_drones):
+
             self.drones.append(Drone(self, i, self.path_manager.path(i, self), self.depot))
 
-        self.environment.add_drones(self.drones)
-        self.environment.add_depot(self.depot)
+        self.environment.drones = self.drones
+        self.environment.depot = self.depot
 
         # Set the maximum distance between the drones and the depot
-        self.max_dist_drone_depot = utilities.euclidean_distance(self.depot.coords, (self.env_width, self.env_height))
+        self.max_dist_drone_depot = utilities.euclidean_distance(self.depot.coordinates, (self.env_width, self.env_height))
 
         if self.show_plot or config.SAVE_PLOT:
             self.draw_manager = pp_draw.PathPlanningDrawer(self.environment, self, borders=True)
 
-
     def __sim_name(self):
         """
-            return the identification name for
-            the current simulation. It is useful to print
-            the simulation progress
+        Returns the identification name for
+        the current simulation. It is useful to print
+        the simulation progress
+        @return:
         """
-        return "sim_seed" + str(self.seed) + "drones" + str(self.n_drones) + "_step"
 
-    def __plot(self, cur_step):
+        return f"SIMULATION_SEED: {str(self.seed)} drones: {str(self.n_drones)} "
+
+    def __plot(self):
         """ plot the simulation """
-        if cur_step % config.SKIP_SIM_STEP != 0:
+
+        if self.cur_step % config.SKIP_SIM_STEP != 0:
             return
 
         # delay draw
         if config.WAIT_SIM_STEP > 0:
+
             time.sleep(config.WAIT_SIM_STEP)
 
         # drones plot
         for drone in self.drones:
-            self.draw_manager.draw_drone(drone, cur_step)
+
+            self.draw_manager.draw_drone(drone, self.cur_step)
 
         # depot plot
         self.draw_manager.draw_depot(self.depot)
 
         # events
         for event in self.environment.active_events:
+
             self.draw_manager.draw_event(event)
 
-        # Draw simulation info
-        self.draw_manager.draw_simulation_info(cur_step=cur_step, max_steps=self.len_simulation)
+        # draw simulation info
+        self.draw_manager.draw_simulation_info(cur_step=self.cur_step, max_steps=self.len_simulation)
 
-        # rendering
-        self.draw_manager.update(show=self.show_plot, save=config.SAVE_PLOT, filename=self.sim_save_file + str(cur_step) + ".png")
+        # rendering phase
+        file_name = self.sim_save_file + str(self.cur_step) + ".png"
+        self.draw_manager.update(show=self.show_plot, save=config.SAVE_PLOT, filename=file_name)
 
     def increase_meetings_probs(self, drones, cur_step):
         """ Increases the probabilities of meeting someone. """
         cells = set()
         for drone in drones:
-            coords = drone.coords
+            coords = drone.coordinates
             cell_index = utilities.TraversedCells.coord_to_cell(size_cell=self.prob_size_cell,
                                                                 width_area=self.env_width,
                                                                 x_pos=coords[0],  # e.g. 1500
@@ -197,6 +214,7 @@ class Simulator:
         """
 
         for cur_step in tqdm(range(self.len_simulation)):
+
             self.cur_step = cur_step
             # check for new events and remove the expired ones from the environment
             # self.environment.update_events(cur_step)
@@ -219,12 +237,14 @@ class Simulator:
 
             # in case we need probability map
             if config.ENABLE_PROBABILITIES:
+
                 self.increase_meetings_probs(self.drones, cur_step)
 
             if self.show_plot or config.SAVE_PLOT:
-                self.__plot(cur_step)
+                self.__plot()
 
         if config.DEBUG:
+
             print("End of simulation, sim time: " + str((cur_step + 1) * self.time_step_duration) + " sec, #iteration: " + str(cur_step + 1))
 
     def close(self):

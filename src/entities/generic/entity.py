@@ -4,7 +4,9 @@ class SimulatedEntity:
     of the simulation. No class of this type is directly instantiable.
     """
     def __init__(self, simulator):
+
         self.simulator = simulator
+
 
 class Entity(SimulatedEntity):
     """
@@ -12,10 +14,11 @@ class Entity(SimulatedEntity):
     Drones, Events, Packets, etc... It extends SimulatedEntity.
     """
 
-    def __init__(self,  simulator, identifier: int, coords: tuple):
-        super().__init__(simulator)
-        self.identifier = identifier  # the id of the entity
-        self.coords = coords          # the coordinates of the entity on the map
+    def __init__(self,  simulator, identifier: int, coordinates: tuple):
+        super().__init__(simulator=simulator)
+
+        self.identifier = identifier     # the id of the entity
+        self.coordinates = coordinates   # the coordinates of the entity on the map
 
     def __eq__(self, other):
         """
@@ -30,7 +33,7 @@ class Entity(SimulatedEntity):
         """
         The hash function is applied to the identifier and the current coordinates
         """
-        return hash((self.identifier, self.coords))
+        return hash((self.identifier, self.coordinates))
 
 
 # ------------------ Environment ----------------------
@@ -45,17 +48,47 @@ class Environment(SimulatedEntity):
 
         self.width = width
         self.height = height
+        self.__drones = None
+        self.__depot = None
 
         self.event_generator = EventGenerator(height, width, simulator)
         self.active_events = []
 
-    def add_drones(self, drones: list):
-        """ add a list of drones in the env """
-        self.drones = drones
+    @property
+    def drones(self):
+        """
 
-    def add_depot(self, depot):
-        """ add depot in the env """
-        self.depot = depot
+        @return:
+        """
+
+        return self.__drones
+
+    @drones.setter
+    def drones(self, drones: list):
+        """
+
+        @param drones:
+        @return:
+        """
+        self.__drones = drones
+
+    @property
+    def depot(self):
+        """
+
+        @return:
+        """
+
+        return self.__depot
+
+    @depot.setter
+    def depot(self, depot):
+        """
+
+        @param depot:
+        @return:
+        """
+        self.__depot = depot
 
 
 class EventGenerator(SimulatedEntity):

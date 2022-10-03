@@ -7,8 +7,7 @@ from collections import defaultdict
 class PathPlanningDrawer():
 
     #init the drawer for the path planning 
-    def __init__(self, env : Environment, simulator,
-                 borders=False, padding=25):
+    def __init__(self, env : Environment, simulator, borders=False, padding=25):
         """ init the path plannind drawer """
         self.width =  env.width
         self.height =  env.height
@@ -28,7 +27,6 @@ class PathPlanningDrawer():
                     #x1, y1, x2, y2
         stddraw.line(self.width/2, self.height, self.width/2, 0)
         self.__reset_pen()
-
 
     def save(self, filename):
         """ save the current plot """
@@ -62,12 +60,20 @@ class PathPlanningDrawer():
             pr = self.simulator.cell_prob_map[index_cell][2]
             stddraw.text(cell_center[0], cell_center[1], "pr-c: " + str(round(pr, 4)))
 
-    def __reset_pen(self):
+    @staticmethod
+    def __reset_pen():
+
         stddraw.setPenColor(c=stddraw.BLACK)
         stddraw.setPenRadius(0.0055)
 
     def draw_drone(self, drone, cur_step):
-        coords = drone.coords
+        """
+
+        @param drone:
+        @param cur_step:
+        @return:
+        """
+        coords = drone.coordinates
         if drone.buffer_length > 0:  # change color when find a packet
             stddraw.setPenColor(c=stddraw.GREEN)
         else:     
@@ -75,46 +81,73 @@ class PathPlanningDrawer():
         stddraw.setPenRadius(0.0055)
         stddraw.point(coords[0], coords[1])
 
-        self.__draw_drone_info(drone, cur_step)
+        self.__draw_drone_info(drone)
         self.__draw_communication_range(drone)
         self.__draw_sensing_range(drone)
         self.__reset_pen()
 
         if config.IS_SHOW_NEXT_TARGET_VEC:
-            self.__draw_next_target(drone.coords, drone.next_target())
+            self.__draw_next_target(drone.coordinates, drone.next_target())
 
-    def update(self, rate=1, 
-                save=False, show=True,
-                filename=None):
-        """ update the draw """
+    def update(self, rate=1, save=False, show=True, filename=None):
+        """
+
+        @param rate:
+        @param save:
+        @param show:
+        @param filename:
+        @return:
+        """
+
         if self.borders:
             self.__borders_plot()
 
         if config.ENABLE_PROBABILITIES:
             self.__grid_plot()
+
         if show:
             stddraw.show(rate)
+
         if save:
             assert(filename is not None)
             self.save(filename)
+
         stddraw.clear()
         
     def draw_event(self, event):
-        coords = event.coords
+        """
+
+        @param event:
+        @return:
+        """
+
+        coords = event.coordinates
         stddraw.setPenRadius(0.0055)
         stddraw.setPenColor(c=stddraw.RED)
         stddraw.point(coords[0], coords[1])
         stddraw.setPenColor()
         self.__reset_pen()
 
-    def draw_vector(self, pos, vector):
+    @staticmethod
+    def draw_vector(pos, vector):
+        """
+
+        @param pos:
+        @param vector:
+        @return:
+        """
+
         stddraw.setPenRadius(0.0500)
-        stddraw.line(pos[0], pos[1], 
-                        vector[0], vector[1])
-    
+        stddraw.line(pos[0], pos[1], vector[0], vector[1])
 
     def draw_depot(self, depot):
-        coords = depot.coords
+        """
+
+        @param depot:
+        @return:
+        """
+
+        coords = depot.coordinates
         stddraw.setPenRadius(0.0100)
         stddraw.setPenColor(c=stddraw.DARK_RED)
         size_depot = 50
@@ -126,20 +159,20 @@ class PathPlanningDrawer():
         # draw the buffer size
         stddraw.setPenRadius(0.0125)
         stddraw.setPenColor(c=stddraw.BLACK)
-        stddraw.text(depot.coords[0], depot.coords[1]+100, "pk: " + str(len(depot.all_packets)))
+        stddraw.text(depot.coordinates[0], depot.coordinates[1] + 100, f"packets delivered: " + str(len(depot.all_packets)))
 
     def __draw_sensing_range(self, body):
         stddraw.setPenRadius(0.0015)
         stddraw.setPenColor(c=stddraw.RED)
-        stddraw.circle(body.coords[0], body.coords[1], 
-                        body.sensing_range)
+        stddraw.circle(body.coordinates[0], body.coordinates[1],
+                       body.sensing_range)
         stddraw.setPenColor(c=stddraw.BLACK)
         
     def __draw_communication_range(self, body):
         stddraw.setPenRadius(0.0015)
         stddraw.setPenColor(c=stddraw.BLUE)
-        stddraw.circle(body.coords[0], body.coords[1], 
-                        body.communication_range)
+        stddraw.circle(body.coordinates[0], body.coordinates[1],
+                       body.communication_range)
         stddraw.setPenColor(c=stddraw.BLACK)
 
     def draw_blocks(self, drone_coo, target, size_cell, cells):
@@ -161,24 +194,51 @@ class PathPlanningDrawer():
         stddraw.line(drone_coo[0], drone_coo[1], target[0], target[1])
         self.__reset_pen()
 
-    def __draw_drone_info(self, drone, cur_step):
+    @staticmethod
+    def __draw_drone_info(drone):
+        """
+
+        @param drone:
+        @return:
+        """
+
         stddraw.setPenRadius(0.0125)
         stddraw.setPenColor(c=stddraw.BLACK)
-        # life time and speed
-        stddraw.text(drone.coords[0]-50, drone.coords[1], "buf: " + str(drone.buffer_length))
-        # index
-        stddraw.text(drone.coords[0], drone.coords[1] + (drone.communication_range / 2.0), "id: " + str(drone.identifier))
+
+        x, y = drone.coordinates[0], drone.coordinates[1]
+        offset_1, offset_2 = 50, drone.communication_range / 2.0
+
+        identifier = f"id: {str(drone.identifier)}"
+        retransmissions = f"retr: {str(drone.routing_algorithm.current_n_transmission)}"
+        buffer = f"buf: {str(drone.buffer_length)}"
+        empty_buffer = "retr: --\\--"
+
+        # buffer
+        stddraw.text(x - offset_1, y, buffer)
+
+        # identifier
+        stddraw.text(x, y + offset_2, identifier)
 
         if drone.buffer_length > 0:
-            stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: " +
-                         str(drone.routing_algorithm.current_n_transmission))
+
+            stddraw.text(x, y - offset_2, retransmissions)
 
         # If the buffer is empty, do not show the retransmission counters since they are not updated
         else:
-            stddraw.text(drone.coords[0], drone.coords[1] - (drone.communication_range / 2.0), "retr: -- \\ --")
+
+            stddraw.text(x, y - offset_2, empty_buffer)
 
     def draw_simulation_info(self, cur_step, max_steps):
+        """
+
+        @param cur_step:
+        @param max_steps:
+        @return:
+        """
+
         TEXT_LEFT = 60
         TEXT_TOP = 20
+
         stddraw.text(TEXT_LEFT + 20, self.height - TEXT_TOP, str(cur_step) + "/" + str(max_steps))
+
         self.__reset_pen()

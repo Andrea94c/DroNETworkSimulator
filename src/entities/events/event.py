@@ -1,11 +1,12 @@
 from src.entities.generic.entity import Entity
 from src.entities.packets.packets import DataPacket
 
+
 class Event(Entity):
     """
     An Event object is any kind of event that the drone detects in the Area-of-Interest
     """
-    def __init__(self, coords: tuple, current_time: int, simulator, deadline=None):
+    def __init__(self, simulator, coords: tuple, current_time: int, deadline=None):
         """
 
         @param coords:
@@ -43,7 +44,7 @@ class Event(Entity):
         """
         return self.simulator.cur_step > self.deadline
 
-    def as_packet(self, time_step_creation, drone):
+    def as_packet(self, drone):
         """
         Build a Packet out of the Event, by default the packet has the same deadline of the event
         so the packet expire at the same time of the event.
@@ -51,10 +52,11 @@ class Event(Entity):
         # Notice: called only when a packet is created
 
         packet = DataPacket(self.simulator, event_ref=self)
-        # if config.DEBUG_PRINT_PACKETS: print("data", pck, pck.source_drone, pck.destination_drone, self.current_time)
         packet.add_hop(drone)
+
         return packet
 
     def __repr__(self):
-        return "Ev id:" + str(self.identifier) + " c:" + str(self.coords)
+
+        return f"Event id:{str(self.identifier)} coordinates:{str(self.coords)}"
 

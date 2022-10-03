@@ -28,16 +28,19 @@ class Depot(Entity):
     def transfer_notified_packets(self, drone):
         """
         This function is called when a Drone wants to offload packets to the depot
+        @param drone:
+        @return:
         """
 
         packets_to_offload = drone.all_packets
         self.__buffer += packets_to_offload
 
-        for pck in packets_to_offload:
+        for packet in packets_to_offload:
+
             # add metrics: all the packets notified to the depot
-            self.simulator.metrics.drones_packets_to_depot.add((pck, self.simulator.cur_step))
-            self.simulator.metrics.drones_packets_to_depot_list.append((pck, self.simulator.cur_step))
-            pck.time_delivery = self.simulator.cur_step
+            self.simulator.metrics.drones_packets_to_depot.add((packet, self.simulator.cur_step))
+            self.simulator.metrics.drones_packets_to_depot_list.append((packet, self.simulator.cur_step))
+            packet.time_delivery = self.simulator.cur_step
 
 
 class Drone(Entity):
@@ -83,6 +86,10 @@ class Drone(Entity):
 
     @property
     def buffer_length(self):
+        """
+        Returns the buffer length
+        @return: an integer describing the current buffer length
+        """
         return len(self.__buffer)
 
     @property
@@ -93,91 +100,76 @@ class Drone(Entity):
         """
         return self.buffer_length == self.buffer_max_size
 
-    def update_packets(self, cur_step):
+    def update_packets(self):
         """
-        removes the expired packets from the buffer
+        Removes the expired packets from the buffer
+        @return:
         """
 
-        to_remove_packets = 0
-        tmp_buffer = []
+        temporary_buffer = []
         self.tightest_event_deadline = np.nan
 
-        for pck in self.__buffer:
-            if not pck.is_expired:
-                tmp_buffer.append(pck)  # append again only if it is not expired
-                self.tightest_event_deadline = np.nanmin([self.tightest_event_deadline, pck.event_ref.deadline])
-            else:
-                to_remove_packets += 1
-        self.__buffer = tmp_buffer
+        for packet in self.__buffer:
 
-        if self.buffer_length == 0:
+            if not packet.is_expired:
+
+                # append again only if it is not expired
+                temporary_buffer.append(packet)
+                self.tightest_event_deadline = np.nanmin([self.tightest_event_deadline, packet.event_ref.deadline])
+
+        self.__buffer = temporary_buffer
+
+        if not self.buffer_length:
+
             self.move_routing = False
 
-    def packet_is_expiring(self):
+    def feel_event(self):
         """
-        return true if exist a packet that is expiring and must be returned to the depot as soon as possible
-        -> start to move manually to the depot.
-        This method is optional, there is flag src.utilities.config.ROUTING_IF_EXPIRING
-        """
-
-        time_to_depot = self.distance_from_depot / self.speed
-        event_time_to_dead = (self.tightest_event_deadline - self.simulator.cur_step) * self.simulator.time_step_duration
-        return event_time_to_dead - 5 < time_to_depot <= event_time_to_dead  # 5 seconds of tolerance
-
-    def next_move_to_mission_point(self):
-        """
-        get the next future position of the drones, according the mission
+        Feel a new event, and adds the packet relative to it, in its buffer.
+        If the drones is doing movement the packet is not added in the buffer
+        @return: None
         """
 
-        current_waypoint = self.current_waypoint
-        if current_waypoint >= len(self.path) - 1:
-            current_waypoint = -1
+        generated_event = Event(simulator=self.simulator,
+                                coords=self.coords,
+                                current_time=self.simulator.cur_step)
 
-        p0 = self.coords
-        p1 = self.path[current_waypoint + 1]
-        all_distance = utilities.euclidean_distance(p0, p1)
-        distance = self.simulator.time_step_duration * self.speed
-        if all_distance == 0 or distance == 0:
-            return self.path[current_waypoint]
+        packet = generated_event.as_packet(self)
 
-        t = distance / all_distance
-        if t >= 1:
-            return self.path[current_waypoint]
-        elif t <= 0:
-            print("Error move drone, ratio < 0")
-            exit(1)
-        else:
-            return ((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1])
-
-    def feel_event(self, cur_step):
-        """
-        feel a new event, and adds the packet relative to it, in its buffer.
-        if the drones is doing movement the packet is not added in the buffer
-        """
-
-        ev = Event(self.coords, cur_step, self.simulator)  # the event
-        pk = ev.as_packet(cur_step, self)  # the packet of the event
         if not self.move_routing and not self.come_back_to_mission:
-            self.__buffer.append(pk)
-        else:  # store the events that are missing due to movement routing
-            self.simulator.metrics.events_not_listened.add(ev)
+
+            self.__buffer.append(packet)
+
+        # store the events that are missing due to movement routing
+        else:
+
+            self.simulator.metrics.events_not_listened.add(generated_event)
 
     def accept_packets(self, packets):
         """
         Self drone adds packets of another drone, when it feels it passing by.
+        @param packets:
+        @return:
         """
 
         for packet in packets:
+
             # add if not notified yet, else don't, proprietary drone will delete all packets, but it is ok
             # because they have already been notified by someone already
 
             if not self.is_known_packet(packet):
+
                 self.__buffer.append(packet)
 
-    def routing(self, drones, cur_step):
-        """ do the routing """
+    def routing(self, drones):
+        """
+        It Starts the routing process
+        @param drones:
+        @return:
+        """
 
         self.distance_from_depot = utilities.euclidean_distance(self.depot.coords, self.coords)
+
         self.routing_algorithm.routing(drones)
 
     def move(self, time):
@@ -209,36 +201,73 @@ class Drone(Entity):
         # set the last move routing
         self.last_move_routing = self.move_routing
 
+    def is_known_packet(self, received_packet):
+        """
+        Returns True if drone has already a similar packet (i.e. a packet referred to the same event)
+        @param received_packet:
+        @return: True if the packet is known, False otherwise
+        """
 
+        for packet in self.__buffer:
 
-    def is_known_packet(self, packet: pckts.DataPacket):
-        """ Returns True if drone has already a similar packet (i.e., referred to the same event).  """
-        for pk in self.__buffer:
-            if pk.event_ref == packet.event_ref:
+            if packet.event_ref == received_packet.event_ref:
+
                 return True
+
         return False
 
     def empty_buffer(self):
+        """
+        It cleans the buffer erasing all the packets within self.__buffer
+        @return: None
+        """
+
         self.__buffer = []
 
     def remove_packets(self, packets):
-        """ Removes the packets from the buffer. """
+        """
+        Removes the packets from the buffer.
+        @param packets:
+        @return:
+        """
+
         for packet in packets:
+
             if packet in self.__buffer:
+
                 self.__buffer.remove(packet)
+
                 if config.DEBUG:
-                    print("ROUTING del: drone: " + str(self.identifier) + " - removed a packet id: " + str(
-                        packet.identifier))
+
+                    print(f"Drone {str(self.identifier)} just removed packet {str(packet.identifier)}")
 
     def next_target(self):
+        """
+        This method returns the next coordinates for a Drone
+        @return: a tuple of coordinates (x, y)
+        """
+
+        # case 1: if move_routing then go to the depot
         if self.move_routing:
+
             return self.depot.coords
+
+        # case 2: if come_back_to_mission then go to the last coordinates known
         elif self.come_back_to_mission:
+
             return self.last_mission_coords
+
+        # case 3: else go to the next waypoint in the path
         else:
-            if self.current_waypoint >= len(self.path) - 1:  # reched the end of the path, start back to 0
+
+            # if it reached the end of the path, start back to 0
+            if self.current_waypoint >= len(self.path) - 1:
+
                 return self.path[0]
+
+            # else go to the next coordinates
             else:
+
                 return self.path[self.current_waypoint + 1]
 
     def __move_to_mission(self, time):
@@ -301,11 +330,46 @@ class Drone(Entity):
             self.coords = (((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1]))
 
     def __repr__(self):
-        return "Drone " + str(self.identifier)
+        return f"Drone {str(self.identifier)}"
 
     def __hash__(self):
         return hash(self.identifier)
 
+###################NOT USED###################
 
+    def packet_is_expiring(self):
+        """
+        return true if exist a packet that is expiring and must be returned to the depot as soon as possible
+        -> start to move manually to the depot.
+        This method is optional, there is flag src.utilities.config.ROUTING_IF_EXPIRING
+        """
 
+        time_to_depot = self.distance_from_depot / self.speed
+        event_time_to_dead = (self.tightest_event_deadline - self.simulator.cur_step) * self.simulator.time_step_duration
+        return event_time_to_dead - 5 < time_to_depot <= event_time_to_dead  # 5 seconds of tolerance
+
+    def next_move_to_mission_point(self):
+        """
+        get the next future position of the drones, according the mission
+        """
+
+        current_waypoint = self.current_waypoint
+        if current_waypoint >= len(self.path) - 1:
+            current_waypoint = -1
+
+        p0 = self.coords
+        p1 = self.path[current_waypoint + 1]
+        all_distance = utilities.euclidean_distance(p0, p1)
+        distance = self.simulator.time_step_duration * self.speed
+        if all_distance == 0 or distance == 0:
+            return self.path[current_waypoint]
+
+        t = distance / all_distance
+        if t >= 1:
+            return self.path[current_waypoint]
+        elif t <= 0:
+            print("Error move drone, ratio < 0")
+            exit(1)
+        else:
+            return ((1 - t) * p0[0] + t * p1[0]), ((1 - t) * p0[1] + t * p1[1])
 

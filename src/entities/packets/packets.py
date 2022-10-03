@@ -1,4 +1,3 @@
-# ------------------ Packet ----------------------
 from src.utilities import utilities
 from src.entities.generic.entity import Entity
 
@@ -44,12 +43,15 @@ class Packet(Entity):
         the current packet
         @return: A float number representing the distance between the Depot and the current packet
         """
+
         return utilities.euclidean_distance(self.simulator.depot_coordinates, self.coords)
 
     @property
     def is_expired(self):
         """
         A Packet expires if the deadline of the event expires, or the maximum TTL is reached
+
+        @return: True if the packet is expired False otherwise
         """
 
         return self.simulator.cur_step > self.event_ref.deadline
@@ -65,22 +67,34 @@ class Packet(Entity):
                 "id_event": self.event_ref.identifier}
 
     def add_hop(self, drone):
-        """ add a new hop in the packet """
+        """
+        Add a new hop in the packet last_2_hops list
+
+        @param drone:
+        @return:
+        """
 
         if len(self.last_2_hops) == 2:
-            self.last_2_hops = self.last_2_hops[1:]  # keep just the last two HOPS
+
+            # keep just the last two HOPS
+            self.last_2_hops = self.last_2_hops[1:]
+
         self.last_2_hops.append(drone)
+        self.increase_ttl_hops()
 
-        # self.hops.add(drone.identifier)
-        self.increase_TTL_hops()
+    def increase_ttl_hops(self):
+        """
 
-    def increase_TTL_hops(self):
+        @return:
+        """
+
         self.__TTL += 1
 
     def __repr__(self):
+
         packet_type = str(self.__class__).split(".")[-1].split("'")[0]
-        return packet_type + "id:" + str(self.identifier) + " event id: " + str(
-            self.event_ref.identifier) + " c:" + str(self.coords)
+
+        return f"{packet_type} id: {str(self.identifier)} event id: {str(self.event_ref.identifier)} coordinates: {+ str(self.coords)}"
 
 
 class DataPacket(Packet):
@@ -89,6 +103,11 @@ class DataPacket(Packet):
     """
 
     def __init__(self, simulator, event_ref=None):
+        """
+
+        @param simulator: A simulator instance
+        @param event_ref: The event that generated the DataPacket
+        """
         super().__init__(simulator=simulator, event_ref=event_ref)
 
 
@@ -99,6 +118,14 @@ class ACKPacket(Packet):
     """
 
     def __init__(self, simulator, source_drone, destination_drone, acked_packet, event_ref):
+        """
+
+        @param simulator:
+        @param source_drone:
+        @param destination_drone:
+        @param acked_packet:
+        @param event_ref:
+        """
         super().__init__(simulator=simulator, event_ref=event_ref)
 
         self.acked_packet = acked_packet
@@ -113,6 +140,15 @@ class HelloPacket(Packet):
     """
 
     def __init__(self, simulator, source_drone, current_position, current_speed, next_target, event_ref):
+        """
+
+        @param simulator:
+        @param source_drone:
+        @param current_position:
+        @param current_speed:
+        @param next_target:
+        @param event_ref:
+        """
         super().__init__(simulator=simulator, event_ref=event_ref)
         self.current_position = current_position
         self.speed = current_speed

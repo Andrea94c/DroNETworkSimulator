@@ -51,6 +51,7 @@ class BaseRouting(metaclass=abc.ABCMeta):
         if isinstance(packet, HelloPacket):
 
             source_drone_id = packet.source_drone.identifier
+
             self.hello_messages[source_drone_id] = packet  # add packet to our dictionary
 
         elif isinstance(packet, DataPacket):
@@ -58,7 +59,7 @@ class BaseRouting(metaclass=abc.ABCMeta):
             self.no_transmission = True
             self.drone.accept_packets([packet])
 
-            null_event = Event((-1, -1), -1, self.simulator)
+            null_event = Event(self.simulator, (-1, -1), -1)
 
             ack_packet = ACKPacket(simulator=self.simulator,
                                    source_drone=self.drone,
@@ -71,21 +72,27 @@ class BaseRouting(metaclass=abc.ABCMeta):
         elif isinstance(packet, ACKPacket):
 
             self.drone.remove_packets([packet.acked_packet])
+
             if self.drone.buffer_length == 0:
+
                 self.current_n_transmission = 0
                 self.drone.move_routing = False
 
     def drone_identification(self, drones):
         """
-
+        It sends to the neighbours an HelloPacket
         @param drones:
         @return:
         """
 
-        if self.simulator.cur_step % config.HELLO_DELAY != 0:  # still not time to communicate
+        # still not time to communicate
+        if self.simulator.cur_step % config.HELLO_DELAY != 0:
+
             return 0
 
-        null_event = Event((-1, -1), -1, self.simulator)
+        null_event = Event(simulator=self.simulator,
+                           coords=(-1, -1),
+                           current_time=-1)
 
         hello_packet = HelloPacket(simulator=self.simulator,
                                    source_drone=self.drone,
@@ -94,7 +101,9 @@ class BaseRouting(metaclass=abc.ABCMeta):
                                    next_target=self.drone.next_target(),
                                    event_ref=null_event)
 
-        self.broadcast_message(packet_to_send=hello_packet, source_drone=self.drone, destination_drones=drones)
+        self.broadcast_message(packet_to_send=hello_packet,
+                               source_drone=self.drone,
+                               destination_drones=drones)
 
     def routing(self, drones):
         """
@@ -187,26 +196,36 @@ class BaseRouting(metaclass=abc.ABCMeta):
         return closest_drones
 
     def channel_success(self, drones_distance, no_error=False):
-        """ Precondition: two drones are close enough to communicate. Return true if the communication
-        goes through, false otherwise.  """
+        """
+        Precondition: two drones are close enough to communicate. Return true if the communication
+        goes through, false otherwise.
+        """
 
         assert (drones_distance <= self.drone.communication_range)
 
         if no_error:
+
             return True
 
         if self.simulator.communication_error_type == config.ChannelError.NO_ERROR:
+
             return True
 
         elif self.simulator.communication_error_type == config.ChannelError.UNIFORM:
+
             return self.simulator.rnd_routing.rand() <= self.simulator.drone_communication_success
 
         elif self.simulator.communication_error_type == config.ChannelError.GAUSSIAN:
+
             return self.simulator.rnd_routing.rand() <= self.gaussian_success_handler(drones_distance)
 
     def broadcast_message(self, packet_to_send, source_drone, destination_drones):
         """
         It Sends a message to all the neighbours
+        @param packet_to_send:
+        @param source_drone:
+        @param destination_drones:
+        @return:
         """
 
         for drone in destination_drones:
@@ -218,6 +237,10 @@ class BaseRouting(metaclass=abc.ABCMeta):
     def unicast_message(self, packet_to_send, source_drone, destination_drone):
         """
         It Sends a message directly to a single drone
+        @param packet_to_send:
+        @param source_drone:
+        @param destination_drone:
+        @return:
         """
 
         self.simulator.network_dispatcher.send_packet_to_medium(packet_to_send=packet_to_send,

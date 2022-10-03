@@ -213,8 +213,8 @@ class Simulator:
                 # 2. try routing packets vs other drones or depot
                 # 3. actually move the drone towards next waypoint or depot
 
-                drone.update_packets(cur_step)
-                drone.routing(self.drones, self.depot)
+                drone.update_packets()
+                drone.routing(self.drones)
                 drone.move(self.time_step_duration)
 
             # in case we need probability map

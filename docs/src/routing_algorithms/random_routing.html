@@ -66,15 +66,16 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">src.utilities.utilities</span> <span class="k">as</span> <span class="nn">util</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span> <span class="nn">src.routing_algorithms.BaseRouting</span> <span class="kn">import</span> <span class="n">BaseRouting</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span> <span class="nc">RandomRouting</span><span class="p">(</span><span class="n">BaseRouting</span><span class="p">):</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_neighbors</span><span class="p">):</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="sd">&quot;&quot;&quot; arg min score  -&gt; geographical approach, take the drone closest to the depot &quot;&quot;&quot;</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="c1"># opt_neighbors --&gt; [(hck packet : drone istance), (hck packet, drone istance).. .. ]</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_routing</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opt_neighbors</span><span class="p">])</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="k">class</span> <span class="nc">RandomRouting</span><span class="p">(</span><span class="n">BaseRouting</span><span class="p">):</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">drone</span><span class="p">)</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">):</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="sd">&quot;&quot;&quot; arg min score  -&gt; geographical approach, take the drone closest to the depot &quot;&quot;&quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="c1"># opt_neighbors --&gt; [(hck packet : drone istance), (hck packet, drone istance).. .. ]</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_routing</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">])</span>
 </span></pre></div>
 
 
@@ -93,16 +94,18 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="RandomRouting-6"><a href="#RandomRouting-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">RandomRouting</span><span class="p">(</span><span class="n">BaseRouting</span><span class="p">):</span>
 </span><span id="RandomRouting-7"><a href="#RandomRouting-7"><span class="linenos"> 7</span></a>
 </span><span id="RandomRouting-8"><a href="#RandomRouting-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="RandomRouting-9"><a href="#RandomRouting-9"><span class="linenos"> 9</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="RandomRouting-9"><a href="#RandomRouting-9"><span class="linenos"> 9</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">drone</span><span class="p">)</span>
 </span><span id="RandomRouting-10"><a href="#RandomRouting-10"><span class="linenos">10</span></a>
-</span><span id="RandomRouting-11"><a href="#RandomRouting-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_neighbors</span><span class="p">):</span>
+</span><span id="RandomRouting-11"><a href="#RandomRouting-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">):</span>
 </span><span id="RandomRouting-12"><a href="#RandomRouting-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot; arg min score  -&gt; geographical approach, take the drone closest to the depot &quot;&quot;&quot;</span>
 </span><span id="RandomRouting-13"><a href="#RandomRouting-13"><span class="linenos">13</span></a>        <span class="c1"># opt_neighbors --&gt; [(hck packet : drone istance), (hck packet, drone istance).. .. ]</span>
-</span><span id="RandomRouting-14"><a href="#RandomRouting-14"><span class="linenos">14</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_routing</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opt_neighbors</span><span class="p">])</span>
+</span><span id="RandomRouting-14"><a href="#RandomRouting-14"><span class="linenos">14</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_routing</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">])</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>This class is used as baseclass to build new routing protocols.</p>
+</div>
+
 
                             <div id="RandomRouting.__init__" class="classattr">
                                         <input id="RandomRouting.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -115,11 +118,12 @@
     </div>
     <a class="headerlink" href="#RandomRouting.__init__"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="RandomRouting.__init__-8"><a href="#RandomRouting.__init__-8"><span class="linenos">8</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="RandomRouting.__init__-9"><a href="#RandomRouting.__init__-9"><span class="linenos">9</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="RandomRouting.__init__-9"><a href="#RandomRouting.__init__-9"><span class="linenos">9</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">drone</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>The drone that is doing routing and simulator object.</p>
+            <div class="docstring"><p>@param drone: The drone that needs to perform routing
+@param simulator: The Simulator instance</p>
 </div>
 
 
@@ -129,16 +133,16 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">relay_selection</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">opt_neighbors</span></span><span class="return-annotation">):</span></span>
+        <span class="name">relay_selection</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">neighbors</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RandomRouting.relay_selection-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#RandomRouting.relay_selection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RandomRouting.relay_selection-11"><a href="#RandomRouting.relay_selection-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_neighbors</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RandomRouting.relay_selection-11"><a href="#RandomRouting.relay_selection-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">):</span>
 </span><span id="RandomRouting.relay_selection-12"><a href="#RandomRouting.relay_selection-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot; arg min score  -&gt; geographical approach, take the drone closest to the depot &quot;&quot;&quot;</span>
 </span><span id="RandomRouting.relay_selection-13"><a href="#RandomRouting.relay_selection-13"><span class="linenos">13</span></a>        <span class="c1"># opt_neighbors --&gt; [(hck packet : drone istance), (hck packet, drone istance).. .. ]</span>
-</span><span id="RandomRouting.relay_selection-14"><a href="#RandomRouting.relay_selection-14"><span class="linenos">14</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_routing</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opt_neighbors</span><span class="p">])</span>
+</span><span id="RandomRouting.relay_selection-14"><a href="#RandomRouting.relay_selection-14"><span class="linenos">14</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_routing</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">])</span>
 </span></pre></div>
 
 

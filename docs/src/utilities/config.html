@@ -78,123 +78,132 @@
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="sd">This file contains all the constants and parameters of the simulator.</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">It comes handy when you want to make one shot simulations, making parameters and constants vary in every</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">simulation. For an extensive experimental campaign read the header at src.simulator.</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">Attributes that one needs tweak often are tagged with # ***</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="c1"># ----------------------------------------------------------------------------------</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="c1">#</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="c1">#                  ██████  ██████  ███    ██ ███████ ██  ██████ </span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="c1">#                 ██      ██    ██ ████   ██ ██      ██ ██      </span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="c1">#                 ██      ██    ██ ██ ██  ██ █████   ██ ██   ███ </span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="c1">#                 ██      ██    ██ ██  ██ ██ ██      ██ ██    ██ </span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="c1">#                  ██████  ██████  ██   ████ ██      ██  ██████  </span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="c1">#</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="c1"># ----------------------------------------------------------------------------------</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="c1"># ----------------------- PATH DRONES -----------------------------------------#</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">CIRCLE_PATH</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># bool: whether to use cirlce paths around the depot</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">DEMO_PATH</span> <span class="o">=</span> <span class="kc">False</span>   <span class="c1"># bool: whether to use handcrafted tours or not</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="c1"># to set up handcrafted torus see utilities.utilities</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">PATH_FROM_JSON</span> <span class="o">=</span> <span class="kc">False</span>                   <span class="c1"># bool: whether to use the path (for drones) store in the JSONS_PATH_PREFIX,</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>                                            <span class="c1"># otherwise path are generated online</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">JSONS_PATH_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;data/tours/RANDOM_missions</span><span class="si">{}</span><span class="s2">.json&quot;</span>     <span class="c1"># str: the path to the drones tours,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>                                            <span class="c1"># the {} should be used to specify the seed -&gt; es. data/tours/RANDOM_missions1.json for seed 1.</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">RANDOM_STEPS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">700</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1100</span><span class="p">,</span> <span class="mi">1400</span><span class="p">]</span>  <span class="c1"># the step after each new random directions is taken, in case of dynamic generation</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">RANDOM_START_POINT</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># bool whether the drones start the mission at random positions</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="c1"># ------------------------------- CONSTANTS ------------------------------- #</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">DEBUG</span> <span class="o">=</span> <span class="kc">False</span>                         <span class="c1"># bool: whether to print debug strings or not.</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="n">EXPERIMENTS_DIR</span> <span class="o">=</span> <span class="s2">&quot;data/experiments/&quot;</span>  <span class="c1"># output data : the results of the simulation</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="c1"># ----------------------------------------------------------------------------------</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="c1">#</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="c1">#</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="c1"># .----------------. .----------------. .-----------------..----------------. .----------------. .----------------.</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="c1"># | .--------------. | .--------------. | .--------------. | .--------------. | .--------------. | .--------------. |</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="c1"># | |     ______   | | |     ____     | | | ____  _____  | | |  _________   | | |     _____    | | |    ______    | |</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="c1"># | |   .&#39; ___  |  | | |   .&#39;    `.   | | ||_   \|_   _| | | | |_   ___  |  | | |    |_   _|   | | |  .&#39; ___  |   | |</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="c1"># | |  / .&#39;   \_|  | | |  /  .--.  \  | | |  |   \ | |   | | |   | |_  \_|  | | |      | |     | | | / .&#39;   \_|   | |</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="c1"># | |  | |         | | |  | |    | |  | | |  | |\ \| |   | | |   |  _|      | | |      | |     | | | | |    ____  | |</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="c1"># | |  \ `.___.&#39;\  | | |  \  `--&#39;  /  | | | _| |_\   |_  | | |  _| |_       | | |     _| |_    | | | \ `.___]  _| | |</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="c1"># | |   `._____.&#39;  | | |   `.____.&#39;   | | ||_____|\____| | | | |_____|      | | |    |_____|   | | |  `._____.&#39;   | |</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="c1"># | |              | | |              | | |              | | |              | | |              | | |              | |</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="c1"># | &#39;--------------&#39; | &#39;--------------&#39; | &#39;--------------&#39; | &#39;--------------&#39; | &#39;--------------&#39; | &#39;--------------&#39; |</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="c1">#  &#39;----------------&#39; &#39;----------------&#39; &#39;----------------&#39; &#39;----------------&#39; &#39;----------------&#39; &#39;----------------&#39;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="c1">#</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="c1">#</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="c1"># ----------------------------------------------------------------------------------</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">This file contains all the constants and parameters of the simulator.</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">It comes handy when you want to make one shot simulations, making parameters and constants vary in every</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">simulation. For an extensive experimental campaign read the header at src.simulator.</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">Attributes that one needs tweak often are tagged with # ***</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="c1"># ----------------------- PATH DRONES -----------------------------------------#</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">CIRCLE_PATH</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># bool: whether to use circle paths around the depot</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">DEMO_PATH</span> <span class="o">=</span> <span class="kc">False</span>   <span class="c1"># bool: whether to use handcrafted tours or not</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="c1"># to set up handcrafted torus see utilities.utilities</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">PATH_FROM_JSON</span> <span class="o">=</span> <span class="kc">False</span>                   <span class="c1"># bool: whether to use the path (for drones) store in the JSONS_PATH_PREFIX,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>                                            <span class="c1"># otherwise path are generated online</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">JSONS_PATH_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;data/tours/RANDOM_missions</span><span class="si">{}</span><span class="s2">.json&quot;</span>     <span class="c1"># str: the path to the drones tours,</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>                                            <span class="c1"># the {} should be used to specify the seed -&gt; es. data/tours/RANDOM_missions1.json for seed 1.</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">RANDOM_STEPS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">700</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1100</span><span class="p">,</span> <span class="mi">1400</span><span class="p">]</span>  <span class="c1"># the step after each new random directions is taken, in case of dynamic generation</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="n">RANDOM_START_POINT</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># bool whether the drones start the mission at random positions</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="c1"># drawaing</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="n">PLOT_SIM</span> <span class="o">=</span> <span class="kc">False</span>      <span class="c1"># bool: whether to plot or not the simulation.</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="n">WAIT_SIM_STEP</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#.1     # float: seconds, pauses the rendering for &#39;DELAY_PLOT&#39; seconds.</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">SKIP_SIM_STEP</span> <span class="o">=</span> <span class="mi">5</span>      <span class="c1"># int: steps, plot the simulation every &#39;RENDERING_STEP&#39; steps. At least 1.</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="n">DRAW_SIZE</span> <span class="o">=</span> <span class="mi">700</span>       <span class="c1"># int: size of the drawing window.</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">IS_SHOW_NEXT_TARGET_VEC</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># bool : whether show the direction and next target of the drone</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">SAVE_PLOT</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># bool: whether to save the plots of the simulation or not.</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="n">SAVE_PLOT_DIR</span> <span class="o">=</span> <span class="s2">&quot;data/plots/&quot;</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="c1"># add constants here...</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="c1"># ----------------------------- SIMULATION PARAMS. ---------------------------- #</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="n">SIM_DURATION</span> <span class="o">=</span> <span class="mi">15000</span>   <span class="c1"># int: steps of simulation. # ***</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="n">TS_DURATION</span> <span class="o">=</span> <span class="mf">0.150</span>   <span class="c1"># float: seconds duration of a step in seconds.</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="n">SEED</span> <span class="o">=</span> <span class="mi">20</span>         <span class="c1"># int: seed of this simulation.</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="n">N_DRONES</span> <span class="o">=</span> <span class="mi">5</span>      <span class="c1"># int: number of drones. # ***</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="n">ENV_WIDTH</span> <span class="o">=</span> <span class="mi">1500</span>      <span class="c1"># float: meters, width of environment.</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="n">ENV_HEIGHT</span> <span class="o">=</span> <span class="mi">1500</span>     <span class="c1"># float: meters, height of environment.</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="c1"># events</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="n">EVENTS_DURATION</span> <span class="o">=</span> <span class="mi">2000</span>  <span class="c1"># SIM_DURATION  # int: steps, number of time steps that an event lasts  -&gt; to seconds = step * step_duration.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="n">D_FEEL_EVENT</span> <span class="o">=</span> <span class="mi">65</span>      <span class="c1"># int: steps, a new packet is felt (generated on the drone) every &#39;D_FEEL_EVENT&#39; steps. # ***</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="n">P_FEEL_EVENT</span> <span class="o">=</span> <span class="mf">.8</span>       <span class="c1"># float: probability that the drones feels the event generated on the drone. # ***</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">&quot;&quot;&quot; e.g. given D_FEEL_EVENT = 500, P_FEEL_EVENT = .5, every 500 steps with probability .5 the drone will feel an event.&quot;&quot;&quot;</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="c1"># ------------------------------- CONSTANTS ------------------------------- #</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="n">DEBUG</span> <span class="o">=</span> <span class="kc">True</span>                           <span class="c1"># bool: whether to print debug strings or not.</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">EXPERIMENTS_DIR</span> <span class="o">=</span> <span class="s2">&quot;data/experiments/&quot;</span>  <span class="c1"># output data : the results of the simulation</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="c1"># drawing</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">PLOT_SIM</span> <span class="o">=</span> <span class="kc">True</span>      <span class="c1"># bool: whether to plot or not the simulation.</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">WAIT_SIM_STEP</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># float: seconds, pauses the rendering for &#39;DELAY_PLOT&#39; seconds.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="n">SKIP_SIM_STEP</span> <span class="o">=</span> <span class="mi">5</span>    <span class="c1"># int: steps, plot the simulation every &#39;RENDERING_STEP&#39; steps. At least 1.</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="n">DRAW_SIZE</span> <span class="o">=</span> <span class="mi">700</span>      <span class="c1"># int: size of the drawing window.</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="n">IS_SHOW_NEXT_TARGET_VEC</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># bool : whether show the direction and next target of the drone</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="n">SAVE_PLOT</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># bool: whether to save the plots of the simulation or not.</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="n">SAVE_PLOT_DIR</span> <span class="o">=</span> <span class="s2">&quot;data/plots/&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="c1"># ----------------------------- SIMULATION PARAMS. ---------------------------- #</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="n">SIM_DURATION</span> <span class="o">=</span> <span class="mi">15000</span>   <span class="c1"># int: steps of simulation. # ***</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="n">TS_DURATION</span> <span class="o">=</span> <span class="mf">0.150</span>    <span class="c1"># float: seconds duration of a step in seconds.</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="n">SEED</span> <span class="o">=</span> <span class="mi">20</span>              <span class="c1"># int: seed of this simulation.</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="n">N_DRONES</span> <span class="o">=</span> <span class="mi">5</span>           <span class="c1"># int: number of drones.</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="n">ENV_WIDTH</span> <span class="o">=</span> <span class="mi">1500</span>       <span class="c1"># float: meters, width of environment.</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="n">ENV_HEIGHT</span> <span class="o">=</span> <span class="mi">1500</span>      <span class="c1"># float: meters, height of environment.</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="n">EVENTS_DURATION</span> <span class="o">=</span> <span class="mi">2000</span>  <span class="c1"># int: steps, number of time steps that an event lasts  -&gt; to seconds = step * step_duration.</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="n">D_FEEL_EVENT</span> <span class="o">=</span> <span class="mi">65</span>       <span class="c1"># int: steps, a new packet is felt (generated on the drone) every &#39;D_FEEL_EVENT&#39; steps. # ***</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="n">P_FEEL_EVENT</span> <span class="o">=</span> <span class="mf">.8</span>       <span class="c1"># float: probability that the drones feels the event generated on the drone. # ***</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="c1"># drones</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="n">COMMUNICATION_RANGE_DRONE</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># float: meters, communication range of the drones.</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="n">SENSING_RANGE_DRONE</span> <span class="o">=</span> <span class="mi">0</span>        <span class="c1"># float: meters, the sensing range of the drones.</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="n">DRONE_SPEED</span> <span class="o">=</span> <span class="mi">8</span>                  <span class="c1"># float: m/s, drone speed.</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="n">DRONE_MAX_BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">100</span>     <span class="c1"># int: max number of packets in the buffer of a drone.</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="n">DRONE_MAX_ENERGY</span> <span class="o">=</span> <span class="mi">1000000</span>           <span class="c1"># int: max energy of a drone.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">&quot;&quot;&quot; </span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">Example:</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">given D_FEEL_EVENT = 500, P_FEEL_EVENT = 0.5, every 500 steps with probability 0.5 the drone will feel an event.</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="c1"># depot</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="n">DEPOT_COMMUNICATION_RANGE</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># float: meters, communication range of the depot.</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="n">DEPOT_COO</span> <span class="o">=</span> <span class="p">(</span><span class="mi">750</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>             <span class="c1"># (float, float): coordinates of the depot.</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="c1"># ------------------------------- ROUTING PARAMS. ------------------------------- #</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="k">class</span> <span class="nc">RoutingAlgorithm</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="n">GEO</span> <span class="o">=</span> <span class="n">GeoRouting</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>    <span class="n">RND</span> <span class="o">=</span> <span class="n">RandomRouting</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="n">AND_GEO</span> <span class="o">=</span> <span class="n">AndreaGeoRouting</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="c1"># drones</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="n">COMMUNICATION_RANGE_DRONE</span> <span class="o">=</span> <span class="mi">200</span>    <span class="c1"># float: meters, communication range of the drones.</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="n">SENSING_RANGE_DRONE</span> <span class="o">=</span> <span class="mi">0</span>            <span class="c1"># float: meters, the sensing range of the drones.</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="n">DRONE_SPEED</span> <span class="o">=</span> <span class="mi">8</span>                    <span class="c1"># float: m/s, drone speed.</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="n">DRONE_MAX_BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">100</span>        <span class="c1"># int: max number of packets in the buffer of a drone.</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="n">DRONE_MAX_ENERGY</span> <span class="o">=</span> <span class="mi">1000000</span>         <span class="c1"># int: max energy of a drone.</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="c1"># depot</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="n">DEPOT_COMMUNICATION_RANGE</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># float: meters, communication range of the depot.</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="n">DEPOT_COO</span> <span class="o">=</span> <span class="p">(</span><span class="mi">750</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>             <span class="c1"># (float, float): coordinates of the depot.</span>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">))</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="k">class</span> <span class="nc">ChannelError</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="n">UNIFORM</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="n">GAUSSIAN</span> <span class="o">=</span> <span class="mi">2</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="n">NO_ERROR</span> <span class="o">=</span> <span class="mi">3</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ChannelError</span><span class="p">))</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="c1"># ------------------------------- ROUTING PARAMS. ------------------------------- #</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="k">class</span> <span class="nc">RoutingAlgorithm</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="n">GEO</span> <span class="o">=</span> <span class="n">GeoRouting</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="n">RND</span> <span class="o">=</span> <span class="n">RandomRouting</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="n">AND_GEO</span> <span class="o">=</span> <span class="n">AndreaGeoRouting</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">))</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="n">ROUTING_ALGORITHM</span> <span class="o">=</span> <span class="n">RoutingAlgorithm</span><span class="o">.</span><span class="n">RND</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="n">CHANNEL_ERROR_TYPE</span> <span class="o">=</span> <span class="n">ChannelError</span><span class="o">.</span><span class="n">GAUSSIAN</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="n">COMMUNICATION_P_SUCCESS</span> <span class="o">=</span> <span class="mi">1</span>   <span class="c1"># float: probability to have success in a communication.</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="n">GUASSIAN_SCALE</span> <span class="o">=</span> <span class="mf">.9</span>            <span class="c1"># float [0,1]: scale the error probability of the guassian -&gt; success * GUASSIAN_SCALER</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="n">PACKETS_MAX_TTL</span> <span class="o">=</span> <span class="mi">200</span>         <span class="c1"># float: threshold in the maximum number of hops. Causes loss of packets.</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="n">RETRANSMISSION_DELAY</span> <span class="o">=</span> <span class="mi">10</span>     <span class="c1"># int: how many time steps to wait before transmit again (for k retransmissions). # ---  #delta_k</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="c1"># ------------------------------------------- ROUTING MISC --------------------------------- #</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="n">HELLO_DELAY</span> <span class="o">=</span> <span class="mi">5</span>            <span class="c1"># int : how many time steps wait before transmit again an hello message</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="n">RECEPTION_GRANTED</span> <span class="o">=</span> <span class="mf">0.95</span>   <span class="c1"># float : the min amount of success to evalute a neigh as relay</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="n">LIL_DELTA</span> <span class="o">=</span> <span class="mi">1</span>              <span class="c1"># INT:  &gt; 0</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="n">OLD_HELLO_PACKET</span> <span class="o">=</span> <span class="mi">50</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="n">ROOT_EVALUATION_DATA</span> <span class="o">=</span> <span class="s2">&quot;data/evaluation_tests/&quot;</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="n">NN_MODEL_PATH</span> <span class="o">=</span> <span class="s2">&quot;data/nnmodels/&quot;</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="k">class</span> <span class="nc">ChannelError</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="n">UNIFORM</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>    <span class="n">GAUSSIAN</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="n">NO_ERROR</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ChannelError</span><span class="p">))</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="n">ROUTING_ALGORITHM</span> <span class="o">=</span> <span class="n">RoutingAlgorithm</span><span class="o">.</span><span class="n">RND</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="n">CHANNEL_ERROR_TYPE</span> <span class="o">=</span> <span class="n">ChannelError</span><span class="o">.</span><span class="n">GAUSSIAN</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="n">COMMUNICATION_P_SUCCESS</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c1"># float: probability to have success in a communication.</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="n">GAUSSIAN_SCALE</span> <span class="o">=</span> <span class="mf">.9</span>            <span class="c1"># float [0,1]: scale the error probability of the guassian -&gt; success * GUASSIAN_SCALER</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="n">PACKETS_MAX_TTL</span> <span class="o">=</span> <span class="mi">200</span>          <span class="c1"># float: threshold in the maximum number of hops. Causes loss of packets.</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="n">RETRANSMISSION_DELAY</span> <span class="o">=</span> <span class="mi">10</span>      <span class="c1"># int: how many time steps to wait before transmit again (for k retransmissions). # ---  #delta_k</span>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="c1"># --------------- new cell probabilities -------------- #</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="n">CELL_PROB_SIZE_R</span> <span class="o">=</span> <span class="mf">1.875</span>  <span class="c1"># the percentage of cell size with respect to drone com range</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="n">ENABLE_PROBABILITIES</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="c1"># ------------------------------------------- ROUTING MISC --------------------------------- #</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="n">HELLO_DELAY</span> <span class="o">=</span> <span class="mi">5</span>            <span class="c1"># int : how many time steps wait before transmit again an hello message</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="n">RECEPTION_GRANTED</span> <span class="o">=</span> <span class="mf">0.95</span>   <span class="c1"># float : the min amount of success to evalute a neigh as relay</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="n">LIL_DELTA</span> <span class="o">=</span> <span class="mi">1</span>              <span class="c1"># INT:  &gt; 0</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="n">OLD_HELLO_PACKET</span> <span class="o">=</span> <span class="mi">50</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="n">ROOT_EVALUATION_DATA</span> <span class="o">=</span> <span class="s2">&quot;data/evaluation_tests/&quot;</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="n">NN_MODEL_PATH</span> <span class="o">=</span> <span class="s2">&quot;data/nnmodels/&quot;</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="c1"># --------------- new cell probabilities -------------- #</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="n">CELL_PROB_SIZE_R</span> <span class="o">=</span> <span class="mf">1.875</span>  <span class="c1"># the percentage of cell size with respect to drone com range</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="n">ENABLE_PROBABILITIES</span> <span class="o">=</span> <span class="kc">False</span>
 </span></pre></div>
 
 
@@ -207,7 +216,8 @@
     </div>
     <a class="headerlink" href="#P_FEEL_EVENT"></a>
     
-            <div class="docstring"><p>e.g. given D_FEEL_EVENT = 500, P_FEEL_EVENT = .5, every 500 steps with probability .5 the drone will feel an event.</p>
+            <div class="docstring"><p>Example:
+given D_FEEL_EVENT = 500, P_FEEL_EVENT = 0.5, every 500 steps with probability 0.5 the drone will feel an event.</p>
 </div>
 
 
@@ -223,14 +233,15 @@
 
     </div>
     <a class="headerlink" href="#RoutingAlgorithm"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RoutingAlgorithm-86"><a href="#RoutingAlgorithm-86"><span class="linenos">86</span></a><span class="k">class</span> <span class="nc">RoutingAlgorithm</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="RoutingAlgorithm-87"><a href="#RoutingAlgorithm-87"><span class="linenos">87</span></a>    <span class="n">GEO</span> <span class="o">=</span> <span class="n">GeoRouting</span>
-</span><span id="RoutingAlgorithm-88"><a href="#RoutingAlgorithm-88"><span class="linenos">88</span></a>    <span class="n">RND</span> <span class="o">=</span> <span class="n">RandomRouting</span>
-</span><span id="RoutingAlgorithm-89"><a href="#RoutingAlgorithm-89"><span class="linenos">89</span></a>    <span class="n">AND_GEO</span> <span class="o">=</span> <span class="n">AndreaGeoRouting</span>
-</span><span id="RoutingAlgorithm-90"><a href="#RoutingAlgorithm-90"><span class="linenos">90</span></a>
-</span><span id="RoutingAlgorithm-91"><a href="#RoutingAlgorithm-91"><span class="linenos">91</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="RoutingAlgorithm-92"><a href="#RoutingAlgorithm-92"><span class="linenos">92</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
-</span><span id="RoutingAlgorithm-93"><a href="#RoutingAlgorithm-93"><span class="linenos">93</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RoutingAlgorithm-92"><a href="#RoutingAlgorithm-92"><span class="linenos"> 92</span></a><span class="k">class</span> <span class="nc">RoutingAlgorithm</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="RoutingAlgorithm-93"><a href="#RoutingAlgorithm-93"><span class="linenos"> 93</span></a>    <span class="n">GEO</span> <span class="o">=</span> <span class="n">GeoRouting</span>
+</span><span id="RoutingAlgorithm-94"><a href="#RoutingAlgorithm-94"><span class="linenos"> 94</span></a>    <span class="n">RND</span> <span class="o">=</span> <span class="n">RandomRouting</span>
+</span><span id="RoutingAlgorithm-95"><a href="#RoutingAlgorithm-95"><span class="linenos"> 95</span></a>    <span class="n">AND_GEO</span> <span class="o">=</span> <span class="n">AndreaGeoRouting</span>
+</span><span id="RoutingAlgorithm-96"><a href="#RoutingAlgorithm-96"><span class="linenos"> 96</span></a>
+</span><span id="RoutingAlgorithm-97"><a href="#RoutingAlgorithm-97"><span class="linenos"> 97</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="RoutingAlgorithm-98"><a href="#RoutingAlgorithm-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
+</span><span id="RoutingAlgorithm-99"><a href="#RoutingAlgorithm-99"><span class="linenos"> 99</span></a>
+</span><span id="RoutingAlgorithm-100"><a href="#RoutingAlgorithm-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -250,9 +261,10 @@
 
     </div>
     <a class="headerlink" href="#RoutingAlgorithm.keylist"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RoutingAlgorithm.keylist-91"><a href="#RoutingAlgorithm.keylist-91"><span class="linenos">91</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="RoutingAlgorithm.keylist-92"><a href="#RoutingAlgorithm.keylist-92"><span class="linenos">92</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
-</span><span id="RoutingAlgorithm.keylist-93"><a href="#RoutingAlgorithm.keylist-93"><span class="linenos">93</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RoutingAlgorithm.keylist-97"><a href="#RoutingAlgorithm.keylist-97"><span class="linenos"> 97</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="RoutingAlgorithm.keylist-98"><a href="#RoutingAlgorithm.keylist-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
+</span><span id="RoutingAlgorithm.keylist-99"><a href="#RoutingAlgorithm.keylist-99"><span class="linenos"> 99</span></a>
+</span><span id="RoutingAlgorithm.keylist-100"><a href="#RoutingAlgorithm.keylist-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -281,14 +293,15 @@
 
     </div>
     <a class="headerlink" href="#ChannelError"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ChannelError-95"><a href="#ChannelError-95"><span class="linenos"> 95</span></a><span class="k">class</span> <span class="nc">ChannelError</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="ChannelError-96"><a href="#ChannelError-96"><span class="linenos"> 96</span></a>    <span class="n">UNIFORM</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="ChannelError-97"><a href="#ChannelError-97"><span class="linenos"> 97</span></a>    <span class="n">GAUSSIAN</span> <span class="o">=</span> <span class="mi">2</span>
-</span><span id="ChannelError-98"><a href="#ChannelError-98"><span class="linenos"> 98</span></a>    <span class="n">NO_ERROR</span> <span class="o">=</span> <span class="mi">3</span>
-</span><span id="ChannelError-99"><a href="#ChannelError-99"><span class="linenos"> 99</span></a>    
-</span><span id="ChannelError-100"><a href="#ChannelError-100"><span class="linenos">100</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="ChannelError-101"><a href="#ChannelError-101"><span class="linenos">101</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
-</span><span id="ChannelError-102"><a href="#ChannelError-102"><span class="linenos">102</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ChannelError</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ChannelError-103"><a href="#ChannelError-103"><span class="linenos">103</span></a><span class="k">class</span> <span class="nc">ChannelError</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="ChannelError-104"><a href="#ChannelError-104"><span class="linenos">104</span></a>    <span class="n">UNIFORM</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="ChannelError-105"><a href="#ChannelError-105"><span class="linenos">105</span></a>    <span class="n">GAUSSIAN</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span id="ChannelError-106"><a href="#ChannelError-106"><span class="linenos">106</span></a>    <span class="n">NO_ERROR</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span id="ChannelError-107"><a href="#ChannelError-107"><span class="linenos">107</span></a>    
+</span><span id="ChannelError-108"><a href="#ChannelError-108"><span class="linenos">108</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="ChannelError-109"><a href="#ChannelError-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
+</span><span id="ChannelError-110"><a href="#ChannelError-110"><span class="linenos">110</span></a>
+</span><span id="ChannelError-111"><a href="#ChannelError-111"><span class="linenos">111</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ChannelError</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -308,9 +321,10 @@
 
     </div>
     <a class="headerlink" href="#ChannelError.keylist"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ChannelError.keylist-100"><a href="#ChannelError.keylist-100"><span class="linenos">100</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="ChannelError.keylist-101"><a href="#ChannelError.keylist-101"><span class="linenos">101</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
-</span><span id="ChannelError.keylist-102"><a href="#ChannelError.keylist-102"><span class="linenos">102</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ChannelError</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ChannelError.keylist-108"><a href="#ChannelError.keylist-108"><span class="linenos">108</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="ChannelError.keylist-109"><a href="#ChannelError.keylist-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">keylist</span><span class="p">():</span>
+</span><span id="ChannelError.keylist-110"><a href="#ChannelError.keylist-110"><span class="linenos">110</span></a>
+</span><span id="ChannelError.keylist-111"><a href="#ChannelError.keylist-111"><span class="linenos">111</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ChannelError</span><span class="p">))</span>
 </span></pre></div>
 
 

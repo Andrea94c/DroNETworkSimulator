@@ -255,6 +255,16 @@ class Simulator:
 
         @return:
         """
+
+        delivery_time_list = []
+
+        for timestep, source_drone, packet in self.logger.drones_packets_to_depot:
+
+            delivery_time = packet.time_delivery - packet.time_step_creation
+            delivery_time_list.append(delivery_time)
+
+        self.metrics.packet_mean_delivery_time = sum(delivery_time_list)/len(delivery_time_list)
+
         self.metrics.drones_packets_to_depot = len(self.logger.drones_packets_to_depot)
         self.metrics.all_packets_correctly_sent_by_drones = len(self.logger.drones_packets)
 

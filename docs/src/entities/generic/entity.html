@@ -48,6 +48,36 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#Environment">Environment</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#Environment.__init__">Environment</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Environment.add_drones">add_drones</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Environment.add_depot">add_depot</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#EventGenerator">EventGenerator</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#EventGenerator.__init__">EventGenerator</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#EventGenerator.uniform_event_generator">uniform_event_generator</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#EventGenerator.poisson_event_generator">poisson_event_generator</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -77,32 +107,75 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">simulator</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">    The class Entity represents everything in the environment, for instance</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">    Drones, Events, Packets, etc... It extends SimulatedEntity.</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>  <span class="c1"># the id of the entity</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>          <span class="c1"># the coordinates of the entity on the map</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">        Entity objects are uniquely identified by their identifier</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Entity</span><span class="p">):</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>            <span class="k">return</span> <span class="kc">False</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">identifier</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">        The hash function is applied to the identifier and the current coordinates</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">))</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">    The class Entity represents everything in the environment, for instance</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">    Drones, Events, Packets, etc... It extends SimulatedEntity.</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">simulator</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>  <span class="c1"># the id of the entity</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>          <span class="c1"># the coordinates of the entity on the map</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">        Entity objects are uniquely identified by their identifier</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Entity</span><span class="p">):</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>            <span class="k">return</span> <span class="kc">False</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">identifier</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="sd">        The hash function is applied to the identifier and the current coordinates</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">))</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="c1"># ------------------ Environment ----------------------</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="k">class</span> <span class="nc">Environment</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="sd">&quot;&quot;&quot; The enviromnet is an entity that represents the area of interest on which events are generated.</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">     WARNING this corresponds to an old view we had, according to which the events are generated on the map at</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">     random and then maybe felt from the drones. Now events are generated on the drones that they feel with</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">     a certain probability.&quot;&quot;&quot;</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span>  <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_generator</span> <span class="o">=</span> <span class="n">EventGenerator</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">active_events</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="k">def</span> <span class="nf">add_drones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drones</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="sd">&quot;&quot;&quot; add a list of drones in the env &quot;&quot;&quot;</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">drones</span> <span class="o">=</span> <span class="n">drones</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">add_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depot</span><span class="p">):</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="sd">&quot;&quot;&quot; add depot in the env &quot;&quot;&quot;</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">depot</span> <span class="o">=</span> <span class="n">depot</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="k">class</span> <span class="nc">EventGenerator</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="sd">&quot;&quot;&quot; uniform event generator &quot;&quot;&quot;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>    <span class="k">def</span> <span class="nf">uniform_event_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>        <span class="sd">&quot;&quot;&quot; generates an event in the map &quot;&quot;&quot;</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_env</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_env</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>    <span class="k">def</span> <span class="nf">poisson_event_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>        <span class="sd">&quot;&quot;&quot; generates an event in the map &quot;&quot;&quot;</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -163,31 +236,31 @@ of the simulation. No class of this type is directly instantiable.</p>
 
     </div>
     <a class="headerlink" href="#Entity"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Entity-11"><a href="#Entity-11"><span class="linenos">11</span></a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
-</span><span id="Entity-12"><a href="#Entity-12"><span class="linenos">12</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Entity-13"><a href="#Entity-13"><span class="linenos">13</span></a><span class="sd">    The class Entity represents everything in the environment, for instance</span>
-</span><span id="Entity-14"><a href="#Entity-14"><span class="linenos">14</span></a><span class="sd">    Drones, Events, Packets, etc... It extends SimulatedEntity.</span>
-</span><span id="Entity-15"><a href="#Entity-15"><span class="linenos">15</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Entity-16"><a href="#Entity-16"><span class="linenos">16</span></a>
-</span><span id="Entity-17"><a href="#Entity-17"><span class="linenos">17</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="Entity-18"><a href="#Entity-18"><span class="linenos">18</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
-</span><span id="Entity-19"><a href="#Entity-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>  <span class="c1"># the id of the entity</span>
-</span><span id="Entity-20"><a href="#Entity-20"><span class="linenos">20</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>          <span class="c1"># the coordinates of the entity on the map</span>
-</span><span id="Entity-21"><a href="#Entity-21"><span class="linenos">21</span></a>
-</span><span id="Entity-22"><a href="#Entity-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="Entity-23"><a href="#Entity-23"><span class="linenos">23</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Entity-24"><a href="#Entity-24"><span class="linenos">24</span></a><span class="sd">        Entity objects are uniquely identified by their identifier</span>
-</span><span id="Entity-25"><a href="#Entity-25"><span class="linenos">25</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Entity-26"><a href="#Entity-26"><span class="linenos">26</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Entity</span><span class="p">):</span>
-</span><span id="Entity-27"><a href="#Entity-27"><span class="linenos">27</span></a>            <span class="k">return</span> <span class="kc">False</span>
-</span><span id="Entity-28"><a href="#Entity-28"><span class="linenos">28</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Entity-29"><a href="#Entity-29"><span class="linenos">29</span></a>            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">identifier</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
-</span><span id="Entity-30"><a href="#Entity-30"><span class="linenos">30</span></a>
-</span><span id="Entity-31"><a href="#Entity-31"><span class="linenos">31</span></a>    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Entity-32"><a href="#Entity-32"><span class="linenos">32</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Entity-33"><a href="#Entity-33"><span class="linenos">33</span></a><span class="sd">        The hash function is applied to the identifier and the current coordinates</span>
-</span><span id="Entity-34"><a href="#Entity-34"><span class="linenos">34</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Entity-35"><a href="#Entity-35"><span class="linenos">35</span></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Entity-10"><a href="#Entity-10"><span class="linenos">10</span></a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
+</span><span id="Entity-11"><a href="#Entity-11"><span class="linenos">11</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Entity-12"><a href="#Entity-12"><span class="linenos">12</span></a><span class="sd">    The class Entity represents everything in the environment, for instance</span>
+</span><span id="Entity-13"><a href="#Entity-13"><span class="linenos">13</span></a><span class="sd">    Drones, Events, Packets, etc... It extends SimulatedEntity.</span>
+</span><span id="Entity-14"><a href="#Entity-14"><span class="linenos">14</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Entity-15"><a href="#Entity-15"><span class="linenos">15</span></a>
+</span><span id="Entity-16"><a href="#Entity-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">simulator</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="Entity-17"><a href="#Entity-17"><span class="linenos">17</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="Entity-18"><a href="#Entity-18"><span class="linenos">18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>  <span class="c1"># the id of the entity</span>
+</span><span id="Entity-19"><a href="#Entity-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>          <span class="c1"># the coordinates of the entity on the map</span>
+</span><span id="Entity-20"><a href="#Entity-20"><span class="linenos">20</span></a>
+</span><span id="Entity-21"><a href="#Entity-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Entity-22"><a href="#Entity-22"><span class="linenos">22</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Entity-23"><a href="#Entity-23"><span class="linenos">23</span></a><span class="sd">        Entity objects are uniquely identified by their identifier</span>
+</span><span id="Entity-24"><a href="#Entity-24"><span class="linenos">24</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Entity-25"><a href="#Entity-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Entity</span><span class="p">):</span>
+</span><span id="Entity-26"><a href="#Entity-26"><span class="linenos">26</span></a>            <span class="k">return</span> <span class="kc">False</span>
+</span><span id="Entity-27"><a href="#Entity-27"><span class="linenos">27</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Entity-28"><a href="#Entity-28"><span class="linenos">28</span></a>            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">identifier</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+</span><span id="Entity-29"><a href="#Entity-29"><span class="linenos">29</span></a>
+</span><span id="Entity-30"><a href="#Entity-30"><span class="linenos">30</span></a>    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Entity-31"><a href="#Entity-31"><span class="linenos">31</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Entity-32"><a href="#Entity-32"><span class="linenos">32</span></a><span class="sd">        The hash function is applied to the identifier and the current coordinates</span>
+</span><span id="Entity-33"><a href="#Entity-33"><span class="linenos">33</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Entity-34"><a href="#Entity-34"><span class="linenos">34</span></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -200,20 +273,238 @@ Drones, Events, Packets, etc... It extends SimulatedEntity.</p>
                                         <input id="Entity.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">Entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span>, </span><span class="param"><span class="n">simulator</span></span>)</span>
+        <span class="name">Entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span></span>)</span>
 
                 <label class="view-source-button" for="Entity.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Entity.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Entity.__init__-17"><a href="#Entity.__init__-17"><span class="linenos">17</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="Entity.__init__-18"><a href="#Entity.__init__-18"><span class="linenos">18</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
-</span><span id="Entity.__init__-19"><a href="#Entity.__init__-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>  <span class="c1"># the id of the entity</span>
-</span><span id="Entity.__init__-20"><a href="#Entity.__init__-20"><span class="linenos">20</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>          <span class="c1"># the coordinates of the entity on the map</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Entity.__init__-16"><a href="#Entity.__init__-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">simulator</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="Entity.__init__-17"><a href="#Entity.__init__-17"><span class="linenos">17</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="Entity.__init__-18"><a href="#Entity.__init__-18"><span class="linenos">18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>  <span class="c1"># the id of the entity</span>
+</span><span id="Entity.__init__-19"><a href="#Entity.__init__-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>          <span class="c1"># the coordinates of the entity on the map</span>
 </span></pre></div>
 
 
     
+
+                            </div>
+                </section>
+                <section id="Environment">
+                            <input id="Environment-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">Environment</span><wbr>(<span class="base"><a href="#SimulatedEntity">SimulatedEntity</a></span>):
+
+                <label class="view-source-button" for="Environment-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Environment"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Environment-38"><a href="#Environment-38"><span class="linenos">38</span></a><span class="k">class</span> <span class="nc">Environment</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
+</span><span id="Environment-39"><a href="#Environment-39"><span class="linenos">39</span></a>    <span class="sd">&quot;&quot;&quot; The enviromnet is an entity that represents the area of interest on which events are generated.</span>
+</span><span id="Environment-40"><a href="#Environment-40"><span class="linenos">40</span></a><span class="sd">     WARNING this corresponds to an old view we had, according to which the events are generated on the map at</span>
+</span><span id="Environment-41"><a href="#Environment-41"><span class="linenos">41</span></a><span class="sd">     random and then maybe felt from the drones. Now events are generated on the drones that they feel with</span>
+</span><span id="Environment-42"><a href="#Environment-42"><span class="linenos">42</span></a><span class="sd">     a certain probability.&quot;&quot;&quot;</span>
+</span><span id="Environment-43"><a href="#Environment-43"><span class="linenos">43</span></a>
+</span><span id="Environment-44"><a href="#Environment-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span>  <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+</span><span id="Environment-45"><a href="#Environment-45"><span class="linenos">45</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="Environment-46"><a href="#Environment-46"><span class="linenos">46</span></a>
+</span><span id="Environment-47"><a href="#Environment-47"><span class="linenos">47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+</span><span id="Environment-48"><a href="#Environment-48"><span class="linenos">48</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</span><span id="Environment-49"><a href="#Environment-49"><span class="linenos">49</span></a>
+</span><span id="Environment-50"><a href="#Environment-50"><span class="linenos">50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_generator</span> <span class="o">=</span> <span class="n">EventGenerator</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="Environment-51"><a href="#Environment-51"><span class="linenos">51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">active_events</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Environment-52"><a href="#Environment-52"><span class="linenos">52</span></a>
+</span><span id="Environment-53"><a href="#Environment-53"><span class="linenos">53</span></a>    <span class="k">def</span> <span class="nf">add_drones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drones</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+</span><span id="Environment-54"><a href="#Environment-54"><span class="linenos">54</span></a>        <span class="sd">&quot;&quot;&quot; add a list of drones in the env &quot;&quot;&quot;</span>
+</span><span id="Environment-55"><a href="#Environment-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">drones</span> <span class="o">=</span> <span class="n">drones</span>
+</span><span id="Environment-56"><a href="#Environment-56"><span class="linenos">56</span></a>
+</span><span id="Environment-57"><a href="#Environment-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">add_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depot</span><span class="p">):</span>
+</span><span id="Environment-58"><a href="#Environment-58"><span class="linenos">58</span></a>        <span class="sd">&quot;&quot;&quot; add depot in the env &quot;&quot;&quot;</span>
+</span><span id="Environment-59"><a href="#Environment-59"><span class="linenos">59</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">depot</span> <span class="o">=</span> <span class="n">depot</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>The enviromnet is an entity that represents the area of interest on which events are generated.
+WARNING this corresponds to an old view we had, according to which the events are generated on the map at
+random and then maybe felt from the drones. Now events are generated on the drones that they feel with
+a certain probability.</p>
+</div>
+
+
+                            <div id="Environment.__init__" class="classattr">
+                                        <input id="Environment.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">Environment</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">width</span>, </span><span class="param"><span class="n">height</span></span>)</span>
+
+                <label class="view-source-button" for="Environment.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Environment.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Environment.__init__-44"><a href="#Environment.__init__-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span>  <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+</span><span id="Environment.__init__-45"><a href="#Environment.__init__-45"><span class="linenos">45</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="Environment.__init__-46"><a href="#Environment.__init__-46"><span class="linenos">46</span></a>
+</span><span id="Environment.__init__-47"><a href="#Environment.__init__-47"><span class="linenos">47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+</span><span id="Environment.__init__-48"><a href="#Environment.__init__-48"><span class="linenos">48</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</span><span id="Environment.__init__-49"><a href="#Environment.__init__-49"><span class="linenos">49</span></a>
+</span><span id="Environment.__init__-50"><a href="#Environment.__init__-50"><span class="linenos">50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_generator</span> <span class="o">=</span> <span class="n">EventGenerator</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="Environment.__init__-51"><a href="#Environment.__init__-51"><span class="linenos">51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">active_events</span> <span class="o">=</span> <span class="p">[]</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="Environment.add_drones" class="classattr">
+                                        <input id="Environment.add_drones-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">add_drones</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">drones</span><span class="p">:</span> <span class="nb">list</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Environment.add_drones-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Environment.add_drones"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Environment.add_drones-53"><a href="#Environment.add_drones-53"><span class="linenos">53</span></a>    <span class="k">def</span> <span class="nf">add_drones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drones</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+</span><span id="Environment.add_drones-54"><a href="#Environment.add_drones-54"><span class="linenos">54</span></a>        <span class="sd">&quot;&quot;&quot; add a list of drones in the env &quot;&quot;&quot;</span>
+</span><span id="Environment.add_drones-55"><a href="#Environment.add_drones-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">drones</span> <span class="o">=</span> <span class="n">drones</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>add a list of drones in the env</p>
+</div>
+
+
+                            </div>
+                            <div id="Environment.add_depot" class="classattr">
+                                        <input id="Environment.add_depot-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">add_depot</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">depot</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Environment.add_depot-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Environment.add_depot"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Environment.add_depot-57"><a href="#Environment.add_depot-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">add_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depot</span><span class="p">):</span>
+</span><span id="Environment.add_depot-58"><a href="#Environment.add_depot-58"><span class="linenos">58</span></a>        <span class="sd">&quot;&quot;&quot; add depot in the env &quot;&quot;&quot;</span>
+</span><span id="Environment.add_depot-59"><a href="#Environment.add_depot-59"><span class="linenos">59</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">depot</span> <span class="o">=</span> <span class="n">depot</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>add depot in the env</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="EventGenerator">
+                            <input id="EventGenerator-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">EventGenerator</span><wbr>(<span class="base"><a href="#SimulatedEntity">SimulatedEntity</a></span>):
+
+                <label class="view-source-button" for="EventGenerator-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#EventGenerator"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="EventGenerator-62"><a href="#EventGenerator-62"><span class="linenos">62</span></a><span class="k">class</span> <span class="nc">EventGenerator</span><span class="p">(</span><span class="n">SimulatedEntity</span><span class="p">):</span>
+</span><span id="EventGenerator-63"><a href="#EventGenerator-63"><span class="linenos">63</span></a>
+</span><span id="EventGenerator-64"><a href="#EventGenerator-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
+</span><span id="EventGenerator-65"><a href="#EventGenerator-65"><span class="linenos">65</span></a>        <span class="sd">&quot;&quot;&quot; uniform event generator &quot;&quot;&quot;</span>
+</span><span id="EventGenerator-66"><a href="#EventGenerator-66"><span class="linenos">66</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="EventGenerator-67"><a href="#EventGenerator-67"><span class="linenos">67</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</span><span id="EventGenerator-68"><a href="#EventGenerator-68"><span class="linenos">68</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+</span><span id="EventGenerator-69"><a href="#EventGenerator-69"><span class="linenos">69</span></a>
+</span><span id="EventGenerator-70"><a href="#EventGenerator-70"><span class="linenos">70</span></a>    <span class="k">def</span> <span class="nf">uniform_event_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="EventGenerator-71"><a href="#EventGenerator-71"><span class="linenos">71</span></a>        <span class="sd">&quot;&quot;&quot; generates an event in the map &quot;&quot;&quot;</span>
+</span><span id="EventGenerator-72"><a href="#EventGenerator-72"><span class="linenos">72</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_env</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+</span><span id="EventGenerator-73"><a href="#EventGenerator-73"><span class="linenos">73</span></a>        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_env</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+</span><span id="EventGenerator-74"><a href="#EventGenerator-74"><span class="linenos">74</span></a>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</span><span id="EventGenerator-75"><a href="#EventGenerator-75"><span class="linenos">75</span></a>
+</span><span id="EventGenerator-76"><a href="#EventGenerator-76"><span class="linenos">76</span></a>    <span class="k">def</span> <span class="nf">poisson_event_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="EventGenerator-77"><a href="#EventGenerator-77"><span class="linenos">77</span></a>        <span class="sd">&quot;&quot;&quot; generates an event in the map &quot;&quot;&quot;</span>
+</span><span id="EventGenerator-78"><a href="#EventGenerator-78"><span class="linenos">78</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>A simulatedEntity keeps track of the simulation object, where you can access all the parameters
+of the simulation. No class of this type is directly instantiable.</p>
+</div>
+
+
+                            <div id="EventGenerator.__init__" class="classattr">
+                                        <input id="EventGenerator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">EventGenerator</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">height</span>, </span><span class="param"><span class="n">width</span>, </span><span class="param"><span class="n">simulator</span></span>)</span>
+
+                <label class="view-source-button" for="EventGenerator.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#EventGenerator.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="EventGenerator.__init__-64"><a href="#EventGenerator.__init__-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
+</span><span id="EventGenerator.__init__-65"><a href="#EventGenerator.__init__-65"><span class="linenos">65</span></a>        <span class="sd">&quot;&quot;&quot; uniform event generator &quot;&quot;&quot;</span>
+</span><span id="EventGenerator.__init__-66"><a href="#EventGenerator.__init__-66"><span class="linenos">66</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">)</span>
+</span><span id="EventGenerator.__init__-67"><a href="#EventGenerator.__init__-67"><span class="linenos">67</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</span><span id="EventGenerator.__init__-68"><a href="#EventGenerator.__init__-68"><span class="linenos">68</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>uniform event generator</p>
+</div>
+
+
+                            </div>
+                            <div id="EventGenerator.uniform_event_generator" class="classattr">
+                                        <input id="EventGenerator.uniform_event_generator-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">uniform_event_generator</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="EventGenerator.uniform_event_generator-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#EventGenerator.uniform_event_generator"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="EventGenerator.uniform_event_generator-70"><a href="#EventGenerator.uniform_event_generator-70"><span class="linenos">70</span></a>    <span class="k">def</span> <span class="nf">uniform_event_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="EventGenerator.uniform_event_generator-71"><a href="#EventGenerator.uniform_event_generator-71"><span class="linenos">71</span></a>        <span class="sd">&quot;&quot;&quot; generates an event in the map &quot;&quot;&quot;</span>
+</span><span id="EventGenerator.uniform_event_generator-72"><a href="#EventGenerator.uniform_event_generator-72"><span class="linenos">72</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_env</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+</span><span id="EventGenerator.uniform_event_generator-73"><a href="#EventGenerator.uniform_event_generator-73"><span class="linenos">73</span></a>        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">rnd_env</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+</span><span id="EventGenerator.uniform_event_generator-74"><a href="#EventGenerator.uniform_event_generator-74"><span class="linenos">74</span></a>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>generates an event in the map</p>
+</div>
+
+
+                            </div>
+                            <div id="EventGenerator.poisson_event_generator" class="classattr">
+                                        <input id="EventGenerator.poisson_event_generator-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">poisson_event_generator</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="EventGenerator.poisson_event_generator-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#EventGenerator.poisson_event_generator"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="EventGenerator.poisson_event_generator-76"><a href="#EventGenerator.poisson_event_generator-76"><span class="linenos">76</span></a>    <span class="k">def</span> <span class="nf">poisson_event_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="EventGenerator.poisson_event_generator-77"><a href="#EventGenerator.poisson_event_generator-77"><span class="linenos">77</span></a>        <span class="sd">&quot;&quot;&quot; generates an event in the map &quot;&quot;&quot;</span>
+</span><span id="EventGenerator.poisson_event_generator-78"><a href="#EventGenerator.poisson_event_generator-78"><span class="linenos">78</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>generates an event in the map</p>
+</div>
+
 
                             </div>
                 </section>

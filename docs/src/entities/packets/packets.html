@@ -49,7 +49,7 @@
                                 <a class="function" href="#Packet.add_hop">add_hop</a>
                         </li>
                         <li>
-                                <a class="function" href="#Packet.increase_TTL_hops">increase_TTL_hops</a>
+                                <a class="function" href="#Packet.increase_ttl_hops">increase_ttl_hops</a>
                         </li>
                 </ul>
 
@@ -102,126 +102,162 @@
 
                         <label class="view-source-button" for="mod-packets-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="c1"># ------------------ Packet ----------------------</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">from</span> <span class="nn">src.utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span> <span class="nn">src.entities.generic.entity</span> <span class="kn">import</span> <span class="n">Entity</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">from</span> <span class="nn">src.utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">from</span> <span class="nn">src.entities.generic.entity</span> <span class="kn">import</span> <span class="n">Entity</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="k">class</span> <span class="nc">Packet</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">    A packet is an entity created by an event in the Area-of-Interest.</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="sd">        @param time_step_creation:</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="sd">        @param simulator:</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">        @param event_ref:</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>        <span class="c1"># id(self) is the id of this instance (unique for every new created packet),</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>        <span class="c1"># the coordinates are those of the event</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">event_ref</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># TTL is the number of hops that the packet crossed</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__max_TTL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">packets_max_ttl</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span> <span class="o">=</span> <span class="n">event_ref</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_retransmission_attempt</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>        <span class="c1"># add metrics: all the packets generated by the drones, either delivered or not (union of all the buffers)</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>        <span class="k">if</span> <span class="n">event_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">drones_packets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optional_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_delivery</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="c1"># if the packet was sent with move routing or not</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_move_packet</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="nd">@property</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="k">def</span> <span class="nf">distance_from_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">        This function computes the euclidean distance between the Depot and</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        the current packet</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">        @return: A float number representing the distance between the Depot and the current packet</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="k">class</span> <span class="nc">Packet</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="sd">    A packet is an entity generated by an event in the Area-of-Interest.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">        @param time_step_creation:</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="sd">        @param simulator:</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>        <span class="c1"># id(self) is the id of this instance (unique for every new created packet),</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>        <span class="c1"># the coordinates are those of the event</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">event_ref</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># TTL is the number of hops that the packet crossed</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__max_TTL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">packets_max_ttl</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span> <span class="o">=</span> <span class="n">event_ref</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_retransmission_attempt</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>        <span class="c1"># add metrics: all the packets generated by the drones, either delivered or not (union of all the buffers)</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>        <span class="k">if</span> <span class="n">event_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">drones_packets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optional_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_delivery</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="c1"># if the packet was sent with move routing or not</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_move_packet</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="nd">@property</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">def</span> <span class="nf">distance_from_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">        This function computes the euclidean distance between the Depot and</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">        the current packet</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        @return: A float number representing the distance between the Depot and the current packet</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>        <span class="k">return</span> <span class="n">utilities</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">depot_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="nd">@property</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="k">def</span> <span class="nf">is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="sd">        A Packet expires if the deadline of the event expires, or the maximum TTL is reached</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span>  <span class="c1"># or self.__TTL &gt; self.__max_TTL  # TODO: questionable</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">        @return: True if the packet is expired False otherwise</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="sd">&quot;&quot;&quot; return the json repr of the obj &quot;&quot;&quot;</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;coord&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>                <span class="s2">&quot;i_gen&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span><span class="p">,</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>                <span class="s2">&quot;i_dead&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span><span class="p">,</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>                <span class="s2">&quot;TTL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span><span class="p">,</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>                <span class="s2">&quot;id_event&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">}</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="k">def</span> <span class="nf">add_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">):</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>        <span class="sd">&quot;&quot;&quot; add a new hop in the packet &quot;&quot;&quot;</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># keep just the last two HOPS</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drone</span><span class="p">)</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="c1"># self.hops.add(drone.identifier)</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">increase_TTL_hops</span><span class="p">()</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="sd">&quot;&quot;&quot; return the json repr of the obj &quot;&quot;&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;coord&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>                <span class="s2">&quot;i_gen&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span><span class="p">,</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>                <span class="s2">&quot;i_dead&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span><span class="p">,</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>                <span class="s2">&quot;TTL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span><span class="p">,</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>                <span class="s2">&quot;id_event&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">}</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="k">def</span> <span class="nf">add_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">):</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        Add a new hop in the packet last_2_hops list</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        @param drone:</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">        @return:</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="k">def</span> <span class="nf">increase_TTL_hops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="n">packet_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="k">return</span> <span class="n">packet_type</span> <span class="o">+</span> <span class="s2">&quot;id:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; event id: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; c:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>            <span class="c1"># keep just the last two HOPS</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drone</span><span class="p">)</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">increase_ttl_hops</span><span class="p">()</span>
 </span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="k">class</span> <span class="nc">DataPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">    A DataPacket, up to now it is not very different from a Packet...</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">def</span> <span class="nf">increase_ttl_hops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        @return:</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">)</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="k">class</span> <span class="nc">ACKPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    An ACKPacket is created to reply to a generic packet.</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">    It is created using the null_event</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_drone</span><span class="p">,</span> <span class="n">dst_drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">acked_packet</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span><span class="p">):</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">)</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">acked_packet</span> <span class="o">=</span> <span class="n">acked_packet</span>  <span class="c1"># packet that the drone who creates it wants to ACK</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">src_drone</span> <span class="o">=</span> <span class="n">src_drone</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dst_drone</span> <span class="o">=</span> <span class="n">dst_drone</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="n">packet_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">packet_type</span><span class="si">}</span><span class="s2"> id: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2"> event id: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2"> coordinates: </span><span class="si">{</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="k">class</span> <span class="nc">DataPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">    A DataPacket, up to now it is not very different from a Packet...</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="k">class</span> <span class="nc">HelloPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">    The hello message is responsible to spread information about a particular UAV</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">    to the neighborhood</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">cur_pos</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">next_target</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="n">cur_pos</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_target</span> <span class="o">=</span> <span class="n">next_target</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">src_drone</span> <span class="o">=</span> <span class="n">src_drone</span>  <span class="c1"># Don&#39;t use this</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">        @param simulator: A simulator instance</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        @param event_ref: The event that generated the DataPacket</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="k">class</span> <span class="nc">ACKPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">    An ACKPacket is created to reply to a generic packet.</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">    It uses null_event to be generated.</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">source_drone</span><span class="p">,</span> <span class="n">destination_drone</span><span class="p">,</span> <span class="n">acked_packet</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">        @param simulator:</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">        @param source_drone:</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">        @param destination_drone:</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">        @param acked_packet:</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">acked_packet</span> <span class="o">=</span> <span class="n">acked_packet</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">source_drone</span> <span class="o">=</span> <span class="n">source_drone</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">destination_drone</span> <span class="o">=</span> <span class="n">destination_drone</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="k">class</span> <span class="nc">HelloPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="sd">    The hello message is responsible to spread information about a particular UAV</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="sd">    to the neighborhood</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">source_drone</span><span class="p">,</span> <span class="n">current_position</span><span class="p">,</span> <span class="n">current_speed</span><span class="p">,</span> <span class="n">next_target</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">        @param simulator:</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">        @param source_drone:</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">        @param current_position:</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        @param current_speed:</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">        @param next_target:</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="n">current_position</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">current_speed</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_target</span> <span class="o">=</span> <span class="n">next_target</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">source_drone</span> <span class="o">=</span> <span class="n">source_drone</span>  <span class="c1"># Don&#39;t use this</span>
 </span></pre></div>
 
 
@@ -237,88 +273,103 @@
 
     </div>
     <a class="headerlink" href="#Packet"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet-7"><a href="#Packet-7"><span class="linenos"> 7</span></a><span class="k">class</span> <span class="nc">Packet</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
-</span><span id="Packet-8"><a href="#Packet-8"><span class="linenos"> 8</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Packet-9"><a href="#Packet-9"><span class="linenos"> 9</span></a><span class="sd">    A packet is an entity created by an event in the Area-of-Interest.</span>
-</span><span id="Packet-10"><a href="#Packet-10"><span class="linenos">10</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Packet-11"><a href="#Packet-11"><span class="linenos">11</span></a>
-</span><span id="Packet-12"><a href="#Packet-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="Packet-13"><a href="#Packet-13"><span class="linenos">13</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Packet-14"><a href="#Packet-14"><span class="linenos">14</span></a>
-</span><span id="Packet-15"><a href="#Packet-15"><span class="linenos">15</span></a><span class="sd">        @param time_step_creation:</span>
-</span><span id="Packet-16"><a href="#Packet-16"><span class="linenos">16</span></a><span class="sd">        @param simulator:</span>
-</span><span id="Packet-17"><a href="#Packet-17"><span class="linenos">17</span></a><span class="sd">        @param event_ref:</span>
-</span><span id="Packet-18"><a href="#Packet-18"><span class="linenos">18</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Packet-19"><a href="#Packet-19"><span class="linenos">19</span></a>
-</span><span id="Packet-20"><a href="#Packet-20"><span class="linenos">20</span></a>        <span class="c1"># id(self) is the id of this instance (unique for every new created packet),</span>
-</span><span id="Packet-21"><a href="#Packet-21"><span class="linenos">21</span></a>        <span class="c1"># the coordinates are those of the event</span>
-</span><span id="Packet-22"><a href="#Packet-22"><span class="linenos">22</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">event_ref</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
-</span><span id="Packet-23"><a href="#Packet-23"><span class="linenos">23</span></a>
-</span><span id="Packet-24"><a href="#Packet-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># TTL is the number of hops that the packet crossed</span>
-</span><span id="Packet-25"><a href="#Packet-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__max_TTL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">packets_max_ttl</span>
-</span><span id="Packet-26"><a href="#Packet-26"><span class="linenos">26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span>
-</span><span id="Packet-27"><a href="#Packet-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span> <span class="o">=</span> <span class="n">event_ref</span>
-</span><span id="Packet-28"><a href="#Packet-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_retransmission_attempt</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="Packet-29"><a href="#Packet-29"><span class="linenos">29</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Packet-30"><a href="#Packet-30"><span class="linenos">30</span></a>
-</span><span id="Packet-31"><a href="#Packet-31"><span class="linenos">31</span></a>        <span class="c1"># add metrics: all the packets generated by the drones, either delivered or not (union of all the buffers)</span>
-</span><span id="Packet-32"><a href="#Packet-32"><span class="linenos">32</span></a>        <span class="k">if</span> <span class="n">event_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Packet-33"><a href="#Packet-33"><span class="linenos">33</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">drones_packets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="Packet-34"><a href="#Packet-34"><span class="linenos">34</span></a>
-</span><span id="Packet-35"><a href="#Packet-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optional_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list</span>
-</span><span id="Packet-36"><a href="#Packet-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_delivery</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="Packet-37"><a href="#Packet-37"><span class="linenos">37</span></a>
-</span><span id="Packet-38"><a href="#Packet-38"><span class="linenos">38</span></a>        <span class="c1"># if the packet was sent with move routing or not</span>
-</span><span id="Packet-39"><a href="#Packet-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_move_packet</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="Packet-40"><a href="#Packet-40"><span class="linenos">40</span></a>
-</span><span id="Packet-41"><a href="#Packet-41"><span class="linenos">41</span></a>    <span class="nd">@property</span>
-</span><span id="Packet-42"><a href="#Packet-42"><span class="linenos">42</span></a>    <span class="k">def</span> <span class="nf">distance_from_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Packet-43"><a href="#Packet-43"><span class="linenos">43</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Packet-44"><a href="#Packet-44"><span class="linenos">44</span></a><span class="sd">        This function computes the euclidean distance between the Depot and</span>
-</span><span id="Packet-45"><a href="#Packet-45"><span class="linenos">45</span></a><span class="sd">        the current packet</span>
-</span><span id="Packet-46"><a href="#Packet-46"><span class="linenos">46</span></a><span class="sd">        @return: A float number representing the distance between the Depot and the current packet</span>
-</span><span id="Packet-47"><a href="#Packet-47"><span class="linenos">47</span></a><span class="sd">        &quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet-6"><a href="#Packet-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">Packet</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
+</span><span id="Packet-7"><a href="#Packet-7"><span class="linenos"> 7</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet-8"><a href="#Packet-8"><span class="linenos"> 8</span></a><span class="sd">    A packet is an entity generated by an event in the Area-of-Interest.</span>
+</span><span id="Packet-9"><a href="#Packet-9"><span class="linenos"> 9</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Packet-10"><a href="#Packet-10"><span class="linenos">10</span></a>
+</span><span id="Packet-11"><a href="#Packet-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Packet-12"><a href="#Packet-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet-13"><a href="#Packet-13"><span class="linenos">13</span></a>
+</span><span id="Packet-14"><a href="#Packet-14"><span class="linenos">14</span></a><span class="sd">        @param time_step_creation:</span>
+</span><span id="Packet-15"><a href="#Packet-15"><span class="linenos">15</span></a><span class="sd">        @param simulator:</span>
+</span><span id="Packet-16"><a href="#Packet-16"><span class="linenos">16</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="Packet-17"><a href="#Packet-17"><span class="linenos">17</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Packet-18"><a href="#Packet-18"><span class="linenos">18</span></a>
+</span><span id="Packet-19"><a href="#Packet-19"><span class="linenos">19</span></a>        <span class="c1"># id(self) is the id of this instance (unique for every new created packet),</span>
+</span><span id="Packet-20"><a href="#Packet-20"><span class="linenos">20</span></a>        <span class="c1"># the coordinates are those of the event</span>
+</span><span id="Packet-21"><a href="#Packet-21"><span class="linenos">21</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">event_ref</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+</span><span id="Packet-22"><a href="#Packet-22"><span class="linenos">22</span></a>
+</span><span id="Packet-23"><a href="#Packet-23"><span class="linenos">23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># TTL is the number of hops that the packet crossed</span>
+</span><span id="Packet-24"><a href="#Packet-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__max_TTL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">packets_max_ttl</span>
+</span><span id="Packet-25"><a href="#Packet-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span>
+</span><span id="Packet-26"><a href="#Packet-26"><span class="linenos">26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span> <span class="o">=</span> <span class="n">event_ref</span>
+</span><span id="Packet-27"><a href="#Packet-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_retransmission_attempt</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="Packet-28"><a href="#Packet-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Packet-29"><a href="#Packet-29"><span class="linenos">29</span></a>
+</span><span id="Packet-30"><a href="#Packet-30"><span class="linenos">30</span></a>        <span class="c1"># add metrics: all the packets generated by the drones, either delivered or not (union of all the buffers)</span>
+</span><span id="Packet-31"><a href="#Packet-31"><span class="linenos">31</span></a>        <span class="k">if</span> <span class="n">event_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Packet-32"><a href="#Packet-32"><span class="linenos">32</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">drones_packets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="Packet-33"><a href="#Packet-33"><span class="linenos">33</span></a>
+</span><span id="Packet-34"><a href="#Packet-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optional_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list</span>
+</span><span id="Packet-35"><a href="#Packet-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_delivery</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="Packet-36"><a href="#Packet-36"><span class="linenos">36</span></a>
+</span><span id="Packet-37"><a href="#Packet-37"><span class="linenos">37</span></a>        <span class="c1"># if the packet was sent with move routing or not</span>
+</span><span id="Packet-38"><a href="#Packet-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_move_packet</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="Packet-39"><a href="#Packet-39"><span class="linenos">39</span></a>
+</span><span id="Packet-40"><a href="#Packet-40"><span class="linenos">40</span></a>    <span class="nd">@property</span>
+</span><span id="Packet-41"><a href="#Packet-41"><span class="linenos">41</span></a>    <span class="k">def</span> <span class="nf">distance_from_depot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Packet-42"><a href="#Packet-42"><span class="linenos">42</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet-43"><a href="#Packet-43"><span class="linenos">43</span></a><span class="sd">        This function computes the euclidean distance between the Depot and</span>
+</span><span id="Packet-44"><a href="#Packet-44"><span class="linenos">44</span></a><span class="sd">        the current packet</span>
+</span><span id="Packet-45"><a href="#Packet-45"><span class="linenos">45</span></a><span class="sd">        @return: A float number representing the distance between the Depot and the current packet</span>
+</span><span id="Packet-46"><a href="#Packet-46"><span class="linenos">46</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Packet-47"><a href="#Packet-47"><span class="linenos">47</span></a>
 </span><span id="Packet-48"><a href="#Packet-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="n">utilities</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">depot_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
 </span><span id="Packet-49"><a href="#Packet-49"><span class="linenos">49</span></a>
 </span><span id="Packet-50"><a href="#Packet-50"><span class="linenos">50</span></a>    <span class="nd">@property</span>
 </span><span id="Packet-51"><a href="#Packet-51"><span class="linenos">51</span></a>    <span class="k">def</span> <span class="nf">is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Packet-52"><a href="#Packet-52"><span class="linenos">52</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Packet-53"><a href="#Packet-53"><span class="linenos">53</span></a><span class="sd">        A Packet expires if the deadline of the event expires, or the maximum TTL is reached</span>
-</span><span id="Packet-54"><a href="#Packet-54"><span class="linenos">54</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Packet-55"><a href="#Packet-55"><span class="linenos">55</span></a>
-</span><span id="Packet-56"><a href="#Packet-56"><span class="linenos">56</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span>  <span class="c1"># or self.__TTL &gt; self.__max_TTL  # TODO: questionable</span>
+</span><span id="Packet-54"><a href="#Packet-54"><span class="linenos">54</span></a>
+</span><span id="Packet-55"><a href="#Packet-55"><span class="linenos">55</span></a><span class="sd">        @return: True if the packet is expired False otherwise</span>
+</span><span id="Packet-56"><a href="#Packet-56"><span class="linenos">56</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Packet-57"><a href="#Packet-57"><span class="linenos">57</span></a>
-</span><span id="Packet-58"><a href="#Packet-58"><span class="linenos">58</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Packet-59"><a href="#Packet-59"><span class="linenos">59</span></a>        <span class="sd">&quot;&quot;&quot; return the json repr of the obj &quot;&quot;&quot;</span>
-</span><span id="Packet-60"><a href="#Packet-60"><span class="linenos">60</span></a>
-</span><span id="Packet-61"><a href="#Packet-61"><span class="linenos">61</span></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;coord&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
-</span><span id="Packet-62"><a href="#Packet-62"><span class="linenos">62</span></a>                <span class="s2">&quot;i_gen&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span><span class="p">,</span>
-</span><span id="Packet-63"><a href="#Packet-63"><span class="linenos">63</span></a>                <span class="s2">&quot;i_dead&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span><span class="p">,</span>
-</span><span id="Packet-64"><a href="#Packet-64"><span class="linenos">64</span></a>                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
-</span><span id="Packet-65"><a href="#Packet-65"><span class="linenos">65</span></a>                <span class="s2">&quot;TTL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span><span class="p">,</span>
-</span><span id="Packet-66"><a href="#Packet-66"><span class="linenos">66</span></a>                <span class="s2">&quot;id_event&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">}</span>
-</span><span id="Packet-67"><a href="#Packet-67"><span class="linenos">67</span></a>
-</span><span id="Packet-68"><a href="#Packet-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">add_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">):</span>
-</span><span id="Packet-69"><a href="#Packet-69"><span class="linenos">69</span></a>        <span class="sd">&quot;&quot;&quot; add a new hop in the packet &quot;&quot;&quot;</span>
-</span><span id="Packet-70"><a href="#Packet-70"><span class="linenos">70</span></a>
-</span><span id="Packet-71"><a href="#Packet-71"><span class="linenos">71</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-</span><span id="Packet-72"><a href="#Packet-72"><span class="linenos">72</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># keep just the last two HOPS</span>
-</span><span id="Packet-73"><a href="#Packet-73"><span class="linenos">73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drone</span><span class="p">)</span>
-</span><span id="Packet-74"><a href="#Packet-74"><span class="linenos">74</span></a>
-</span><span id="Packet-75"><a href="#Packet-75"><span class="linenos">75</span></a>        <span class="c1"># self.hops.add(drone.identifier)</span>
-</span><span id="Packet-76"><a href="#Packet-76"><span class="linenos">76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">increase_TTL_hops</span><span class="p">()</span>
+</span><span id="Packet-58"><a href="#Packet-58"><span class="linenos">58</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span>
+</span><span id="Packet-59"><a href="#Packet-59"><span class="linenos">59</span></a>
+</span><span id="Packet-60"><a href="#Packet-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Packet-61"><a href="#Packet-61"><span class="linenos">61</span></a>        <span class="sd">&quot;&quot;&quot; return the json repr of the obj &quot;&quot;&quot;</span>
+</span><span id="Packet-62"><a href="#Packet-62"><span class="linenos">62</span></a>
+</span><span id="Packet-63"><a href="#Packet-63"><span class="linenos">63</span></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;coord&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+</span><span id="Packet-64"><a href="#Packet-64"><span class="linenos">64</span></a>                <span class="s2">&quot;i_gen&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span><span class="p">,</span>
+</span><span id="Packet-65"><a href="#Packet-65"><span class="linenos">65</span></a>                <span class="s2">&quot;i_dead&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span><span class="p">,</span>
+</span><span id="Packet-66"><a href="#Packet-66"><span class="linenos">66</span></a>                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+</span><span id="Packet-67"><a href="#Packet-67"><span class="linenos">67</span></a>                <span class="s2">&quot;TTL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span><span class="p">,</span>
+</span><span id="Packet-68"><a href="#Packet-68"><span class="linenos">68</span></a>                <span class="s2">&quot;id_event&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">}</span>
+</span><span id="Packet-69"><a href="#Packet-69"><span class="linenos">69</span></a>
+</span><span id="Packet-70"><a href="#Packet-70"><span class="linenos">70</span></a>    <span class="k">def</span> <span class="nf">add_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">):</span>
+</span><span id="Packet-71"><a href="#Packet-71"><span class="linenos">71</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet-72"><a href="#Packet-72"><span class="linenos">72</span></a><span class="sd">        Add a new hop in the packet last_2_hops list</span>
+</span><span id="Packet-73"><a href="#Packet-73"><span class="linenos">73</span></a>
+</span><span id="Packet-74"><a href="#Packet-74"><span class="linenos">74</span></a><span class="sd">        @param drone:</span>
+</span><span id="Packet-75"><a href="#Packet-75"><span class="linenos">75</span></a><span class="sd">        @return:</span>
+</span><span id="Packet-76"><a href="#Packet-76"><span class="linenos">76</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Packet-77"><a href="#Packet-77"><span class="linenos">77</span></a>
-</span><span id="Packet-78"><a href="#Packet-78"><span class="linenos">78</span></a>    <span class="k">def</span> <span class="nf">increase_TTL_hops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Packet-79"><a href="#Packet-79"><span class="linenos">79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="Packet-80"><a href="#Packet-80"><span class="linenos">80</span></a>
-</span><span id="Packet-81"><a href="#Packet-81"><span class="linenos">81</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Packet-82"><a href="#Packet-82"><span class="linenos">82</span></a>        <span class="n">packet_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="Packet-83"><a href="#Packet-83"><span class="linenos">83</span></a>        <span class="k">return</span> <span class="n">packet_type</span> <span class="o">+</span> <span class="s2">&quot;id:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; event id: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
-</span><span id="Packet-84"><a href="#Packet-84"><span class="linenos">84</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; c:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+</span><span id="Packet-78"><a href="#Packet-78"><span class="linenos">78</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+</span><span id="Packet-79"><a href="#Packet-79"><span class="linenos">79</span></a>
+</span><span id="Packet-80"><a href="#Packet-80"><span class="linenos">80</span></a>            <span class="c1"># keep just the last two HOPS</span>
+</span><span id="Packet-81"><a href="#Packet-81"><span class="linenos">81</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span id="Packet-82"><a href="#Packet-82"><span class="linenos">82</span></a>
+</span><span id="Packet-83"><a href="#Packet-83"><span class="linenos">83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drone</span><span class="p">)</span>
+</span><span id="Packet-84"><a href="#Packet-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">increase_ttl_hops</span><span class="p">()</span>
+</span><span id="Packet-85"><a href="#Packet-85"><span class="linenos">85</span></a>
+</span><span id="Packet-86"><a href="#Packet-86"><span class="linenos">86</span></a>    <span class="k">def</span> <span class="nf">increase_ttl_hops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Packet-87"><a href="#Packet-87"><span class="linenos">87</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet-88"><a href="#Packet-88"><span class="linenos">88</span></a>
+</span><span id="Packet-89"><a href="#Packet-89"><span class="linenos">89</span></a><span class="sd">        @return:</span>
+</span><span id="Packet-90"><a href="#Packet-90"><span class="linenos">90</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Packet-91"><a href="#Packet-91"><span class="linenos">91</span></a>
+</span><span id="Packet-92"><a href="#Packet-92"><span class="linenos">92</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="Packet-93"><a href="#Packet-93"><span class="linenos">93</span></a>
+</span><span id="Packet-94"><a href="#Packet-94"><span class="linenos">94</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Packet-95"><a href="#Packet-95"><span class="linenos">95</span></a>
+</span><span id="Packet-96"><a href="#Packet-96"><span class="linenos">96</span></a>        <span class="n">packet_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="Packet-97"><a href="#Packet-97"><span class="linenos">97</span></a>
+</span><span id="Packet-98"><a href="#Packet-98"><span class="linenos">98</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">packet_type</span><span class="si">}</span><span class="s2"> id: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2"> event id: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2"> coordinates: </span><span class="si">{</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>A packet is an entity created by an event in the Area-of-Interest.</p>
+            <div class="docstring"><p>A packet is an entity generated by an event in the Area-of-Interest.</p>
 </div>
 
 
@@ -326,40 +377,40 @@
                                         <input id="Packet.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">Packet</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">event_ref</span><span class="p">:</span> <span class="s1">&#39;Event&#39;</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">Packet</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="Packet.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Packet.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.__init__-12"><a href="#Packet.__init__-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="Packet.__init__-13"><a href="#Packet.__init__-13"><span class="linenos">13</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Packet.__init__-14"><a href="#Packet.__init__-14"><span class="linenos">14</span></a>
-</span><span id="Packet.__init__-15"><a href="#Packet.__init__-15"><span class="linenos">15</span></a><span class="sd">        @param time_step_creation:</span>
-</span><span id="Packet.__init__-16"><a href="#Packet.__init__-16"><span class="linenos">16</span></a><span class="sd">        @param simulator:</span>
-</span><span id="Packet.__init__-17"><a href="#Packet.__init__-17"><span class="linenos">17</span></a><span class="sd">        @param event_ref:</span>
-</span><span id="Packet.__init__-18"><a href="#Packet.__init__-18"><span class="linenos">18</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Packet.__init__-19"><a href="#Packet.__init__-19"><span class="linenos">19</span></a>
-</span><span id="Packet.__init__-20"><a href="#Packet.__init__-20"><span class="linenos">20</span></a>        <span class="c1"># id(self) is the id of this instance (unique for every new created packet),</span>
-</span><span id="Packet.__init__-21"><a href="#Packet.__init__-21"><span class="linenos">21</span></a>        <span class="c1"># the coordinates are those of the event</span>
-</span><span id="Packet.__init__-22"><a href="#Packet.__init__-22"><span class="linenos">22</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">event_ref</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
-</span><span id="Packet.__init__-23"><a href="#Packet.__init__-23"><span class="linenos">23</span></a>
-</span><span id="Packet.__init__-24"><a href="#Packet.__init__-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># TTL is the number of hops that the packet crossed</span>
-</span><span id="Packet.__init__-25"><a href="#Packet.__init__-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__max_TTL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">packets_max_ttl</span>
-</span><span id="Packet.__init__-26"><a href="#Packet.__init__-26"><span class="linenos">26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span>
-</span><span id="Packet.__init__-27"><a href="#Packet.__init__-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span> <span class="o">=</span> <span class="n">event_ref</span>
-</span><span id="Packet.__init__-28"><a href="#Packet.__init__-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_retransmission_attempt</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="Packet.__init__-29"><a href="#Packet.__init__-29"><span class="linenos">29</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Packet.__init__-30"><a href="#Packet.__init__-30"><span class="linenos">30</span></a>
-</span><span id="Packet.__init__-31"><a href="#Packet.__init__-31"><span class="linenos">31</span></a>        <span class="c1"># add metrics: all the packets generated by the drones, either delivered or not (union of all the buffers)</span>
-</span><span id="Packet.__init__-32"><a href="#Packet.__init__-32"><span class="linenos">32</span></a>        <span class="k">if</span> <span class="n">event_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Packet.__init__-33"><a href="#Packet.__init__-33"><span class="linenos">33</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">drones_packets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="Packet.__init__-34"><a href="#Packet.__init__-34"><span class="linenos">34</span></a>
-</span><span id="Packet.__init__-35"><a href="#Packet.__init__-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optional_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list</span>
-</span><span id="Packet.__init__-36"><a href="#Packet.__init__-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_delivery</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="Packet.__init__-37"><a href="#Packet.__init__-37"><span class="linenos">37</span></a>
-</span><span id="Packet.__init__-38"><a href="#Packet.__init__-38"><span class="linenos">38</span></a>        <span class="c1"># if the packet was sent with move routing or not</span>
-</span><span id="Packet.__init__-39"><a href="#Packet.__init__-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_move_packet</span> <span class="o">=</span> <span class="kc">None</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.__init__-11"><a href="#Packet.__init__-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Packet.__init__-12"><a href="#Packet.__init__-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet.__init__-13"><a href="#Packet.__init__-13"><span class="linenos">13</span></a>
+</span><span id="Packet.__init__-14"><a href="#Packet.__init__-14"><span class="linenos">14</span></a><span class="sd">        @param time_step_creation:</span>
+</span><span id="Packet.__init__-15"><a href="#Packet.__init__-15"><span class="linenos">15</span></a><span class="sd">        @param simulator:</span>
+</span><span id="Packet.__init__-16"><a href="#Packet.__init__-16"><span class="linenos">16</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="Packet.__init__-17"><a href="#Packet.__init__-17"><span class="linenos">17</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Packet.__init__-18"><a href="#Packet.__init__-18"><span class="linenos">18</span></a>
+</span><span id="Packet.__init__-19"><a href="#Packet.__init__-19"><span class="linenos">19</span></a>        <span class="c1"># id(self) is the id of this instance (unique for every new created packet),</span>
+</span><span id="Packet.__init__-20"><a href="#Packet.__init__-20"><span class="linenos">20</span></a>        <span class="c1"># the coordinates are those of the event</span>
+</span><span id="Packet.__init__-21"><a href="#Packet.__init__-21"><span class="linenos">21</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">event_ref</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+</span><span id="Packet.__init__-22"><a href="#Packet.__init__-22"><span class="linenos">22</span></a>
+</span><span id="Packet.__init__-23"><a href="#Packet.__init__-23"><span class="linenos">23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># TTL is the number of hops that the packet crossed</span>
+</span><span id="Packet.__init__-24"><a href="#Packet.__init__-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__max_TTL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">packets_max_ttl</span>
+</span><span id="Packet.__init__-25"><a href="#Packet.__init__-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">cur_step</span>
+</span><span id="Packet.__init__-26"><a href="#Packet.__init__-26"><span class="linenos">26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span> <span class="o">=</span> <span class="n">event_ref</span>
+</span><span id="Packet.__init__-27"><a href="#Packet.__init__-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_retransmission_attempt</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="Packet.__init__-28"><a href="#Packet.__init__-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Packet.__init__-29"><a href="#Packet.__init__-29"><span class="linenos">29</span></a>
+</span><span id="Packet.__init__-30"><a href="#Packet.__init__-30"><span class="linenos">30</span></a>        <span class="c1"># add metrics: all the packets generated by the drones, either delivered or not (union of all the buffers)</span>
+</span><span id="Packet.__init__-31"><a href="#Packet.__init__-31"><span class="linenos">31</span></a>        <span class="k">if</span> <span class="n">event_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Packet.__init__-32"><a href="#Packet.__init__-32"><span class="linenos">32</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">drones_packets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="Packet.__init__-33"><a href="#Packet.__init__-33"><span class="linenos">33</span></a>
+</span><span id="Packet.__init__-34"><a href="#Packet.__init__-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optional_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list</span>
+</span><span id="Packet.__init__-35"><a href="#Packet.__init__-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time_delivery</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="Packet.__init__-36"><a href="#Packet.__init__-36"><span class="linenos">36</span></a>
+</span><span id="Packet.__init__-37"><a href="#Packet.__init__-37"><span class="linenos">37</span></a>        <span class="c1"># if the packet was sent with move routing or not</span>
+</span><span id="Packet.__init__-38"><a href="#Packet.__init__-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_move_packet</span> <span class="o">=</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -394,6 +445,8 @@ the current packet
     <a class="headerlink" href="#Packet.is_expired"></a>
     
             <div class="docstring"><p>A Packet expires if the deadline of the event expires, or the maximum TTL is reached</p>
+
+<p>@return: True if the packet is expired False otherwise</p>
 </div>
 
 
@@ -409,15 +462,15 @@ the current packet
 
     </div>
     <a class="headerlink" href="#Packet.to_json"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.to_json-58"><a href="#Packet.to_json-58"><span class="linenos">58</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Packet.to_json-59"><a href="#Packet.to_json-59"><span class="linenos">59</span></a>        <span class="sd">&quot;&quot;&quot; return the json repr of the obj &quot;&quot;&quot;</span>
-</span><span id="Packet.to_json-60"><a href="#Packet.to_json-60"><span class="linenos">60</span></a>
-</span><span id="Packet.to_json-61"><a href="#Packet.to_json-61"><span class="linenos">61</span></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;coord&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
-</span><span id="Packet.to_json-62"><a href="#Packet.to_json-62"><span class="linenos">62</span></a>                <span class="s2">&quot;i_gen&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span><span class="p">,</span>
-</span><span id="Packet.to_json-63"><a href="#Packet.to_json-63"><span class="linenos">63</span></a>                <span class="s2">&quot;i_dead&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span><span class="p">,</span>
-</span><span id="Packet.to_json-64"><a href="#Packet.to_json-64"><span class="linenos">64</span></a>                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
-</span><span id="Packet.to_json-65"><a href="#Packet.to_json-65"><span class="linenos">65</span></a>                <span class="s2">&quot;TTL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span><span class="p">,</span>
-</span><span id="Packet.to_json-66"><a href="#Packet.to_json-66"><span class="linenos">66</span></a>                <span class="s2">&quot;id_event&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">}</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.to_json-60"><a href="#Packet.to_json-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Packet.to_json-61"><a href="#Packet.to_json-61"><span class="linenos">61</span></a>        <span class="sd">&quot;&quot;&quot; return the json repr of the obj &quot;&quot;&quot;</span>
+</span><span id="Packet.to_json-62"><a href="#Packet.to_json-62"><span class="linenos">62</span></a>
+</span><span id="Packet.to_json-63"><a href="#Packet.to_json-63"><span class="linenos">63</span></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;coord&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+</span><span id="Packet.to_json-64"><a href="#Packet.to_json-64"><span class="linenos">64</span></a>                <span class="s2">&quot;i_gen&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step_creation</span><span class="p">,</span>
+</span><span id="Packet.to_json-65"><a href="#Packet.to_json-65"><span class="linenos">65</span></a>                <span class="s2">&quot;i_dead&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">deadline</span><span class="p">,</span>
+</span><span id="Packet.to_json-66"><a href="#Packet.to_json-66"><span class="linenos">66</span></a>                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+</span><span id="Packet.to_json-67"><a href="#Packet.to_json-67"><span class="linenos">67</span></a>                <span class="s2">&quot;TTL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span><span class="p">,</span>
+</span><span id="Packet.to_json-68"><a href="#Packet.to_json-68"><span class="linenos">68</span></a>                <span class="s2">&quot;id_event&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ref</span><span class="o">.</span><span class="n">identifier</span><span class="p">}</span>
 </span></pre></div>
 
 
@@ -437,40 +490,56 @@ the current packet
 
     </div>
     <a class="headerlink" href="#Packet.add_hop"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.add_hop-68"><a href="#Packet.add_hop-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">add_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">):</span>
-</span><span id="Packet.add_hop-69"><a href="#Packet.add_hop-69"><span class="linenos">69</span></a>        <span class="sd">&quot;&quot;&quot; add a new hop in the packet &quot;&quot;&quot;</span>
-</span><span id="Packet.add_hop-70"><a href="#Packet.add_hop-70"><span class="linenos">70</span></a>
-</span><span id="Packet.add_hop-71"><a href="#Packet.add_hop-71"><span class="linenos">71</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-</span><span id="Packet.add_hop-72"><a href="#Packet.add_hop-72"><span class="linenos">72</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># keep just the last two HOPS</span>
-</span><span id="Packet.add_hop-73"><a href="#Packet.add_hop-73"><span class="linenos">73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drone</span><span class="p">)</span>
-</span><span id="Packet.add_hop-74"><a href="#Packet.add_hop-74"><span class="linenos">74</span></a>
-</span><span id="Packet.add_hop-75"><a href="#Packet.add_hop-75"><span class="linenos">75</span></a>        <span class="c1"># self.hops.add(drone.identifier)</span>
-</span><span id="Packet.add_hop-76"><a href="#Packet.add_hop-76"><span class="linenos">76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">increase_TTL_hops</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.add_hop-70"><a href="#Packet.add_hop-70"><span class="linenos">70</span></a>    <span class="k">def</span> <span class="nf">add_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">):</span>
+</span><span id="Packet.add_hop-71"><a href="#Packet.add_hop-71"><span class="linenos">71</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet.add_hop-72"><a href="#Packet.add_hop-72"><span class="linenos">72</span></a><span class="sd">        Add a new hop in the packet last_2_hops list</span>
+</span><span id="Packet.add_hop-73"><a href="#Packet.add_hop-73"><span class="linenos">73</span></a>
+</span><span id="Packet.add_hop-74"><a href="#Packet.add_hop-74"><span class="linenos">74</span></a><span class="sd">        @param drone:</span>
+</span><span id="Packet.add_hop-75"><a href="#Packet.add_hop-75"><span class="linenos">75</span></a><span class="sd">        @return:</span>
+</span><span id="Packet.add_hop-76"><a href="#Packet.add_hop-76"><span class="linenos">76</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Packet.add_hop-77"><a href="#Packet.add_hop-77"><span class="linenos">77</span></a>
+</span><span id="Packet.add_hop-78"><a href="#Packet.add_hop-78"><span class="linenos">78</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+</span><span id="Packet.add_hop-79"><a href="#Packet.add_hop-79"><span class="linenos">79</span></a>
+</span><span id="Packet.add_hop-80"><a href="#Packet.add_hop-80"><span class="linenos">80</span></a>            <span class="c1"># keep just the last two HOPS</span>
+</span><span id="Packet.add_hop-81"><a href="#Packet.add_hop-81"><span class="linenos">81</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span id="Packet.add_hop-82"><a href="#Packet.add_hop-82"><span class="linenos">82</span></a>
+</span><span id="Packet.add_hop-83"><a href="#Packet.add_hop-83"><span class="linenos">83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">last_2_hops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drone</span><span class="p">)</span>
+</span><span id="Packet.add_hop-84"><a href="#Packet.add_hop-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">increase_ttl_hops</span><span class="p">()</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>add a new hop in the packet</p>
+            <div class="docstring"><p>Add a new hop in the packet last_2_hops list</p>
+
+<p>@param drone:
+@return:</p>
 </div>
 
 
                             </div>
-                            <div id="Packet.increase_TTL_hops" class="classattr">
-                                        <input id="Packet.increase_TTL_hops-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="Packet.increase_ttl_hops" class="classattr">
+                                        <input id="Packet.increase_ttl_hops-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">increase_TTL_hops</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">increase_ttl_hops</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="Packet.increase_TTL_hops-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="Packet.increase_ttl_hops-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#Packet.increase_TTL_hops"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.increase_TTL_hops-78"><a href="#Packet.increase_TTL_hops-78"><span class="linenos">78</span></a>    <span class="k">def</span> <span class="nf">increase_TTL_hops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Packet.increase_TTL_hops-79"><a href="#Packet.increase_TTL_hops-79"><span class="linenos">79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">+=</span> <span class="mi">1</span>
+    <a class="headerlink" href="#Packet.increase_ttl_hops"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Packet.increase_ttl_hops-86"><a href="#Packet.increase_ttl_hops-86"><span class="linenos">86</span></a>    <span class="k">def</span> <span class="nf">increase_ttl_hops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Packet.increase_ttl_hops-87"><a href="#Packet.increase_ttl_hops-87"><span class="linenos">87</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Packet.increase_ttl_hops-88"><a href="#Packet.increase_ttl_hops-88"><span class="linenos">88</span></a>
+</span><span id="Packet.increase_ttl_hops-89"><a href="#Packet.increase_ttl_hops-89"><span class="linenos">89</span></a><span class="sd">        @return:</span>
+</span><span id="Packet.increase_ttl_hops-90"><a href="#Packet.increase_ttl_hops-90"><span class="linenos">90</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Packet.increase_ttl_hops-91"><a href="#Packet.increase_ttl_hops-91"><span class="linenos">91</span></a>
+</span><span id="Packet.increase_ttl_hops-92"><a href="#Packet.increase_ttl_hops-92"><span class="linenos">92</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__TTL</span> <span class="o">+=</span> <span class="mi">1</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>@return:</p>
+</div>
+
 
                             </div>
                 </section>
@@ -485,13 +554,18 @@ the current packet
 
     </div>
     <a class="headerlink" href="#DataPacket"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DataPacket-87"><a href="#DataPacket-87"><span class="linenos">87</span></a><span class="k">class</span> <span class="nc">DataPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
-</span><span id="DataPacket-88"><a href="#DataPacket-88"><span class="linenos">88</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DataPacket-89"><a href="#DataPacket-89"><span class="linenos">89</span></a><span class="sd">    A DataPacket, up to now it is not very different from a Packet...</span>
-</span><span id="DataPacket-90"><a href="#DataPacket-90"><span class="linenos">90</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="DataPacket-91"><a href="#DataPacket-91"><span class="linenos">91</span></a>
-</span><span id="DataPacket-92"><a href="#DataPacket-92"><span class="linenos">92</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="DataPacket-93"><a href="#DataPacket-93"><span class="linenos">93</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DataPacket-101"><a href="#DataPacket-101"><span class="linenos">101</span></a><span class="k">class</span> <span class="nc">DataPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
+</span><span id="DataPacket-102"><a href="#DataPacket-102"><span class="linenos">102</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DataPacket-103"><a href="#DataPacket-103"><span class="linenos">103</span></a><span class="sd">    A DataPacket, up to now it is not very different from a Packet...</span>
+</span><span id="DataPacket-104"><a href="#DataPacket-104"><span class="linenos">104</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="DataPacket-105"><a href="#DataPacket-105"><span class="linenos">105</span></a>
+</span><span id="DataPacket-106"><a href="#DataPacket-106"><span class="linenos">106</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="DataPacket-107"><a href="#DataPacket-107"><span class="linenos">107</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DataPacket-108"><a href="#DataPacket-108"><span class="linenos">108</span></a>
+</span><span id="DataPacket-109"><a href="#DataPacket-109"><span class="linenos">109</span></a><span class="sd">        @param simulator: A simulator instance</span>
+</span><span id="DataPacket-110"><a href="#DataPacket-110"><span class="linenos">110</span></a><span class="sd">        @param event_ref: The event that generated the DataPacket</span>
+</span><span id="DataPacket-111"><a href="#DataPacket-111"><span class="linenos">111</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="DataPacket-112"><a href="#DataPacket-112"><span class="linenos">112</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -503,20 +577,24 @@ the current packet
                                         <input id="DataPacket.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">DataPacket</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">event_ref</span><span class="p">:</span> <span class="s1">&#39;Event&#39;</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">DataPacket</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="DataPacket.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#DataPacket.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DataPacket.__init__-92"><a href="#DataPacket.__init__-92"><span class="linenos">92</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="DataPacket.__init__-93"><a href="#DataPacket.__init__-93"><span class="linenos">93</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DataPacket.__init__-106"><a href="#DataPacket.__init__-106"><span class="linenos">106</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="DataPacket.__init__-107"><a href="#DataPacket.__init__-107"><span class="linenos">107</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DataPacket.__init__-108"><a href="#DataPacket.__init__-108"><span class="linenos">108</span></a>
+</span><span id="DataPacket.__init__-109"><a href="#DataPacket.__init__-109"><span class="linenos">109</span></a><span class="sd">        @param simulator: A simulator instance</span>
+</span><span id="DataPacket.__init__-110"><a href="#DataPacket.__init__-110"><span class="linenos">110</span></a><span class="sd">        @param event_ref: The event that generated the DataPacket</span>
+</span><span id="DataPacket.__init__-111"><a href="#DataPacket.__init__-111"><span class="linenos">111</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="DataPacket.__init__-112"><a href="#DataPacket.__init__-112"><span class="linenos">112</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>@param time_step_creation:
-@param simulator:
-@param event_ref:</p>
+            <div class="docstring"><p>@param simulator: A simulator instance
+@param event_ref: The event that generated the DataPacket</p>
 </div>
 
 
@@ -529,7 +607,7 @@ the current packet
                 <dd id="DataPacket.is_expired" class="variable"><a href="#Packet.is_expired">is_expired</a></dd>
                 <dd id="DataPacket.to_json" class="function"><a href="#Packet.to_json">to_json</a></dd>
                 <dd id="DataPacket.add_hop" class="function"><a href="#Packet.add_hop">add_hop</a></dd>
-                <dd id="DataPacket.increase_TTL_hops" class="function"><a href="#Packet.increase_TTL_hops">increase_TTL_hops</a></dd>
+                <dd id="DataPacket.increase_ttl_hops" class="function"><a href="#Packet.increase_ttl_hops">increase_ttl_hops</a></dd>
 
             </div>
                                 </dl>
@@ -546,23 +624,31 @@ the current packet
 
     </div>
     <a class="headerlink" href="#ACKPacket"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ACKPacket-96"><a href="#ACKPacket-96"><span class="linenos"> 96</span></a><span class="k">class</span> <span class="nc">ACKPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
-</span><span id="ACKPacket-97"><a href="#ACKPacket-97"><span class="linenos"> 97</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ACKPacket-98"><a href="#ACKPacket-98"><span class="linenos"> 98</span></a><span class="sd">    An ACKPacket is created to reply to a generic packet.</span>
-</span><span id="ACKPacket-99"><a href="#ACKPacket-99"><span class="linenos"> 99</span></a><span class="sd">    It is created using the null_event</span>
-</span><span id="ACKPacket-100"><a href="#ACKPacket-100"><span class="linenos">100</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="ACKPacket-101"><a href="#ACKPacket-101"><span class="linenos">101</span></a>
-</span><span id="ACKPacket-102"><a href="#ACKPacket-102"><span class="linenos">102</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_drone</span><span class="p">,</span> <span class="n">dst_drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">acked_packet</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span><span class="p">):</span>
-</span><span id="ACKPacket-103"><a href="#ACKPacket-103"><span class="linenos">103</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">)</span>
-</span><span id="ACKPacket-104"><a href="#ACKPacket-104"><span class="linenos">104</span></a>
-</span><span id="ACKPacket-105"><a href="#ACKPacket-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">acked_packet</span> <span class="o">=</span> <span class="n">acked_packet</span>  <span class="c1"># packet that the drone who creates it wants to ACK</span>
-</span><span id="ACKPacket-106"><a href="#ACKPacket-106"><span class="linenos">106</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">src_drone</span> <span class="o">=</span> <span class="n">src_drone</span>
-</span><span id="ACKPacket-107"><a href="#ACKPacket-107"><span class="linenos">107</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dst_drone</span> <span class="o">=</span> <span class="n">dst_drone</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ACKPacket-115"><a href="#ACKPacket-115"><span class="linenos">115</span></a><span class="k">class</span> <span class="nc">ACKPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
+</span><span id="ACKPacket-116"><a href="#ACKPacket-116"><span class="linenos">116</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ACKPacket-117"><a href="#ACKPacket-117"><span class="linenos">117</span></a><span class="sd">    An ACKPacket is created to reply to a generic packet.</span>
+</span><span id="ACKPacket-118"><a href="#ACKPacket-118"><span class="linenos">118</span></a><span class="sd">    It uses null_event to be generated.</span>
+</span><span id="ACKPacket-119"><a href="#ACKPacket-119"><span class="linenos">119</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="ACKPacket-120"><a href="#ACKPacket-120"><span class="linenos">120</span></a>
+</span><span id="ACKPacket-121"><a href="#ACKPacket-121"><span class="linenos">121</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">source_drone</span><span class="p">,</span> <span class="n">destination_drone</span><span class="p">,</span> <span class="n">acked_packet</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
+</span><span id="ACKPacket-122"><a href="#ACKPacket-122"><span class="linenos">122</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ACKPacket-123"><a href="#ACKPacket-123"><span class="linenos">123</span></a>
+</span><span id="ACKPacket-124"><a href="#ACKPacket-124"><span class="linenos">124</span></a><span class="sd">        @param simulator:</span>
+</span><span id="ACKPacket-125"><a href="#ACKPacket-125"><span class="linenos">125</span></a><span class="sd">        @param source_drone:</span>
+</span><span id="ACKPacket-126"><a href="#ACKPacket-126"><span class="linenos">126</span></a><span class="sd">        @param destination_drone:</span>
+</span><span id="ACKPacket-127"><a href="#ACKPacket-127"><span class="linenos">127</span></a><span class="sd">        @param acked_packet:</span>
+</span><span id="ACKPacket-128"><a href="#ACKPacket-128"><span class="linenos">128</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="ACKPacket-129"><a href="#ACKPacket-129"><span class="linenos">129</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ACKPacket-130"><a href="#ACKPacket-130"><span class="linenos">130</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="ACKPacket-131"><a href="#ACKPacket-131"><span class="linenos">131</span></a>
+</span><span id="ACKPacket-132"><a href="#ACKPacket-132"><span class="linenos">132</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">acked_packet</span> <span class="o">=</span> <span class="n">acked_packet</span>
+</span><span id="ACKPacket-133"><a href="#ACKPacket-133"><span class="linenos">133</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">source_drone</span> <span class="o">=</span> <span class="n">source_drone</span>
+</span><span id="ACKPacket-134"><a href="#ACKPacket-134"><span class="linenos">134</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">destination_drone</span> <span class="o">=</span> <span class="n">destination_drone</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>An ACKPacket is created to reply to a generic packet.
-It is created using the null_event</p>
+It uses null_event to be generated.</p>
 </div>
 
 
@@ -570,23 +656,33 @@ It is created using the null_event</p>
                                         <input id="ACKPacket.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">ACKPacket</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">src_drone</span>, </span><span class="param"><span class="n">dst_drone</span>, </span><span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">acked_packet</span>, </span><span class="param"><span class="n">event_ref</span><span class="p">:</span> <span class="s1">&#39;Event&#39;</span></span>)</span>
+        <span class="name">ACKPacket</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">source_drone</span>, </span><span class="param"><span class="n">destination_drone</span>, </span><span class="param"><span class="n">acked_packet</span>, </span><span class="param"><span class="n">event_ref</span></span>)</span>
 
                 <label class="view-source-button" for="ACKPacket.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ACKPacket.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ACKPacket.__init__-102"><a href="#ACKPacket.__init__-102"><span class="linenos">102</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_drone</span><span class="p">,</span> <span class="n">dst_drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">acked_packet</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">:</span> <span class="s2">&quot;Event&quot;</span><span class="p">):</span>
-</span><span id="ACKPacket.__init__-103"><a href="#ACKPacket.__init__-103"><span class="linenos">103</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">)</span>
-</span><span id="ACKPacket.__init__-104"><a href="#ACKPacket.__init__-104"><span class="linenos">104</span></a>
-</span><span id="ACKPacket.__init__-105"><a href="#ACKPacket.__init__-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">acked_packet</span> <span class="o">=</span> <span class="n">acked_packet</span>  <span class="c1"># packet that the drone who creates it wants to ACK</span>
-</span><span id="ACKPacket.__init__-106"><a href="#ACKPacket.__init__-106"><span class="linenos">106</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">src_drone</span> <span class="o">=</span> <span class="n">src_drone</span>
-</span><span id="ACKPacket.__init__-107"><a href="#ACKPacket.__init__-107"><span class="linenos">107</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dst_drone</span> <span class="o">=</span> <span class="n">dst_drone</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ACKPacket.__init__-121"><a href="#ACKPacket.__init__-121"><span class="linenos">121</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">source_drone</span><span class="p">,</span> <span class="n">destination_drone</span><span class="p">,</span> <span class="n">acked_packet</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
+</span><span id="ACKPacket.__init__-122"><a href="#ACKPacket.__init__-122"><span class="linenos">122</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ACKPacket.__init__-123"><a href="#ACKPacket.__init__-123"><span class="linenos">123</span></a>
+</span><span id="ACKPacket.__init__-124"><a href="#ACKPacket.__init__-124"><span class="linenos">124</span></a><span class="sd">        @param simulator:</span>
+</span><span id="ACKPacket.__init__-125"><a href="#ACKPacket.__init__-125"><span class="linenos">125</span></a><span class="sd">        @param source_drone:</span>
+</span><span id="ACKPacket.__init__-126"><a href="#ACKPacket.__init__-126"><span class="linenos">126</span></a><span class="sd">        @param destination_drone:</span>
+</span><span id="ACKPacket.__init__-127"><a href="#ACKPacket.__init__-127"><span class="linenos">127</span></a><span class="sd">        @param acked_packet:</span>
+</span><span id="ACKPacket.__init__-128"><a href="#ACKPacket.__init__-128"><span class="linenos">128</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="ACKPacket.__init__-129"><a href="#ACKPacket.__init__-129"><span class="linenos">129</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ACKPacket.__init__-130"><a href="#ACKPacket.__init__-130"><span class="linenos">130</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="ACKPacket.__init__-131"><a href="#ACKPacket.__init__-131"><span class="linenos">131</span></a>
+</span><span id="ACKPacket.__init__-132"><a href="#ACKPacket.__init__-132"><span class="linenos">132</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">acked_packet</span> <span class="o">=</span> <span class="n">acked_packet</span>
+</span><span id="ACKPacket.__init__-133"><a href="#ACKPacket.__init__-133"><span class="linenos">133</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">source_drone</span> <span class="o">=</span> <span class="n">source_drone</span>
+</span><span id="ACKPacket.__init__-134"><a href="#ACKPacket.__init__-134"><span class="linenos">134</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">destination_drone</span> <span class="o">=</span> <span class="n">destination_drone</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>@param time_step_creation:
-@param simulator:
+            <div class="docstring"><p>@param simulator:
+@param source_drone:
+@param destination_drone:
+@param acked_packet:
 @param event_ref:</p>
 </div>
 
@@ -600,7 +696,7 @@ It is created using the null_event</p>
                 <dd id="ACKPacket.is_expired" class="variable"><a href="#Packet.is_expired">is_expired</a></dd>
                 <dd id="ACKPacket.to_json" class="function"><a href="#Packet.to_json">to_json</a></dd>
                 <dd id="ACKPacket.add_hop" class="function"><a href="#Packet.add_hop">add_hop</a></dd>
-                <dd id="ACKPacket.increase_TTL_hops" class="function"><a href="#Packet.increase_TTL_hops">increase_TTL_hops</a></dd>
+                <dd id="ACKPacket.increase_ttl_hops" class="function"><a href="#Packet.increase_ttl_hops">increase_ttl_hops</a></dd>
 
             </div>
                                 </dl>
@@ -617,18 +713,27 @@ It is created using the null_event</p>
 
     </div>
     <a class="headerlink" href="#HelloPacket"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="HelloPacket-110"><a href="#HelloPacket-110"><span class="linenos">110</span></a><span class="k">class</span> <span class="nc">HelloPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
-</span><span id="HelloPacket-111"><a href="#HelloPacket-111"><span class="linenos">111</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="HelloPacket-112"><a href="#HelloPacket-112"><span class="linenos">112</span></a><span class="sd">    The hello message is responsible to spread information about a particular UAV</span>
-</span><span id="HelloPacket-113"><a href="#HelloPacket-113"><span class="linenos">113</span></a><span class="sd">    to the neighborhood</span>
-</span><span id="HelloPacket-114"><a href="#HelloPacket-114"><span class="linenos">114</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="HelloPacket-115"><a href="#HelloPacket-115"><span class="linenos">115</span></a>
-</span><span id="HelloPacket-116"><a href="#HelloPacket-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">cur_pos</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">next_target</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
-</span><span id="HelloPacket-117"><a href="#HelloPacket-117"><span class="linenos">117</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
-</span><span id="HelloPacket-118"><a href="#HelloPacket-118"><span class="linenos">118</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="n">cur_pos</span>
-</span><span id="HelloPacket-119"><a href="#HelloPacket-119"><span class="linenos">119</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span>
-</span><span id="HelloPacket-120"><a href="#HelloPacket-120"><span class="linenos">120</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_target</span> <span class="o">=</span> <span class="n">next_target</span>
-</span><span id="HelloPacket-121"><a href="#HelloPacket-121"><span class="linenos">121</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">src_drone</span> <span class="o">=</span> <span class="n">src_drone</span>  <span class="c1"># Don&#39;t use this</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="HelloPacket-137"><a href="#HelloPacket-137"><span class="linenos">137</span></a><span class="k">class</span> <span class="nc">HelloPacket</span><span class="p">(</span><span class="n">Packet</span><span class="p">):</span>
+</span><span id="HelloPacket-138"><a href="#HelloPacket-138"><span class="linenos">138</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="HelloPacket-139"><a href="#HelloPacket-139"><span class="linenos">139</span></a><span class="sd">    The hello message is responsible to spread information about a particular UAV</span>
+</span><span id="HelloPacket-140"><a href="#HelloPacket-140"><span class="linenos">140</span></a><span class="sd">    to the neighborhood</span>
+</span><span id="HelloPacket-141"><a href="#HelloPacket-141"><span class="linenos">141</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="HelloPacket-142"><a href="#HelloPacket-142"><span class="linenos">142</span></a>
+</span><span id="HelloPacket-143"><a href="#HelloPacket-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">source_drone</span><span class="p">,</span> <span class="n">current_position</span><span class="p">,</span> <span class="n">current_speed</span><span class="p">,</span> <span class="n">next_target</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
+</span><span id="HelloPacket-144"><a href="#HelloPacket-144"><span class="linenos">144</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="HelloPacket-145"><a href="#HelloPacket-145"><span class="linenos">145</span></a>
+</span><span id="HelloPacket-146"><a href="#HelloPacket-146"><span class="linenos">146</span></a><span class="sd">        @param simulator:</span>
+</span><span id="HelloPacket-147"><a href="#HelloPacket-147"><span class="linenos">147</span></a><span class="sd">        @param source_drone:</span>
+</span><span id="HelloPacket-148"><a href="#HelloPacket-148"><span class="linenos">148</span></a><span class="sd">        @param current_position:</span>
+</span><span id="HelloPacket-149"><a href="#HelloPacket-149"><span class="linenos">149</span></a><span class="sd">        @param current_speed:</span>
+</span><span id="HelloPacket-150"><a href="#HelloPacket-150"><span class="linenos">150</span></a><span class="sd">        @param next_target:</span>
+</span><span id="HelloPacket-151"><a href="#HelloPacket-151"><span class="linenos">151</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="HelloPacket-152"><a href="#HelloPacket-152"><span class="linenos">152</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="HelloPacket-153"><a href="#HelloPacket-153"><span class="linenos">153</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="HelloPacket-154"><a href="#HelloPacket-154"><span class="linenos">154</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="n">current_position</span>
+</span><span id="HelloPacket-155"><a href="#HelloPacket-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">current_speed</span>
+</span><span id="HelloPacket-156"><a href="#HelloPacket-156"><span class="linenos">156</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_target</span> <span class="o">=</span> <span class="n">next_target</span>
+</span><span id="HelloPacket-157"><a href="#HelloPacket-157"><span class="linenos">157</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">source_drone</span> <span class="o">=</span> <span class="n">source_drone</span>  <span class="c1"># Don&#39;t use this</span>
 </span></pre></div>
 
 
@@ -641,23 +746,35 @@ to the neighborhood</p>
                                         <input id="HelloPacket.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">HelloPacket</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">src_drone</span>, </span><span class="param"><span class="n">simulator</span>, </span><span class="param"><span class="n">cur_pos</span>, </span><span class="param"><span class="n">speed</span>, </span><span class="param"><span class="n">next_target</span>, </span><span class="param"><span class="n">event_ref</span></span>)</span>
+        <span class="name">HelloPacket</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">simulator</span>,</span><span class="param">	<span class="n">source_drone</span>,</span><span class="param">	<span class="n">current_position</span>,</span><span class="param">	<span class="n">current_speed</span>,</span><span class="param">	<span class="n">next_target</span>,</span><span class="param">	<span class="n">event_ref</span></span>)</span>
 
                 <label class="view-source-button" for="HelloPacket.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#HelloPacket.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="HelloPacket.__init__-116"><a href="#HelloPacket.__init__-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">cur_pos</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">next_target</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
-</span><span id="HelloPacket.__init__-117"><a href="#HelloPacket.__init__-117"><span class="linenos">117</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
-</span><span id="HelloPacket.__init__-118"><a href="#HelloPacket.__init__-118"><span class="linenos">118</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="n">cur_pos</span>
-</span><span id="HelloPacket.__init__-119"><a href="#HelloPacket.__init__-119"><span class="linenos">119</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span>
-</span><span id="HelloPacket.__init__-120"><a href="#HelloPacket.__init__-120"><span class="linenos">120</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_target</span> <span class="o">=</span> <span class="n">next_target</span>
-</span><span id="HelloPacket.__init__-121"><a href="#HelloPacket.__init__-121"><span class="linenos">121</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">src_drone</span> <span class="o">=</span> <span class="n">src_drone</span>  <span class="c1"># Don&#39;t use this</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="HelloPacket.__init__-143"><a href="#HelloPacket.__init__-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">source_drone</span><span class="p">,</span> <span class="n">current_position</span><span class="p">,</span> <span class="n">current_speed</span><span class="p">,</span> <span class="n">next_target</span><span class="p">,</span> <span class="n">event_ref</span><span class="p">):</span>
+</span><span id="HelloPacket.__init__-144"><a href="#HelloPacket.__init__-144"><span class="linenos">144</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="HelloPacket.__init__-145"><a href="#HelloPacket.__init__-145"><span class="linenos">145</span></a>
+</span><span id="HelloPacket.__init__-146"><a href="#HelloPacket.__init__-146"><span class="linenos">146</span></a><span class="sd">        @param simulator:</span>
+</span><span id="HelloPacket.__init__-147"><a href="#HelloPacket.__init__-147"><span class="linenos">147</span></a><span class="sd">        @param source_drone:</span>
+</span><span id="HelloPacket.__init__-148"><a href="#HelloPacket.__init__-148"><span class="linenos">148</span></a><span class="sd">        @param current_position:</span>
+</span><span id="HelloPacket.__init__-149"><a href="#HelloPacket.__init__-149"><span class="linenos">149</span></a><span class="sd">        @param current_speed:</span>
+</span><span id="HelloPacket.__init__-150"><a href="#HelloPacket.__init__-150"><span class="linenos">150</span></a><span class="sd">        @param next_target:</span>
+</span><span id="HelloPacket.__init__-151"><a href="#HelloPacket.__init__-151"><span class="linenos">151</span></a><span class="sd">        @param event_ref:</span>
+</span><span id="HelloPacket.__init__-152"><a href="#HelloPacket.__init__-152"><span class="linenos">152</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="HelloPacket.__init__-153"><a href="#HelloPacket.__init__-153"><span class="linenos">153</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">simulator</span><span class="o">=</span><span class="n">simulator</span><span class="p">,</span> <span class="n">event_ref</span><span class="o">=</span><span class="n">event_ref</span><span class="p">)</span>
+</span><span id="HelloPacket.__init__-154"><a href="#HelloPacket.__init__-154"><span class="linenos">154</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="n">current_position</span>
+</span><span id="HelloPacket.__init__-155"><a href="#HelloPacket.__init__-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">current_speed</span>
+</span><span id="HelloPacket.__init__-156"><a href="#HelloPacket.__init__-156"><span class="linenos">156</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">next_target</span> <span class="o">=</span> <span class="n">next_target</span>
+</span><span id="HelloPacket.__init__-157"><a href="#HelloPacket.__init__-157"><span class="linenos">157</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">source_drone</span> <span class="o">=</span> <span class="n">source_drone</span>  <span class="c1"># Don&#39;t use this</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>@param time_step_creation:
-@param simulator:
+            <div class="docstring"><p>@param simulator:
+@param source_drone:
+@param current_position:
+@param current_speed:
+@param next_target:
 @param event_ref:</p>
 </div>
 
@@ -671,7 +788,7 @@ to the neighborhood</p>
                 <dd id="HelloPacket.is_expired" class="variable"><a href="#Packet.is_expired">is_expired</a></dd>
                 <dd id="HelloPacket.to_json" class="function"><a href="#Packet.to_json">to_json</a></dd>
                 <dd id="HelloPacket.add_hop" class="function"><a href="#Packet.add_hop">add_hop</a></dd>
-                <dd id="HelloPacket.increase_TTL_hops" class="function"><a href="#Packet.increase_TTL_hops">increase_TTL_hops</a></dd>
+                <dd id="HelloPacket.increase_ttl_hops" class="function"><a href="#Packet.increase_ttl_hops">increase_ttl_hops</a></dd>
 
             </div>
                                 </dl>

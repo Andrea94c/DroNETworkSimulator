@@ -51,7 +51,7 @@ class Environment(SimulatedEntity):
         self.__drones = None
         self.__depot = None
 
-        self.event_generator = EventGenerator(height, width, simulator)
+        #self.event_generator = EventGenerator(height, width, simulator) %EventGenerator is not used
         self.active_events = []
 
     @property
@@ -91,21 +91,27 @@ class Environment(SimulatedEntity):
         self.__depot = depot
 
 
-class EventGenerator(SimulatedEntity):
-
-    def __init__(self, height, width, simulator):
-        """ uniform event generator """
-        super().__init__(simulator)
-        self.height = height
-        self.width = width
-
-    def uniform_event_generator(self):
-        """ generates an event in the map """
-        x = self.simulator.rnd_env.randint(0, self.height)
-        y = self.simulator.rnd_env.randint(0, self.width)
-        return x, y
-
-    def poisson_event_generator(self):
-        """ generates an event in the map """
-        pass
-
+# class EventGenerator(SimulatedEntity):
+#     # Not used
+#     def __init__(self, height, width, simulator):
+#
+#         super().__init__(simulator)
+#         self.DISTRIBUTIONS = ["uniform", "poisson"]
+#         self.height = height
+#         self.width = width
+#
+#     def generate_event(self, distribution: str):
+#         "This "
+#         assert distribution in self.DISTRIBUTIONS
+#         if distribution == "uniform": return self.uniform_event_generator()
+#         elif distribution == "poisson": return self.poisson_event_generator()
+#
+#     def uniform_event_generator(self):
+#         """ generates an event in the map """
+#         x = self.simulator.rnd_env.randint(0, self.height)
+#         y = self.simulator.rnd_env.randint(0, self.width)
+#         return x, y
+#
+#     def poisson_event_generator(self):
+#         """ generates an event in the map """
+#         pass

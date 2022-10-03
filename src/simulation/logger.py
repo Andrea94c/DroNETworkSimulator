@@ -3,7 +3,7 @@ from typing import Union
 
 from src.entities.events.event import Event
 from src.entities.packets.packets import Packet, HelloPacket, ACKPacket
-from src.entities.uavs.uav_entities import Drone
+from src.entities.uavs.drone import Drone
 
 
 @dataclass

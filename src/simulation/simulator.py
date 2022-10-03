@@ -1,5 +1,6 @@
 from src.drawing import pp_draw
-from src.entities.uavs.uav_entities import *
+from src.entities.uavs.depot import Depot
+from src.entities.uavs.drone import Drone
 from src.simulation.logger import Logger
 from src.simulation.metrics import Metrics
 from src.utilities import config, utilities

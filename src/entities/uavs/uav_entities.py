@@ -1,18 +1,19 @@
 import numpy as np
-
 from src.entities.events.event import Event
-from src.entities.generic.entity import Entity, SimulatedEntity
+from src.entities.generic.entity import Entity
 import src.entities.packets.packets as pckts
 from src.utilities import config, utilities
 
 
 class Depot(Entity):
-    """ The depot is an Entity. """
-    def __init__(self, coords, communication_range, simulator):
-        super().__init__(id(self), coords, simulator)
+    """
+    The depot is an Entity
+    """
+
+    def __init__(self, simulator, coordinates, communication_range):
+        super().__init__(simulator=simulator, identifier=id(self), coords=coordinates)
 
         self.communication_range = communication_range
-
         self.__buffer = list()  # also with duplicated packets
 
     @property
@@ -41,9 +42,9 @@ class Depot(Entity):
 
 class Drone(Entity):
 
-    def __init__(self, identifier: int, path: list, depot: Depot, simulator):
+    def __init__(self, simulator, identifier: int, path: list, depot: Depot):
 
-        super().__init__(identifier, path[0], simulator)
+        super().__init__(simulator=simulator, identifier=identifier, coords=path[0])
 
         self.depot = depot
         self.path = path
@@ -52,14 +53,14 @@ class Drone(Entity):
         self.communication_range = self.simulator.drone_com_range
         self.buffer_max_size = self.simulator.drone_max_buffer_size
         self.residual_energy = self.simulator.drone_max_energy
-        self.come_back_to_mission = False  # if i'm coming back to my applicative mission
-        self.last_move_routing = False  # if in the last step i was moving to depot
+        self.come_back_to_mission = False
+        self.last_move_routing = False
 
         # dynamic parameters
         self.tightest_event_deadline = None  # used later to check if there is an event that is about to expire
         self.current_waypoint = 0
 
-        self.__buffer = []  # contains the packets
+        self.__buffer = []
 
         self.distance_from_depot = 0
         self.move_routing = False  # if true, it moves to the depot
@@ -74,6 +75,10 @@ class Drone(Entity):
 
     @property
     def all_packets(self):
+        """
+        Returns all the packets within the buffer
+        @return: a list of packets or an empty list
+        """
         return self.__buffer
 
     @property
@@ -169,11 +174,11 @@ class Drone(Entity):
             if not self.is_known_packet(packet):
                 self.__buffer.append(packet)
 
-    def routing(self, drones, depot, cur_step):
+    def routing(self, drones, cur_step):
         """ do the routing """
 
         self.distance_from_depot = utilities.euclidean_distance(self.depot.coords, self.coords)
-        self.routing_algorithm.routing(drones, cur_step)
+        self.routing_algorithm.routing(drones)
 
     def move(self, time):
         """

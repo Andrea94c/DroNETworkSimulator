@@ -2,14 +2,14 @@
 import numpy as np
 import src.utilities.utilities as util
 
-from src.routing_algorithms.BASE_routing import BASE_routing
+from src.routing_algorithms.BaseRouting import BaseRouting
 
-class AndreaGeoRouting(BASE_routing):
+class AndreaGeoRouting(BaseRouting):
 
     def __init__(self, drone, simulator):
-        BASE_routing.__init__(self, drone, simulator)
+        BaseRouting.__init__(self, simulator, drone)
 
-    def relay_selection(self, opt_neighbors):
+    def relay_selection(self, neighbors):
         """ arg min score  -> geographical approach, take the drone closest to the depot """
         #if self.drone.identifier == 0:
         #    print(opt_neighbors)
@@ -19,7 +19,7 @@ class AndreaGeoRouting(BASE_routing):
         my_distance_from_bs = util.euclidean_distance(self.drone.coords, depot_pos)
         drone_to_send = None
         current_score = my_distance_from_bs
-        for hll_pck, close_drone in opt_neighbors:
+        for hll_pck, close_drone in neighbors:
             close_drone_pos = hll_pck.current_position
             close_drone_speed = hll_pck.speed  # m / s
             hll_pck_timestep_creation = hll_pck.time_step_creation

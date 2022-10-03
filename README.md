@@ -128,7 +128,7 @@ TTL to avoid infinite pin-pongs, _that are seen to be rare_.
 The routing algorithms in the project go under the directory``src.routing_algorithms`` . 
 
 #### Adding routing algorithms
-Routing algorithms should be implemented as a class, extending the ``src.routing_algorithms.BASE_routing`` 
+Routing algorithms should be implemented as a class, extending the ``src.routing_algorithms.BaseRouting`` 
 class. This will need the definition of required methods, such as: ``routing()``. 
 
 Once created, the class should be declared in the configuration file, specifically in the ``RoutingAlgorithm`` enumeration, in 

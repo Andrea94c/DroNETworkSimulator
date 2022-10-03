@@ -14,7 +14,7 @@ class Event(Entity):
         @param deadline:
         """
 
-        super().__init__(id(self), coords, simulator)
+        super().__init__(simulator, id(self), coords)
         self.current_time = current_time
 
         # One can specify the deadline or just consider as deadline now + EVENTS_DURATION
@@ -51,7 +51,7 @@ class Event(Entity):
         # Notice: called only when a packet is created
 
         packet = DataPacket(self.simulator, event_ref=self)
-        # if config.DEBUG_PRINT_PACKETS: print("data", pck, pck.src_drone, pck.dst_drone, self.current_time)
+        # if config.DEBUG_PRINT_PACKETS: print("data", pck, pck.source_drone, pck.destination_drone, self.current_time)
         packet.add_hop(drone)
         return packet
 

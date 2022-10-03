@@ -66,12 +66,12 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span> <span class="nn">src.utilities.utilities</span> <span class="k">as</span> <span class="nn">util</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">src.routing_algorithms.BASE_routing</span> <span class="kn">import</span> <span class="n">BASE_routing</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">src.routing_algorithms.BaseRouting</span> <span class="kn">import</span> <span class="n">BaseRouting</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">AndreaGeoRouting</span><span class="p">(</span><span class="n">BASE_routing</span><span class="p">):</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">AndreaGeoRouting</span><span class="p">(</span><span class="n">BaseRouting</span><span class="p">):</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="n">BASE_routing</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_neighbors</span><span class="p">):</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot; arg min score  -&gt; geographical approach, take the drone closest to the depot &quot;&quot;&quot;</span>
@@ -109,16 +109,16 @@
 <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">AndreaGeoRouting</span><wbr>(<span class="base"><a href="BASE_routing.html#BASE_routing">src.routing_algorithms.BASE_routing.BASE_routing</a></span>):
+    <span class="name">AndreaGeoRouting</span><wbr>(<span class="base"><a href="BaseRouting.html#BaseRouting">src.routing_algorithms.BaseRouting.BaseRouting</a></span>):
 
                 <label class="view-source-button" for="AndreaGeoRouting-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#AndreaGeoRouting"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AndreaGeoRouting-8"><a href="#AndreaGeoRouting-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">AndreaGeoRouting</span><span class="p">(</span><span class="n">BASE_routing</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AndreaGeoRouting-8"><a href="#AndreaGeoRouting-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">AndreaGeoRouting</span><span class="p">(</span><span class="n">BaseRouting</span><span class="p">):</span>
 </span><span id="AndreaGeoRouting-9"><a href="#AndreaGeoRouting-9"><span class="linenos"> 9</span></a>
 </span><span id="AndreaGeoRouting-10"><a href="#AndreaGeoRouting-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="AndreaGeoRouting-11"><a href="#AndreaGeoRouting-11"><span class="linenos">11</span></a>        <span class="n">BASE_routing</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="AndreaGeoRouting-11"><a href="#AndreaGeoRouting-11"><span class="linenos">11</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
 </span><span id="AndreaGeoRouting-12"><a href="#AndreaGeoRouting-12"><span class="linenos">12</span></a>
 </span><span id="AndreaGeoRouting-13"><a href="#AndreaGeoRouting-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="nf">relay_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_neighbors</span><span class="p">):</span>
 </span><span id="AndreaGeoRouting-14"><a href="#AndreaGeoRouting-14"><span class="linenos">14</span></a>        <span class="sd">&quot;&quot;&quot; arg min score  -&gt; geographical approach, take the drone closest to the depot &quot;&quot;&quot;</span>
@@ -163,7 +163,7 @@
     </div>
     <a class="headerlink" href="#AndreaGeoRouting.__init__"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="AndreaGeoRouting.__init__-10"><a href="#AndreaGeoRouting.__init__-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-</span><span id="AndreaGeoRouting.__init__-11"><a href="#AndreaGeoRouting.__init__-11"><span class="linenos">11</span></a>        <span class="n">BASE_routing</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+</span><span id="AndreaGeoRouting.__init__-11"><a href="#AndreaGeoRouting.__init__-11"><span class="linenos">11</span></a>        <span class="n">BaseRouting</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drone</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -221,18 +221,18 @@
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt><a href="BASE_routing.html#BASE_routing">src.routing_algorithms.BASE_routing.BASE_routing</a></dt>
-                                <dd id="AndreaGeoRouting.routing_close" class="function"><a href="BASE_routing.html#BASE_routing.routing_close">routing_close</a></dd>
-                <dd id="AndreaGeoRouting.drone_reception" class="function"><a href="BASE_routing.html#BASE_routing.drone_reception">drone_reception</a></dd>
-                <dd id="AndreaGeoRouting.drone_identification" class="function"><a href="BASE_routing.html#BASE_routing.drone_identification">drone_identification</a></dd>
-                <dd id="AndreaGeoRouting.routing" class="function"><a href="BASE_routing.html#BASE_routing.routing">routing</a></dd>
-                <dd id="AndreaGeoRouting.send_packets" class="function"><a href="BASE_routing.html#BASE_routing.send_packets">send_packets</a></dd>
-                <dd id="AndreaGeoRouting.geo_neighborhood" class="function"><a href="BASE_routing.html#BASE_routing.geo_neighborhood">geo_neighborhood</a></dd>
-                <dd id="AndreaGeoRouting.channel_success" class="function"><a href="BASE_routing.html#BASE_routing.channel_success">channel_success</a></dd>
-                <dd id="AndreaGeoRouting.broadcast_message" class="function"><a href="BASE_routing.html#BASE_routing.broadcast_message">broadcast_message</a></dd>
-                <dd id="AndreaGeoRouting.unicast_message" class="function"><a href="BASE_routing.html#BASE_routing.unicast_message">unicast_message</a></dd>
-                <dd id="AndreaGeoRouting.gaussian_success_handler" class="function"><a href="BASE_routing.html#BASE_routing.gaussian_success_handler">gaussian_success_handler</a></dd>
-                <dd id="AndreaGeoRouting.transfer_to_depot" class="function"><a href="BASE_routing.html#BASE_routing.transfer_to_depot">transfer_to_depot</a></dd>
+                                    <div><dt><a href="BaseRouting.html#BaseRouting">src.routing_algorithms.BaseRouting.BaseRouting</a></dt>
+                                <dd id="AndreaGeoRouting.routing_close" class="function"><a href="BaseRouting.html#BaseRouting.routing_close">routing_close</a></dd>
+                <dd id="AndreaGeoRouting.drone_reception" class="function"><a href="BaseRouting.html#BaseRouting.drone_reception">drone_reception</a></dd>
+                <dd id="AndreaGeoRouting.drone_identification" class="function"><a href="BaseRouting.html#BaseRouting.drone_identification">drone_identification</a></dd>
+                <dd id="AndreaGeoRouting.routing" class="function"><a href="BaseRouting.html#BaseRouting.routing">routing</a></dd>
+                <dd id="AndreaGeoRouting.send_packets" class="function"><a href="BaseRouting.html#BaseRouting.send_packets">send_packets</a></dd>
+                <dd id="AndreaGeoRouting.geo_neighborhood" class="function"><a href="BaseRouting.html#BaseRouting.geo_neighborhood">geo_neighborhood</a></dd>
+                <dd id="AndreaGeoRouting.channel_success" class="function"><a href="BaseRouting.html#BaseRouting.channel_success">channel_success</a></dd>
+                <dd id="AndreaGeoRouting.broadcast_message" class="function"><a href="BaseRouting.html#BaseRouting.broadcast_message">broadcast_message</a></dd>
+                <dd id="AndreaGeoRouting.unicast_message" class="function"><a href="BaseRouting.html#BaseRouting.unicast_message">unicast_message</a></dd>
+                <dd id="AndreaGeoRouting.gaussian_success_handler" class="function"><a href="BaseRouting.html#BaseRouting.gaussian_success_handler">gaussian_success_handler</a></dd>
+                <dd id="AndreaGeoRouting.transfer_to_depot" class="function"><a href="BaseRouting.html#BaseRouting.transfer_to_depot">transfer_to_depot</a></dd>
 
             </div>
                                 </dl>

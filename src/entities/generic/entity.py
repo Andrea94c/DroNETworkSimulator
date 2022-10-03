@@ -12,7 +12,7 @@ class Entity(SimulatedEntity):
     Drones, Events, Packets, etc... It extends SimulatedEntity.
     """
 
-    def __init__(self, identifier: int, coords: tuple, simulator):
+    def __init__(self,  simulator, identifier: int, coords: tuple):
         super().__init__(simulator)
         self.identifier = identifier  # the id of the entity
         self.coords = coords          # the coordinates of the entity on the map
@@ -40,7 +40,7 @@ class Environment(SimulatedEntity):
      random and then maybe felt from the drones. Now events are generated on the drones that they feel with
      a certain probability."""
 
-    def __init__(self, width, height, simulator):
+    def __init__(self, simulator,  width, height):
         super().__init__(simulator)
 
         self.width = width

@@ -2,13 +2,13 @@
 import numpy as np
 import src.utilities.utilities as util
 
-from src.routing_algorithms.BASE_routing import BASE_routing
+from src.routing_algorithms.BaseRouting import BaseRouting
 
-class GeoRouting(BASE_routing):
+class GeoRouting(BaseRouting):
     def __init__(self, drone, simulator):
-        BASE_routing.__init__(self, drone, simulator)
+        BaseRouting.__init__(self, simulator, drone)
 
-    def relay_selection(self, opt_neighbors):
+    def relay_selection(self, neighbors):
         """ arg min score  -> geographical approach, take the drone closest to the depot """
         # TODO
         return None

@@ -1,4 +1,3 @@
-
 from src.drawing import pp_draw
 from src.entities.uavs.uav_entities import *
 from src.simulation.metrics import Metrics
@@ -6,7 +5,7 @@ from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher
 from collections import defaultdict
 from tqdm import tqdm
-
+from src.entities.generic.entity import Environment
 import numpy as np
 import math
 import time
@@ -110,20 +109,19 @@ class Simulator:
 
     def __set_simulation(self):
         """ the method creates all the uav entities """
-        from src.entities.generic.entity import Environment
         self.__set_random_generators()
 
 
         self.path_manager = utilities.PathManager(config.PATH_FROM_JSON, config.JSONS_PATH_PREFIX, self.seed)
-        self.environment = Environment(self.env_width, self.env_height, self)
+        self.environment = Environment(self, self.env_width, self.env_height)
 
-        self.depot = Depot(self.depot_coordinates, self.depot_com_range, self)
+        self.depot = Depot(simulator=self, coordinates=self.depot_coordinates, communication_range=self.depot_com_range)
 
         self.drones = []
 
         # drone 0 is the first
         for i in range(self.n_drones):
-            self.drones.append(Drone(i, self.path_manager.path(i, self), self.depot, self))
+            self.drones.append(Drone(self, i, self.path_manager.path(i, self), self.depot))
 
         self.environment.add_drones(self.drones)
         self.environment.add_depot(self.depot)
@@ -216,7 +214,7 @@ class Simulator:
                 # 3. actually move the drone towards next waypoint or depot
 
                 drone.update_packets(cur_step)
-                drone.routing(self.drones, self.depot, cur_step)
+                drone.routing(self.drones, self.depot)
                 drone.move(self.time_step_duration)
 
             # in case we need probability map

@@ -1,6 +1,6 @@
 import numpy as np
 from src.entities.events.event import Event
-from src.entities.generic.entity import Entity
+from src.entities.entity import Entity
 from src.entities.uavs.depot import Depot
 from src.utilities import config, utilities
 

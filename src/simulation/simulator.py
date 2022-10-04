@@ -7,7 +7,7 @@ from src.utilities import config, utilities
 from src.routing_algorithms.net_routing import MediumDispatcher
 from collections import defaultdict
 from tqdm import tqdm
-from src.entities.generic.entity import Environment
+from src.entities.entity import Environment
 import numpy as np
 import math
 import time

@@ -1,5 +1,5 @@
 from src.utilities import utilities
-from src.entities.generic.entity import Entity
+from src.entities.entity import Entity
 
 
 class Packet(Entity):

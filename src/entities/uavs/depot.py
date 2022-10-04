@@ -1,4 +1,4 @@
-from src.entities.generic.entity import Entity
+from src.entities.entity import Entity
 
 
 class Depot(Entity):

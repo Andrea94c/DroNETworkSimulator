@@ -1,4 +1,3 @@
-
 from src.drawing import pp_draw
 from src.entities.uav_entities import *
 from src.simulation.metrics import Metrics
@@ -99,6 +98,10 @@ class Simulator:
         self.event_generator = utilities.EventGenerator(self)
 
     def __setup_net_dispatcher(self):
+        """
+        This method set the network dispatcher
+        @return:
+        """
         self.network_dispatcher = MediumDispatcher(self.metrics)
 
     def __set_metrics(self):
@@ -106,6 +109,10 @@ class Simulator:
         self.metrics.info_mission()
 
     def __set_random_generators(self):
+        """
+        The method set all the seeds for random functions
+        @return:
+        """
         if self.seed is not None:
             self.rnd_network = np.random.RandomState(self.seed)
             self.rnd_routing = np.random.RandomState(self.seed)
@@ -113,7 +120,10 @@ class Simulator:
             self.rnd_event = np.random.RandomState(self.seed)
 
     def __set_simulation(self):
-        """ the method creates all the uav entities """
+        """
+        The method creates all the uav entities
+        @return:
+        """
 
         self.__set_random_generators()
 
@@ -141,7 +151,6 @@ class Simulator:
 
         if self.show_plot or config.SAVE_PLOT:
             self.draw_manager = pp_draw.PathPlanningDrawer(self.environment, self, borders=True)
-
 
     def __sim_name(self):
         """
@@ -175,7 +184,8 @@ class Simulator:
         self.draw_manager.draw_simulation_info(cur_step=cur_step, max_steps=self.len_simulation)
 
         # rendering
-        self.draw_manager.update(show=self.show_plot, save=config.SAVE_PLOT, filename=self.sim_save_file + str(cur_step) + ".png")
+        self.draw_manager.update(show=self.show_plot, save=config.SAVE_PLOT,
+                                 filename=self.sim_save_file + str(cur_step) + ".png")
 
     def increase_meetings_probs(self, drones, cur_step):
         """ Increases the probabilities of meeting someone. """
@@ -189,7 +199,7 @@ class Simulator:
             cells.add(int(cell_index[0]))
 
         for cell, cell_center in utilities.TraversedCells.all_centers(self.env_width, self.env_height,
-                                                                          self.prob_size_cell):
+                                                                      self.prob_size_cell):
 
             index_cell = int(cell[0])
             old_vals = self.cell_prob_map[index_cell]
@@ -202,9 +212,14 @@ class Simulator:
             self.cell_prob_map[index_cell] = old_vals
 
     def run(self):
-        """ the method starts the simulation """
+        """
+        The method starts the simulation and execute it step by step
+        @return:
+        """
+
         cells_to_travel = None
         for cur_step in range(self.len_simulation):
+
             self.cur_step = cur_step
             # check for new events and remove the expired ones from the environment
             # self.environment.update_events(cur_step)
@@ -216,7 +231,6 @@ class Simulator:
             self.event_generator.handle_events_generation(cur_step, self.drones)
 
             for drone in self.drones:
-
                 # 1. update expired packets on drone buffers
                 # 2. try routing packets vs other drones or depot
                 # 3. actually move the drone towards next waypoint or depot
@@ -241,11 +255,12 @@ class Simulator:
                 self.__plot(cur_step)
 
         if config.DEBUG:
-            print("End of simulation, sim time: " + str((cur_step + 1) * self.time_step_duration) + " sec, #iteration: " + str(cur_step + 1))
+            print("End of simulation, sim time: " + str(
+                (cur_step + 1) * self.time_step_duration) + " sec, #iteration: " + str(cur_step + 1))
 
     def close(self):
         """ do some stuff at the end of simulation"""
-        print("Closing simulation")
+        print(f"Closing simulation")
 
         self.print_metrics(plot_id="final")
         self.save_metrics(config.ROOT_EVALUATION_DATA + self.simulation_name)
@@ -261,13 +276,13 @@ class Simulator:
             self.metrics.save(filename_path + ".pickle")
 
     def score(self):
-        """ returns a score for the exectued simulation: 
-
-                sum( event delays )  / number of events
-
-            Notice that, expired or not found events will be counted with a max_delay
         """
+        Notice that, expired or not found events will be counted with a max_delay
+        @return: Float value that describes score for the executed simulation: sum( event delays )  / number of events
+        """
+
         score = round(sum(self.metrics.delivered_packet_for_drone.values())
                       / sum(self.metrics.generated_packet_for_drone.values()), 2)
-        print("Score sim " + self.simulation_name + ":", score)
+        print(f"Score sim {self.simulation_name} : {score}")
+
         return score

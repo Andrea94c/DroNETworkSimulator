@@ -6,10 +6,7 @@ from src.utilities import config
 import numpy as np
 import matplotlib.pyplot as plt
 
-"""
-The class is responsable to allocate communication resources to neighbors drones that want to offload data to the depot.
-We work over an semplified TDMA approach, each time step only one drone can receive the resource and communicate a packet to the depot. 
-"""
+
 class AIDepotMAC(DepotMAC):
     '''
     epsilon-greedy k-bandit problem

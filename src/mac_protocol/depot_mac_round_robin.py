@@ -1,21 +1,27 @@
-
 from src.entities.uav_entities import Drone
 from src.mac_protocol.depot_mac import DepotMAC
 
 """
-The class is responsable to allocate communication resources to neighbors drones that want to offload data to the depot.
-We work over an semplified TDMA approach, each time step only one drone can receive the resource and communicate a packet to the depot. 
+Details:
+An example of a random Depot MAC protocol. Here we use simple a round robin methodology.
 """
+
+
 class RoundRobinDepotMAC(DepotMAC):
 
     def __init__(self, simulator, depot):
         DepotMAC.__init__(self, simulator, depot)
         self.last_choice = -1
 
-    def allocate_resource_to_drone(self, drones : list, cur_step : int) -> Drone:
-        """ Return the drone to who allocate bandwith for upload data in this step """
+    def allocate_resource_to_drone(self, drones: list, cur_step: int) -> Drone:
+        """
+        This method select the drone to query using round-robin
+        @param drones: A list of Drones object
+        @param cur_step: an integer value that represent current time step
+        @return: Returns the drone to query in this step
+        """
         # implement here your logic
-        # schedule each time the next drone, like a round robin approach
+        # schedule each time the next drone, like a round-robin approach
         if self.last_choice >= self.simulator.n_drones - 1:
             self.last_choice = -1
 
